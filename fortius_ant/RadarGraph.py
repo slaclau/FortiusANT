@@ -15,7 +15,7 @@ import math
 import random
 import time
 import wx
-import logfile
+import fortius_ant.logfile as logfile
 
 # ------------------------------------------------------------------------------
 # Create the RadarGraph window

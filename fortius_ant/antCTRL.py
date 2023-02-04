@@ -5,7 +5,8 @@ __version__ = "2020-12-27"
 # 2020-12-27    Interleave like antPWR.py
 # 2020-12-14    First version, obtained from switchable
 #-------------------------------------------------------------------------------
-import antDongle         as ant
+import fortius_ant.antDongle         as ant
+
 
 #---------------------------------------------------------------------------
 # ANT+ Control command codes

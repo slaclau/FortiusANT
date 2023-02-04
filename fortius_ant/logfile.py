@@ -24,15 +24,13 @@ __version__ = "2022-04-07"
 # 2020-02-02    Open() has optional parameter for logfile-prefix
 #-------------------------------------------------------------------------------
 import binascii
-import json
-import os
 import sys
 import time
-from   datetime     import datetime
+from   datetime                 import datetime
 import traceback
 
-from   constants    import UsePythonLogging
-import debug
+from   fortius_ant.constants    import UsePythonLogging
+import fortius_ant.debug        as debug
 
 global LogfileCreated
 LogfileCreated = False

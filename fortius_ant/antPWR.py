@@ -27,8 +27,7 @@ __version__ = "2020-12-28"
 #                   the AccumulatedPower related EventCount.
 # 2020-06-11    First version, based upon antHRM.py
 #-------------------------------------------------------------------------------
-import time
-import antDongle         as ant
+import fortius_ant.antDongle         as ant
 
 def Initialize():
     global AccumulatedPower, EventCount, Interleave

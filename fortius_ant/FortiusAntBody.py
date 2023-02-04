@@ -215,7 +215,7 @@ __version__ = "2022-05-12"
 #               - test with Zwift; done 2019-12-24
 #               - calibration test; done 2020-01-07
 #-------------------------------------------------------------------------------
-from   constants                    import mode_Power, mode_Grade, UseBluetooth, UseGui
+from   fortius_ant.constants         import mode_Power, mode_Grade, UseBluetooth, UseGui
 
 import argparse
 import binascii
@@ -233,23 +233,23 @@ import usb.core
 if UseGui:
     import wx
 
-from   datetime                     import datetime
+from   datetime                      import datetime
 
-import antDongle         as ant
-import antFE             as fe
-import antHRM            as hrm
-import antPWR            as pwr
-import antSCS            as scs
-import antCTRL           as ctrl
-import constants
-import debug
-import logfile
-import raspberry
-import TCXexport
-import usbTrainer
+import fortius_ant.antDongle         as ant
+import fortius_ant.antFE             as fe
+import fortius_ant.antHRM            as hrm
+import fortius_ant.antPWR            as pwr
+import fortius_ant.antSCS            as scs
+import fortius_ant.antCTRL           as ctrl
+import fortius_ant.constants         as constants
+import fortius_ant.debug             as debug
+import fortius_ant.logfile           as logfile
+import fortius_ant.raspberry         as raspberry
+import fortius_ant.TCXexport         as TCXexport
+import fortius_ant.usbTrainer        as usbTrainer
 
-import bleBless
-import bleDongle
+import fortius_ant.bleBless          as bleBless
+import fortius_ant.bleDongle         as bleDongle
 
 PrintWarnings = False   # Print warnings even when logging = off
 CycleTimeFast = 0.02    # TRAINER- SHOULD WRITE THEN READ 70MS LATER REALLY
