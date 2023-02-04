@@ -50,12 +50,12 @@ if True:
     #---------------------------------------------------------------------------
     # Import in the FortiusAnt context
     #---------------------------------------------------------------------------
-    import debug
-    import logfile
-    from   constants            import mode_Power, mode_Grade, UseBluetooth
-    from   logfile              import HexSpace
-    from   bleBlessClass        import clsBleServer
-    import bleConstants         as bc
+    import fortius_ant.debug     as debug
+    import fortius_ant.logfile   as logfile
+    from   fortius_ant.constants import mode_Power, mode_Grade, UseBluetooth
+    from   logfile               import HexSpace
+    from   bleBlessClass         import clsBleServer
+    import bleConstants          as bc
 
 else:
     BlessExample = True

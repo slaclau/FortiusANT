@@ -10,7 +10,7 @@ setup(
     packages=['fortius_ant'],
     entry_points={
         'console_scripts': [
-            'fortius-ant=fortiusant.FortiusAnt:main',
+            'fortius-ant=fortius_ant.FortiusAnt:main',
         ],
     }
 )

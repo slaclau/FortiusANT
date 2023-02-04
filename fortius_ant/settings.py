@@ -25,9 +25,9 @@ import json
 import lib_programname
 import os
 import sys
-import constants
-import debug
-import logfile
+import fortius_ant.constants as constants
+import fortius_ant.debug     as debug
+import fortius_ant.logfile   as logfile
 
 if constants.UseGui:
     import webbrowser

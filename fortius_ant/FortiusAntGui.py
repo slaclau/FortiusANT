@@ -102,15 +102,15 @@ import threading
 import time
 import webbrowser
 import wx
-import wx.lib.agw.speedmeter as SM
+import wx.lib.agw.speedmeter             as SM
 
-from   constants                    import mode_Power, mode_Grade, OnRaspberry, mile
-import debug
-import logfile
-import FortiusAntCommand     as cmd
-from   FortiusAntTitle                  import githubWindowTitle
-import RadarGraph
-import settings
+from   fortius_ant.constants             import mode_Power, mode_Grade, OnRaspberry, mile
+import fortius_ant.debug                 as debug
+import fortius_ant.logfile               as logfile
+import fortius_ant.FortiusAntCommand     as cmd
+from   fortius_ant.FortiusAntTitle       import githubWindowTitle
+import fortius_ant.RadarGraph            as RadarGraph
+import fortius_ant.settings              as settings
 
 #-------------------------------------------------------------------------------
 # constants

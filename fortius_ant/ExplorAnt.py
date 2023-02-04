@@ -34,13 +34,13 @@ import wx
 
 from datetime import datetime
 
-import antDongle         as ant
-import antHRM            as hrm
-import antFE             as fe
-import debug
-import ExplorAntCommand  as cmd
-import logfile
-import usbTrainer
+import fortius_ant.antDongle         as ant
+import fortius_ant.antHRM            as hrm
+import fortius_ant.antFE             as fe
+import fortius_ant.debug             as debug
+import fortius_ant.ExplorAntCommand  as cmd
+import fortius_ant.logfile           as logfile
+import fortius_ant.usbTrainer        as usbTrainer
 class clsDeviceID(object):
     def __init__(self, Channel, DeviceType, DeviceNumber, DeviceTypeID, TransmissionType):
         self.Channel             = Channel

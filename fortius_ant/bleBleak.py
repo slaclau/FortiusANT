@@ -79,7 +79,6 @@ __version__ = "2022-03-21"
 #-------------------------------------------------------------------------------
 import asyncio
 import logging
-import os
 from socket import timeout
 
 from bleak import BleakClient

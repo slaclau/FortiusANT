@@ -9,10 +9,10 @@ __version__ = "2021-04-28"
 # 2020-11-05    First version
 #-------------------------------------------------------------------------------
 import time
-from   datetime         import datetime
+from   datetime               import datetime
 
-import logfile
-from   constants                    import mode_Power, mode_Grade
+import fortius_ant.logfile    as logfile
+from   fortius_ant.constants  import mode_Power, mode_Grade
 #-------------------------------------------------------------------------------
 # TCX template
 #-------------------------------------------------------------------------------
