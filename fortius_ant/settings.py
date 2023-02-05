@@ -557,7 +557,7 @@ if constants.UseGui:
         # Output:       None
         # --------------------------------------------------------------------------
         def __init__(self, parent):
-            wx.Dialog.__init__(self, parent, -1, TitleText, size=(1000, 1000))
+            wx.Dialog.__init__(self, parent, -1, TitleText, size=(1500,1500))
             panel = wx.Panel(self)
 
             ButtonW         = 80
@@ -570,9 +570,9 @@ if constants.UseGui:
             # BASIC 
             # ----------------------------------------------------------------------
             l = "Basic arguments:"
-            s = (-1, -1)
+            s = (500, -1)
             p = (Margin * 2, Margin * 2)
-            self.lblBasic = wx.StaticText(panel, id=wx.ID_ANY, label=l, pos=p, size=s, style=0, name=wx.StaticTextNameStr)
+            self.lblBasic = wx.StaticText(panel, id=wx.ID_ANY, label=l, pos=p, size=s, style=wx.ALIGN_LEFT, name=wx.StaticTextNameStr)
             self.lblBasic.SetFont(GroupLabelFont)
 
             l = constants.help_a + " (-a *)"
@@ -631,9 +631,9 @@ if constants.UseGui:
             # POWER CURVE
             # ----------------------------------------------------------------------
             l = "Power curve adjustment:"
-            s = (-1, -1)
+            s = (500, -1)
             p = Under(self.combo_t, 15)
-            self.lblPower = wx.StaticText(panel, id=wx.ID_ANY, label=l, pos=p, size=s, style=wx.BOLD, name=wx.StaticTextNameStr)
+            self.lblPower = wx.StaticText(panel, id=wx.ID_ANY, label=l, pos=p, size=s, style=wx.ALIGN_LEFT, name=wx.StaticTextNameStr)
             self.lblPower.SetFont(GroupLabelFont)
 
             s = (65, EntrySizeY)
@@ -682,9 +682,9 @@ if constants.UseGui:
             # ADVANCED 
             # ----------------------------------------------------------------------
             l = "Advanced arguments:"
-            s = (-1, -1)
+            s = (500, -1)
             p = Under(self.txt_p, 15)
-            self.lblAdvanced = wx.StaticText(panel, id=wx.ID_ANY, label=l, pos=p, size=s, style=wx.BOLD, name=wx.StaticTextNameStr)
+            self.lblAdvanced = wx.StaticText(panel, id=wx.ID_ANY, label=l, pos=p, size=s, style=wx.ALIGN_LEFT, name=wx.StaticTextNameStr)
             self.lblAdvanced.SetFont(GroupLabelFont)
 
             l = constants.help_A + " (-A *)"
@@ -793,9 +793,9 @@ if constants.UseGui:
             # DEVELOPER 
             # ----------------------------------------------------------------------
             l = "Developer arguments:"
-            s = (-1, -1)
+            s = (500, -1)
             p = Under(self.cb_x, 15)
-            self.lblDeveloper = wx.StaticText(panel, id=wx.ID_ANY, label=l, pos=p, size=s, style=wx.BOLD, name=wx.StaticTextNameStr)
+            self.lblDeveloper = wx.StaticText(panel, id=wx.ID_ANY, label=l, pos=p, size=s, style=wx.ALIGN_LEFT, name=wx.StaticTextNameStr)
             self.lblDeveloper.SetFont(GroupLabelFont)
 
             v = ""
@@ -921,8 +921,8 @@ if constants.UseGui:
             # Resize frame to controls
             # +40 +50 added; I do not know why that is required
             # ----------------------------------------------------------------------
-            self.SetSize((self.btnHelp.Position[0] + self.btnHelp.Size[0] + Margin * 2 + 40, \
-                        self.btnHelp.Position[1] + self.btnHelp.Size[1] + Margin * 2 + 50
+            self.SetSize((self.btnHelp.Position[0] + self.btnHelp.Size[0] + Margin * 2 + 150, \
+                        self.btnHelp.Position[1] + self.btnHelp.Size[1] + Margin * 2 + 100
                         ))
 
             # ----------------------------------------------------------------------
