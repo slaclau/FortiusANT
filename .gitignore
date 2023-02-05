@@ -13,3 +13,7 @@ wheels
 build
 dist
 fortius_ant.egg-info
+debian/fortius-ant
+debian/.debhelper
+*.debhelper
+*.substvars

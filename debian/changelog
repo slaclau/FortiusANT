@@ -1,3 +1,9 @@
+fortius-ant (6.5ubuntu1) unstable; urgency=medium
+
+  * Update version to match upstream.
+
+ -- Sebastien Laclau <sebastien@SL-XPS13-UBUNTU>  Sun, 05 Feb 2023 01:06:31 +0000
+
 fortius-ant (0.1.0) unstable; urgency=medium
 
   * Initial release.
