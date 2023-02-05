@@ -1,6 +1,6 @@
 fortius-ant (6.5.1ubuntu3) UNRELEASED; urgency=medium
 
-  * Fix .desktop.
+  * Lots of changes to .desktop so it validates
 
  -- Sebastien Laclau <seb.laclau@gmail.com>  Sun, 05 Feb 2023 16:40:11 +0000
 
