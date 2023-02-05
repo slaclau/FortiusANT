@@ -1,3 +1,9 @@
+fortius-ant (6.5.1ubuntu1) UNRELEASED; urgency=medium
+
+  * Add action to launch settings window.
+
+ -- Sebastien Laclau <seb.laclau@gmail.com>  Sun, 05 Feb 2023 16:06:36 +0000
+
 fortius-ant (6.5ubuntu4) unstable; urgency=medium
 
   * Add action to .desktop to launch with gnome-terminal.
