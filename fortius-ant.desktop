@@ -8,7 +8,7 @@ Actions=Terminal; Settings;
 
 [Desktop Action Terminal]
 Name=Open with terminal window
-Exec=gnome-terminal --working-directory=~ -- 'fortius-ant'
+Exec=gnome-terminal -- 'fortius-ant'
 
 [Desktop Action Settings]
 Name=Open settings window
