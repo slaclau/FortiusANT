@@ -1,4 +1,16 @@
-fortius-ant (6.5.1ubuntu1) UNRELEASED; urgency=medium
+fortius-ant (6.5.1ubuntu3) UNRELEASED; urgency=medium
+
+  * Fix .desktop.
+
+ -- Sebastien Laclau <seb.laclau@gmail.com>  Sun, 05 Feb 2023 16:40:11 +0000
+
+fortius-ant (6.5.1ubuntu2) unstable; urgency=medium
+
+  * Fix missing entry in .desktop
+
+ -- Sebastien Laclau <seb.laclau@gmail.com>  Sun, 05 Feb 2023 16:17:08 +0000
+
+fortius-ant (6.5.1ubuntu1) unstable; urgency=medium
 
   * Add action to launch settings window.
 
