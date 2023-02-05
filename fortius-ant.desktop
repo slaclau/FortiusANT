@@ -4,7 +4,7 @@ Type=Application
 Exec=fortius-ant
 Name=FortiusANT
 Icon=FortiusAntIcon.png
-Actions=Terminal;
+Actions=Terminal; Settings;
 
 [Desktop Action Terminal]
 Name=Open with terminal window
