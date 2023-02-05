@@ -1,7 +1,8 @@
 #-------------------------------------------------------------------------------
 # Version info
 #-------------------------------------------------------------------------------
-__version__ = "2022-04-15"
+__version__ = "2023-02-05"
+# 2023-02-05    move settings to .fortius-ant/ on posix compliant systems
 # 2022-04-15    The new flags for debugging (performance, logging) are not
 #               translated to the user-interface.
 #               - maximum value for debug=127
@@ -108,7 +109,12 @@ def JsonFileName():
 #        dirname = os.path.realpath(sys.argv[0]) # the started executable
 #        dirname = os.path.dirname(dirname)		 # Remove /filename.exe
 #    else:
-    dirname = '.'                                # Current directory
+    if os.name=='posix':
+        dirname = './.fortius-ant'
+        if not os.path.exists(dirname):
+            os.mkdir(dirname)
+    else:
+        dirname = '.'                                # Current directory
     return dirname + '/FortiusAntSettings.json'
 
 def JsonFileExists():
