@@ -171,7 +171,11 @@ class CommandLineVariables(object):
     RunoffMinSpeed  =   1
     RunoffTime      =   7
     RunoffPower     = 100
-
+    
+    #---------------------------------------------------------------------------
+    # Launch in settings editor mode
+    #---------------------------------------------------------------------------
+    SettingsOnly    = False      # introduced 2023-02-05; allow program to be launched as settings editor only
     #---------------------------------------------------------------------------
     # Define and process command line
     #---------------------------------------------------------------------------
@@ -254,14 +258,13 @@ class CommandLineVariables(object):
                     choices=self.ant_tacx_models + ['i-Vortex'])
                     # i-Vortex is still allowed for compatibility
         parser.add_argument   ('-x', dest='exportTCX',                                  help=constants.help_x,  required=False, action='store_true')
-
+        parser.add_argument   ('--settings', dest='SettingsOnly',                                               required=False, action='store_true')
         #-----------------------------------------------------------------------
         # Parse command line
         # Overwrite from json file if present
         #-----------------------------------------------------------------------
         self.args  = parser.parse_args()
         jsonLoaded = settings.ReadJsonFile(self.args)
-
         #-----------------------------------------------------------------------
         # If nothing specified at all, use sensible defaults
         #-----------------------------------------------------------------------
@@ -684,7 +687,8 @@ class CommandLineVariables(object):
                                          self.Tacx_Genius or self.Tacx_Bushido):
             logfile.Console("Pedal stroke analysis is not possible in console mode or this Tacx type")
             self.PedalStrokeAnalysis = False
-
+        
+        self.SettingsOnly = self.args.SettingsOnly
     def print(self):
         try:
             v = self.debug                          # Verbose: print all command-line variables with values

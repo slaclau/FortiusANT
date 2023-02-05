@@ -138,7 +138,6 @@ def ReadJsonFile (args):
         logfile.Write ("ReadJsonFile () ...")
 
     jsonLoaded = False
-
     # --------------------------------------------------------------------------
     # Open json file
     # --------------------------------------------------------------------------
@@ -284,7 +283,6 @@ def ReadJsonFile (args):
                     args.Runoff = "%s/%s/%s/%s/%s" % (RunoffMaxSpeed, RunoffDip, RunoffMinSpeed, RunoffTime, RunoffPower)
 
             jsonLoaded = True
-
         # ----------------------------------------------------------------------
         # Close json file
         # ----------------------------------------------------------------------

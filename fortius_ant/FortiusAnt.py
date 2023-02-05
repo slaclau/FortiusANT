@@ -659,8 +659,11 @@ def mainProgram():
     #-------------------------------------------------------------------------------
     if clv.DeviceNumberBase:
         ant.DeviceNumberBase(clv.DeviceNumberBase)
-
-    if not clv.gui:
+    if clv.SettingsOnly:
+        app = wx.App(0)
+        
+        settings.OpenDialog(None, None, clv)
+    elif not clv.gui:
         # --------------------------------------------------------------------------
         # Console only, no multiprocessing required to separate GUI
         # --------------------------------------------------------------------------

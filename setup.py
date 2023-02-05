@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='fortius-ant',
-    version='6.5b',
+    version='6.5.1',
     description='FortiusANT',
     author='Sebastien Laclau',
     author_email='seb.laclau@gmail.com',
