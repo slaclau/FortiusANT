@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.5
+Type=Application
+Exec=fortius-ant
+Name=FortiusANT
+Icon=FortiusAntIcon.png
+Actions=Terminal;
+
+[Desktop Action Terminal]
+Name=with terminal
+Exec=gnome-terminal -- 'fortius-ant'

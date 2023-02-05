@@ -15,5 +15,8 @@ setup(
         'console_scripts': [
             'fortius-ant=fortius_ant.FortiusAnt:main',
         ],
-    }
+    },
+    data_files=[
+        ("/share/applications",["fortius-ant.desktop"])
+    ],
 )

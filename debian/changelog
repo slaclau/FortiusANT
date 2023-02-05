@@ -1,3 +1,15 @@
+fortius-ant (6.5ubuntu3) unstable; urgency=medium
+
+  * Add icon to .desktop file.
+
+ -- Sebastien Laclau <seb.laclau@gmail.com>  Sun, 05 Feb 2023 12:35:38 +0000
+
+fortius-ant (6.5ubuntu2) unstable; urgency=medium
+
+  * Add .desktop file.
+
+ -- Sebastien Laclau <sebastien@SL-XPS13-UBUNTU>  Sun, 05 Feb 2023 11:52:02 +0000
+
 fortius-ant (6.5ubuntu1) unstable; urgency=medium
 
   * Update version to match upstream.
