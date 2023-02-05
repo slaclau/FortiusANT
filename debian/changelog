@@ -1,3 +1,9 @@
+fortius-ant (6.5ubuntu4) unstable; urgency=medium
+
+  * Add action to .desktop to launch with gnome-terminal.
+
+ -- Sebastien Laclau <seb.laclau@gmail.com>  Sun, 05 Feb 2023 14:07:07 +0000
+
 fortius-ant (6.5ubuntu3) unstable; urgency=medium
 
   * Add icon to .desktop file.
