@@ -1,4 +1,10 @@
-fortius-ant (6.5.1ubuntu3) UNRELEASED; urgency=medium
+fortius-ant (6.5.1-0ubuntu4) UNRELEASED; urgency=medium
+
+  * Remove dependency on specific python version
+
+ -- Sebastien Laclau <seb.laclau@gmail.com>  Mon, 06 Feb 2023 13:45:05 +0000
+
+fortius-ant (6.5.1ubuntu3) unstable; urgency=medium
 
   * Lots of changes to .desktop so it validates
 
