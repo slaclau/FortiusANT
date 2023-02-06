@@ -1,6 +1,8 @@
 fortius-ant (6.5.1-0ubuntu4) UNRELEASED; urgency=medium
 
-  * Remove dependency on specific python version
+  * Remove dependency on python3.7
+  * Depend on python3.9 instead
+  * Add dependency on libsdl2-2.0-0
 
  -- Sebastien Laclau <seb.laclau@gmail.com>  Mon, 06 Feb 2023 13:45:05 +0000
 
