@@ -16,3 +16,6 @@ dist
 fortius_ant.egg-info
 debian/fortius-ant
 debian/.debhelper
+debian/*debhelper
+debian/*substvars
+debian/files
