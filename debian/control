@@ -8,5 +8,18 @@ Standards-Version: 3.9.5
 Package: fortius-ant
 Architecture: any
 Pre-Depends: dpkg (>= 1.16.1), python3.9, ${misc:Pre-Depends}
-Depends: ${misc:Depends}, python3, libsdl2-2.0-0
+Depends: ${misc:Depends},
+ freeglut3,
+ libgl1-mesa-glx,
+ libglu1-mesa,
+ libgstreamer-plugins-base1.0-0,
+ libgtk-3-0,
+ libjpeg8,
+ libnotify4,
+ libpng16-16,
+ libsdl2-2.0-0,
+ libsm6,
+ libtiff5,
+ libwebkit2gtk-4.0-37,
+ libxtst6
 Description: FortiusANT by WouterJD
