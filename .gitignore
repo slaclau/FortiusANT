@@ -3,6 +3,7 @@
 *.lnk
 *.tcx
 *.json
+*.png
 Thumbs.db
 Miscellaneous/
 node_modules
