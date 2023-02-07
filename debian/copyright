@@ -1,15 +1,15 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 
-Files:
- *
-Copyright: 2020, Wouter Dubbeldam
-           2023, Sebastien Laclau
+Files: *
+Copyright: 2023, Sebastien Laclau
+ 2020, Wouter Dubbeldam
 License: GPL-3
 
-Files:
- debian/*
- setup.py
- fortius-ant.desktop
+Files: debian/*
+Copyright: 2023, Sebastien Laclau
+License: GPL-3
+
+Files: setup.py
 Copyright: 2023, Sebastien Laclau
 License: GPL-3
 
