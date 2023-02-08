@@ -4,6 +4,7 @@
 	dh $@ --with python-virtualenv
 
 override_dh_virtualenv:
+  python3 wxPython-source.py
 	dh_virtualenv \
 	--verbose \
 	--python python3.9
