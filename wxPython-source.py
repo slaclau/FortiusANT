@@ -9,14 +9,13 @@ def main():
     elif version >= 18:
         lts = "18.04"
     else:
-        print("wxPython needs to be built from sourcw")
+        print("wxPython needs to be built from source")
         lts = None
-    print(lts)
-    wheels_url = "https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-" + lts + "/"
-    print(wheels_url)
-    
-    f = open("wxPython-source.txt","w+")
-    f.write("-f " + wheels_url)
+    if lts != None:
+        wheels_url = "https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-" + lts + "/"
+        print("wxPython will be installed from " + wheels_url)
+        f = open("wxPython-source.txt","w+")
+        f.write("-f " + wheels_url)
 
 if __name__ == "__main__":
     main()
