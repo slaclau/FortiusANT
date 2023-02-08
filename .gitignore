@@ -19,3 +19,4 @@ debian/.debhelper
 debian/*debhelper
 debian/*substvars
 debian/files
+wxPython-source.txt
