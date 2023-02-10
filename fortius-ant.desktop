@@ -6,7 +6,7 @@ Icon=FortiusAntIcon
 Actions=Terminal;Settings;
 
 [Desktop Action Terminal]
-Exec="gnome-terminal -- 'fortius-ant'"
+Exec=gnome-terminal -- 'fortius-ant'
 Name=Open with terminal window
 
 [Desktop Action Settings]
