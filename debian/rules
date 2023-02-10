@@ -3,7 +3,8 @@
 %:
 	dh $@ --with python-virtualenv
 
-ifeq (python3, $(python3 getPythonVersion.py))
+SYSPY := $(shell python3 useSystemPython.py)
+ifdef SYSPY
 override_dh_virtualenv:
 	python3 wxPython-source.py
 	dh_virtualenv \
@@ -11,11 +12,12 @@ override_dh_virtualenv:
 	--builtin-venv
 else
 override_dh_virtualenv:
-	python3.9 wxPython-source.py
+	python3 wxPython-source.py
 	dh_virtualenv \
 	--python python3.9 \
 	--builtin-venv
 endif
+
 override_dh_strip:
 	dh_strip --exclude=/site-packages/
 
