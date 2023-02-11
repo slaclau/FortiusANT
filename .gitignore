@@ -4,6 +4,7 @@
 *.tcx
 *.json
 *.png
+.pydevproject
 Thumbs.db
 Miscellaneous/
 node_modules
