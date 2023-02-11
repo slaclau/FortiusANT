@@ -3,6 +3,8 @@
 *.lnk
 *.tcx
 *.json
+*.png
+.pydevproject
 Thumbs.db
 Miscellaneous/
 node_modules
@@ -13,3 +15,9 @@ wheels
 build
 dist
 fortius_ant.egg-info
+debian/fortius-ant
+debian/.debhelper
+debian/*debhelper
+debian/*substvars
+debian/files
+wxPython-source.txt

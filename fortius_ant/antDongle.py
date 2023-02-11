@@ -103,22 +103,17 @@ __version__ = "2021-12-03"
 # 2019-12-30    strings[] replaced by messages[]
 #---------------------------------------------------------------------------
 import binascii
-import glob
 import os
 import platform
-import re
 if platform.system() == 'False':
-    import serial                   # pylint: disable=import-error
+    import serial                   # pylint: disable rt-error
 import struct
 import usb.core
 import time
 
-import debug
-import logfile
-import structConstants      as sc
-
-import FortiusAntCommand    as cmd
-
+import fortius_ant.structConstants      as sc
+import fortius_ant.debug                as debug
+import fortius_ant.logfile              as logfile
 #---------------------------------------------------------------------------
 # Our own choice what channels are used
 #

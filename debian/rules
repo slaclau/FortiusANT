@@ -3,11 +3,23 @@
 %:
 	dh $@ --with python-virtualenv
 
+SYSPY := $(shell python3 useSystemPython.py)
+ifdef SYSPY
 override_dh_virtualenv:
-	dh_virtualenv --python /home/sebastien/.pyenv/versions/3.7.9/bin/python
+	python3 wxPython-source.py
+	dh_virtualenv \
+	--python python3 \
+	--builtin-venv
+else
+override_dh_virtualenv:
+	python3 wxPython-source.py
+	dh_virtualenv \
+	--python python3.9 \
+	--builtin-venv
+endif
 
 override_dh_strip:
-	dh_strip --exclude=/site-packages/
+	dh_strip --exclude=/site-packages/Pillow.libs
 
 override_dh_shlibdeps:
-	dh_shlibdeps --exclude=/site-packages/
+	dh_shlibdeps --exclude=/site-packages/Pillow.libs --exclude=/site-packages/numpy

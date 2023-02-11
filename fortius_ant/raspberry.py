@@ -37,10 +37,10 @@ import sys
 import time
 
 MySelf = None
-from   constants            import mode_Power, mode_Grade, OnRaspberry, mile
-import constants
-import FortiusAntCommand    as cmd
-import logfile
+from   fortius_ant.constants            import mode_Power, mode_Grade, OnRaspberry, mile
+import fortius_ant.constants            as constants
+import fortius_ant.FortiusAntCommand    as cmd
+import fortius_ant.logfile              as logfile
 
 UseOutputDisplay = False
 if OnRaspberry:

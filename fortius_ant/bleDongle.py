@@ -12,11 +12,11 @@ __version__ = "2022-03-24"
 #               https://github.com/WouterJD/FortiusANT/issues/103#issuecomment-753359525
 # 2020-12-18    First version, obtained from @MarcoVeeneman
 #---------------------------------------------------------------------------
-from   constants import mode_Power, mode_Grade, UseBluetooth
+from   fortius_ant.constants import mode_Power, mode_Grade, UseBluetooth
 
-import debug
+import fortius_ant.debug     as debug
 import lib_programname
-import logfile
+import fortius_ant.logfile   as logfile
 import os
 import sys
 import time
@@ -27,7 +27,7 @@ if UseBluetooth:
     import subprocess
 import atexit
 
-import FortiusAntCommand    as cmd
+import fortius_ant.FortiusAntCommand    as cmd
 
 #---------------------------------------------------------------------------
 # c l s B l e I n t e r f a c e

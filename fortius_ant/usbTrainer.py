@@ -155,14 +155,14 @@ import struct
 import sys
 import time
 
-import antDongle         as ant
-from   constants                    import mode_Power, mode_Grade
-import constants
-import debug
-import logfile
-import structConstants   as sc
-import FortiusAntCommand as cmd
-import fxload
+import fortius_ant.antDongle         as ant
+from   fortius_ant.constants         import mode_Power, mode_Grade
+import fortius_ant.constants         as constants
+import fortius_ant.debug             as debug
+import fortius_ant.logfile           as logfile
+import fortius_ant.structConstants   as sc
+import fortius_ant.FortiusAntCommand as cmd
+import fortius_ant.fxload            as fxload
 
 #-------------------------------------------------------------------------------
 # Constants
@@ -363,6 +363,7 @@ class clsTacxTrainer():
     #---------------------------------------------------------------------------
     @staticmethod                       # pretent to be c++ factory function
     def GetTrainer(clv, AntDevice=None):
+        import time
         if debug.on(debug.Function):logfile.Write ("clsTacxTrainer.GetTrainer()")
 
         #-----------------------------------------------------------------------
@@ -580,6 +581,7 @@ class clsTacxTrainer():
     # Output        Class variables match with Target***
     #---------------------------------------------------------------------------
     def Refresh(self, QuarterSecond, TacxMode):
+        import time
         if debug.on(debug.Function):logfile.Write ( \
                     'clsTacxTrainer.Refresh(%s, %s)' % (QuarterSecond, TacxMode))
         #-----------------------------------------------------------------------
@@ -994,6 +996,7 @@ class clsSimulatedTrainer(clsTacxTrainer):
     # Output:       self.* variables, see next 10 lines
     # --------------------------------------------------------------------------
     def Refresh (self, _QuarterSecond=None, _TacxMode=None):
+        import time
         if debug.on(debug.Function):logfile.Write ("clsSimulatedTrainer.Refresh()")
         # ----------------------------------------------------------------------
         # Trigger for pedalstroke analysis (PedalEcho)
@@ -1081,6 +1084,7 @@ class clsTacxAntVortexTrainer(clsTacxTrainer):
         self.__ResetTrainer()
 
     def __ResetTrainer(self):
+        import time
         self.__AntVTXpaired    = False
         self.__AntVHUpaired    = False
         self.__DeviceNumberVTX = 0              # provided by CHANNEL_ID msg
@@ -1165,6 +1169,7 @@ class clsTacxAntVortexTrainer(clsTacxTrainer):
     # SendToTrainer()
     #---------------------------------------------------------------------------
     def SendToTrainer(self, QuarterSecond, TacxMode):
+        import time
         if TacxMode == modeStop:
             self.__ResetTrainer()                       # Must be paired again!
 
@@ -1691,6 +1696,7 @@ class clsTacxAntGeniusTrainer(clsTacxAntTrainer):
         super().__init__(clv, msg, AntDevice, ant.channel_GNS_s)
 
     def _ResetTrainer(self):
+        import time
         super()._ResetTrainer()
         self.__Calibrated       = False
         self.__WatchdogTime     = time.time()
@@ -1707,9 +1713,11 @@ class clsTacxAntGeniusTrainer(clsTacxAntTrainer):
             self.Operational = True       # FortiusAnt can send/receive to brake
 
     def __ResetTimeout(self):
+        import time
         self.__WatchdogTime = time.time()
 
     def __CheckCalibrationTimeout(self):
+        import time
         # cancel calibration if no progress in last 60s
         timeout = 60
         if time.time() > self.__WatchdogTime + timeout:
@@ -2036,6 +2044,7 @@ class clsTacxAntBushidoTrainer(clsTacxAntTrainer):
         super().__init__(clv, msg, AntDevice, ant.channel_BHU_s)
 
     def _ResetTrainer(self):
+        import time
         super()._ResetTrainer()
         self.__State            = BushidoState.Pairing
         self.__ModeRequested    = ant.VHU_PCmode
@@ -2115,6 +2124,7 @@ class clsTacxAntBushidoTrainer(clsTacxAntTrainer):
     # SendToTrainer()
     # ---------------------------------------------------------------------------
     def SendToTrainer(self, QuarterSecond, TacxMode):
+        import time
         messages = []
 
         # -------------------------------------------------------------------
@@ -2431,6 +2441,7 @@ class clsTacxUsbTrainer(clsTacxTrainer):
     #           At least 40 bytes must be returned, retry 4 times
     #---------------------------------------------------------------------------
     def USB_Read_retry4x40(self, expectedHeader = USB_ControlResponse):
+        import time
         retry = 4
 
         while True:
@@ -2771,6 +2782,7 @@ class clsTacxLegacyUsbTrainer(clsTacxUsbTrainer):
 #-------------------------------------------------------------------------------
 class clsTacxNewUsbTrainer(clsTacxUsbTrainer):
     def __init__(self, clv, Message, Headunit, UsbDevice):
+        import time
         super().__init__(clv, Message)
         if debug.on(debug.Function):logfile.Write ("clsTacxNewUsbTrainer.__init__()")
         self.SpeedScale = 289.75                    # See comment above

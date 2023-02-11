@@ -26,8 +26,8 @@ __version__ = "2022-03-08"
 #               This module contains program startup, GUI-binding and
 #               multi-processing functionality only
 #-------------------------------------------------------------------------------
-from   constants import mode_Power, mode_Grade, UseGui, UseBluetooth, UseMultiProcessing, OnRaspberry, mile
-import constants                        #  for __version__
+from   fortius_ant.constants import mode_Power, mode_Grade, UseGui, UseBluetooth, UseMultiProcessing, OnRaspberry, mile
+import fortius_ant.constants as constants                   #  for __version__
 
 import argparse
 from datetime                           import datetime
@@ -43,30 +43,30 @@ import threading
 import time
 import usb.core
 
-import antCTRL
-import antDongle            as ant
-import antHRM               as hrm
-import antFE                as fe
-import antPWR               as pwr
-import antSCS               as scs
-import bleBless
-import bleBlessClass
-import bleDongle
-import debug
-import logfile
-import FortiusAntBody
-import FortiusAntCommand    as cmd
-from   FortiusAntTitle                  import githubWindowTitle
-import raspberry
-import settings
-import structConstants      as sc
-import TCXexport
-import usbTrainer
+import fortius_ant.antCTRL              as antCTRL
+import fortius_ant.antDongle            as ant
+import fortius_ant.antHRM               as hrm
+import fortius_ant.antFE                as fe
+import fortius_ant.antPWR               as pwr
+import fortius_ant.antSCS               as scs
+import fortius_ant.bleBless             as bleBless
+import fortius_ant.bleBlessClass        as bleBlessClass
+import fortius_ant.bleDongle            as bleDongle
+import fortius_ant.debug                as debug
+import fortius_ant.logfile              as logfile
+import fortius_ant.FortiusAntBody       as FortiusAntBody
+import fortius_ant.FortiusAntCommand    as cmd
+from   fortius_ant.FortiusAntTitle      import githubWindowTitle
+import fortius_ant.raspberry            as raspberry
+import fortius_ant.settings             as settings
+import fortius_ant.structConstants      as sc
+import fortius_ant.TCXexport            as TCXexport
+import fortius_ant.usbTrainer           as usbTrainer
 
 if UseGui:
     import wx
-    import FortiusAntGui        as gui
-    import RadarGraph
+    import fortius_ant.FortiusAntGui   as gui
+    import fortius_ant.RadarGraph      as RadarGraph
 
 #-------------------------------------------------------------------------------
 # Directives for this module
@@ -659,8 +659,11 @@ def mainProgram():
     #-------------------------------------------------------------------------------
     if clv.DeviceNumberBase:
         ant.DeviceNumberBase(clv.DeviceNumberBase)
-
-    if not clv.gui:
+    if clv.SettingsOnly:
+        app = wx.App(0)
+        
+        settings.OpenDialog(None, None, clv)
+    elif not clv.gui:
         # --------------------------------------------------------------------------
         # Console only, no multiprocessing required to separate GUI
         # --------------------------------------------------------------------------
