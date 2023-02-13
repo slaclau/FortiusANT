@@ -133,9 +133,9 @@ class CommandLineVariables(object):
 
     Transmission    = ''        # introduced 2020-01-10
 
-    Cranckset       = []
-    CrancksetStart  = 0         # The initial value of index
-    CrancksetMax    = 0         # Corresponds to full WH of the drawing area
+    Crankset       = []
+    CranksetStart  = 0         # The initial value of index
+    CranksetMax    = 0         # Corresponds to full WH of the drawing area
 
     Cassette        = []
     CassetteStart   = 0         # The initial value of index
@@ -630,9 +630,9 @@ class CommandLineVariables(object):
             # Use command-line value, if fails - use default
             #-------------------------------------------------------------------
             try:
-                self.Cranckset      = []
-                self.CrancksetStart = 0  # The initial value of index
-                self.CrancksetMax   = 0  # Corresponds to full WH of the drawing area
+                self.Crankset      = []
+                self.CranksetStart = 0  # The initial value of index
+                self.CranksetMax   = 0  # Corresponds to full WH of the drawing area
 
                 self.Cassette       = []
                 self.CassetteStart  = 0  # The initial value of index
@@ -651,10 +651,10 @@ class CommandLineVariables(object):
                 for i in range(0, len(s2)):
                     chainring = s2[i]
                     if (chainring.find('*') != -1): 
-                        self.CrancksetStart = i
+                        self.CranksetStart = i
                         chainring = chainring.replace('*', '')
-                    self.Cranckset.append(int(chainring))
-                    if int(chainring) > self.CrancksetMax: self.CrancksetMax = int(chainring)
+                    self.Crankset.append(int(chainring))
+                    if int(chainring) > self.CranksetMax: self.CranksetMax = int(chainring)
                     if i == 2: break
                 #---------------------------------------------------------------
                 # Split cassette into sprockets (max 13)
@@ -677,7 +677,7 @@ class CommandLineVariables(object):
         #-----------------------------------------------------------------------
         # If no start defined, take middle position
         #-----------------------------------------------------------------------
-        if self.CrancksetStart == 0: self.CrancksetStart = int(round(len(self.Cranckset) / 2 - 0.5))
+        if self.CranksetStart == 0: self.CranksetStart = int(round(len(self.Crankset) / 2 - 0.5))
         if self.CassetteStart  == 0: self.CassetteStart  = int(round(len(self.Cassette)  / 2 - 0.5))
 
         #-----------------------------------------------------------------------
@@ -730,8 +730,8 @@ class CommandLineVariables(object):
             if v or self.args.TacxType:                 logfile.Console("-t %s" % self.TacxType)
             if v or self.args.Transmission:
                                                         logfile.Console('-T %s x %s (start=%sx%s)' % \
-                                                                    (self.Cranckset, self.Cassette, \
-                                                                     self.Cranckset[self.CrancksetStart], \
+                                                                    (self.Crankset, self.Cassette, \
+                                                                     self.Crankset[self.CranksetStart], \
                                                                      self.Cassette [self.CassetteStart]) )
             if      self.exportTCX:                     logfile.Console("-x")
 
