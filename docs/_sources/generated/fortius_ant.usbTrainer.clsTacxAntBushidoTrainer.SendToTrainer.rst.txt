@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxAntBushidoTrainer.SendToTrainer
+==============================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. automethod:: clsTacxAntBushidoTrainer.SendToTrainer

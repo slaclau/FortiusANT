@@ -1,0 +1,34 @@
+﻿clsTacxAntGeniusTrainer
+=======================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoclass:: fortius_ant.usbTrainer.clsTacxAntGeniusTrainer
+   :show-inheritance:
+
+   .. inheritance-diagram:: clsTacxAntGeniusTrainer
+   
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~clsTacxAntGeniusTrainer.DisplayStateTable
+      ~clsTacxAntGeniusTrainer.HandleANTmessage
+      ~clsTacxAntGeniusTrainer.SendToTrainer
+      ~clsTacxAntGeniusTrainer.__init__
+   
+   
+
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+      :toctree:
+   
+   
+   

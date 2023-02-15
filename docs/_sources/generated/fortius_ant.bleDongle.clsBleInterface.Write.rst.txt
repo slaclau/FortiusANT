@@ -1,0 +1,6 @@
+fortius\_ant.bleDongle.clsBleInterface.Write
+============================================
+
+.. currentmodule:: fortius_ant.bleDongle
+
+.. automethod:: clsBleInterface.Write

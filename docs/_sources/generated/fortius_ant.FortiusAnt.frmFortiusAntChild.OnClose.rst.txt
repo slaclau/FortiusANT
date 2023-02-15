@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAnt.frmFortiusAntChild.OnClose
+==================================================
+
+.. currentmodule:: fortius_ant.FortiusAnt
+
+.. automethod:: frmFortiusAntChild.OnClose

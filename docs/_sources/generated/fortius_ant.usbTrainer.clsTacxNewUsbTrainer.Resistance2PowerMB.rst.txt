@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxNewUsbTrainer.Resistance2PowerMB
+===============================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. automethod:: clsTacxNewUsbTrainer.Resistance2PowerMB

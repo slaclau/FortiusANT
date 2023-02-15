@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.clsAntDongle.\_\_init\_\_
+================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. automethod:: clsAntDongle.__init__

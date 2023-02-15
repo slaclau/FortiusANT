@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgUnpage173\_01\_TacxBushidoSerialMode
+==============================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgUnpage173_01_TacxBushidoSerialMode

@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxAntVortexTrainer.HandleANTmessage
+================================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. automethod:: clsTacxAntVortexTrainer.HandleANTmessage

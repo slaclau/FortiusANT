@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgPage25\_TrainerData
+=============================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgPage25_TrainerData

@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgPage220\_02\_TacxGeniusWindResistance
+===============================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgPage220_02_TacxGeniusWindResistance

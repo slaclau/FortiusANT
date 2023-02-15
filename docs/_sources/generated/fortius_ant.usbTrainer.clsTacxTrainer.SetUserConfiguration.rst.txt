@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.SetUserConfiguration
+===========================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. automethod:: clsTacxTrainer.SetUserConfiguration

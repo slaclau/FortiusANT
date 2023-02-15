@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.TargetMode
+=================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoattribute:: clsTacxTrainer.TargetMode

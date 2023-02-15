@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgPage220\_04\_TacxGeniusCalibration
+============================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgPage220_04_TacxGeniusCalibration

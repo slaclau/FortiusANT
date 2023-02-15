@@ -1,0 +1,6 @@
+fortius\_ant.fxload.writeEzusbVendor\_RwInternal
+================================================
+
+.. currentmodule:: fortius_ant.fxload
+
+.. autofunction:: writeEzusbVendor_RwInternal

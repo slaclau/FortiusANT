@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.AntDevice
+================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoattribute:: clsTacxTrainer.AntDevice

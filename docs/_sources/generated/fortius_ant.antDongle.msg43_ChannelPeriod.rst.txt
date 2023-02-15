@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msg43\_ChannelPeriod
+===========================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msg43_ChannelPeriod

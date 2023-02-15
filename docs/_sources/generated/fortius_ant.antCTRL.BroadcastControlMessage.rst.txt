@@ -1,0 +1,6 @@
+fortius\_ant.antCTRL.BroadcastControlMessage
+============================================
+
+.. currentmodule:: fortius_ant.antCTRL
+
+.. autofunction:: BroadcastControlMessage

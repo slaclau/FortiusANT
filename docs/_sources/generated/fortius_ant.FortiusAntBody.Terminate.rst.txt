@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAntBody.Terminate
+=====================================
+
+.. currentmodule:: fortius_ant.FortiusAntBody
+
+.. autofunction:: Terminate

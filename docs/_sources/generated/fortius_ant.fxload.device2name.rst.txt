@@ -1,0 +1,6 @@
+fortius\_ant.fxload.device2name
+===============================
+
+.. currentmodule:: fortius_ant.fxload
+
+.. autofunction:: device2name

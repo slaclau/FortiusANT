@@ -1,0 +1,37 @@
+﻿FortiusAntBody
+==============
+
+.. automodule:: fortius_ant.FortiusAntBody
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      IdleFunction
+      Initialize
+      LocateHW
+      Runoff
+      Settings
+      Tacx2Dongle
+      Tacx2DongleSub
+      Terminate
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msg4A\_ResetSystem
+=========================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msg4A_ResetSystem

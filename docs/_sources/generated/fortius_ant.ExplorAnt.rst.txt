@@ -1,0 +1,38 @@
+﻿ExplorAnt
+=========
+
+.. automodule:: fortius_ant.ExplorAnt
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      main
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+   
+      clsDeviceID
+   
+   
+
+   
+   
+   
+
+
+

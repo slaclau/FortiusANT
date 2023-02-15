@@ -1,0 +1,6 @@
+fortius\_ant.bleBleak.notificationIndoorBikeData
+================================================
+
+.. currentmodule:: fortius_ant.bleBleak
+
+.. autofunction:: notificationIndoorBikeData

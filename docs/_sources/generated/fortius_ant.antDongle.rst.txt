@@ -1,0 +1,107 @@
+﻿antDongle
+=========
+
+.. automodule:: fortius_ant.antDongle
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      CalcChecksum
+      ComposeMessage
+      DecomposeMessage
+      DeviceNumberBase
+      DongleDebugMessage
+      EnumerateAll
+      calc_checksum
+      msg41_UnassignChannel
+      msg42_AssignChannel
+      msg43_ChannelPeriod
+      msg44_ChannelSearchTimeout
+      msg45_ChannelRfFrequency
+      msg46_SetNetworkKey
+      msg4A_ResetSystem
+      msg4B_OpenChannel
+      msg4D_RequestMessage
+      msg51_ChannelID
+      msg60_ChannelTransmitPower
+      msgPage000_TacxVortexHU_StayAlive
+      msgPage00_TacxVortexDataSpeed
+      msgPage03_TacxVortexDataCalibration
+      msgPage16_GeneralFEdata
+      msgPage16_PowerOnly
+      msgPage16_TacxVortexSetCalibrationValue
+      msgPage16_TacxVortexSetFCSerial
+      msgPage16_TacxVortexSetPower
+      msgPage16_TacxVortexStartCalibration
+      msgPage16_tacxVortexStopCalibration
+      msgPage172_TacxVortexHU_ChangeHeadunitMode
+      msgPage220_01_TacxGeniusSetTarget
+      msgPage220_02_TacxGeniusWindResistance
+      msgPage220_04_TacxGeniusCalibration
+      msgPage25_TrainerData
+      msgPage2_CTRL
+      msgPage54_FE_Capabilities
+      msgPage70_RequestDataPage
+      msgPage71_CommandStatus
+      msgPage73_GenericCommand
+      msgPage80_ManufacturerInfo
+      msgPage81_ProductInformation
+      msgPage82_BatteryStatus
+      msgPage_Hrm
+      msgPage_SCS
+      msgUnpage00_TacxVortexDataSpeed
+      msgUnpage01_TacxVortexDataSerial
+      msgUnpage02_TacxVortexDataVersion
+      msgUnpage03_TacxVortexDataCalibration
+      msgUnpage16_GeneralFEdata
+      msgUnpage16_TacxVortexSetPower
+      msgUnpage173_01_TacxBushidoSerialMode
+      msgUnpage173_01_TacxVortexHU_SerialMode
+      msgUnpage221_01_TacxGeniusSpeedPowerCadence
+      msgUnpage221_02_TacxGeniusDistanceHR
+      msgUnpage221_03_TacxGeniusAlarmTemperature
+      msgUnpage221_04_TacxGeniusCalibrationInfo
+      msgUnpage221_TacxVortexHU_ButtonPressed
+      msgUnpage25_TrainerData
+      msgUnpage48_BasicResistance
+      msgUnpage49_TargetPower
+      msgUnpage50_WindResistance
+      msgUnpage51_TrackResistance
+      msgUnpage55_UserConfiguration
+      msgUnpage70_RequestDataPage
+      msgUnpage73_GenericCommand
+      msgUnpage80_ManufacturerInfo
+      msgUnpage81_ProductInformation
+      msgUnpage_Hrm
+      msgUnpage_SCS
+      unmsg51_ChannelID
+      unmsg64_ChannelResponse
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+   
+      clsAntDongle
+   
+   
+
+   
+   
+   
+
+
+

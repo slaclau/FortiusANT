@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgPage16\_tacxVortexStopCalibration
+===========================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgPage16_tacxVortexStopCalibration

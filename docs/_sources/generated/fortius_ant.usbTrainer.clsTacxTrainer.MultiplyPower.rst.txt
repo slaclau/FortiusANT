@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.MultiplyPower
+====================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. automethod:: clsTacxTrainer.MultiplyPower

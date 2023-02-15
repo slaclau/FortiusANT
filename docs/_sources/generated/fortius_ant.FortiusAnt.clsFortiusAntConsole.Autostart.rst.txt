@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAnt.clsFortiusAntConsole.Autostart
+======================================================
+
+.. currentmodule:: fortius_ant.FortiusAnt
+
+.. automethod:: clsFortiusAntConsole.Autostart

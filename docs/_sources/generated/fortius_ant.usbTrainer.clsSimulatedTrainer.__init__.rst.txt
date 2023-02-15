@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsSimulatedTrainer.\_\_init\_\_
+========================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. automethod:: clsSimulatedTrainer.__init__

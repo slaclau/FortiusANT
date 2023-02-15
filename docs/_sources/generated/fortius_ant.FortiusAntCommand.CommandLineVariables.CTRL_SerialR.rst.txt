@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAntCommand.CommandLineVariables.CTRL\_SerialR
+=================================================================
+
+.. currentmodule:: fortius_ant.FortiusAntCommand
+
+.. autoattribute:: CommandLineVariables.CTRL_SerialR

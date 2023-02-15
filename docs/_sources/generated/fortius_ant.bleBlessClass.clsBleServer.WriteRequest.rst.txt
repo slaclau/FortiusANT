@@ -1,0 +1,6 @@
+fortius\_ant.bleBlessClass.clsBleServer.WriteRequest
+====================================================
+
+.. currentmodule:: fortius_ant.bleBlessClass
+
+.. automethod:: clsBleServer.WriteRequest

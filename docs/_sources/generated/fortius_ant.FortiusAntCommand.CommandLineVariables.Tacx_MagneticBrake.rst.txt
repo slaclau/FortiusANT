@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAntCommand.CommandLineVariables.Tacx\_MagneticBrake
+=======================================================================
+
+.. currentmodule:: fortius_ant.FortiusAntCommand
+
+.. autoattribute:: CommandLineVariables.Tacx_MagneticBrake

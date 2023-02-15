@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAntBody.Tacx2Dongle
+=======================================
+
+.. currentmodule:: fortius_ant.FortiusAntBody
+
+.. autofunction:: Tacx2Dongle

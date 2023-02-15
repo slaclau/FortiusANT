@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAntCommand.CommandLineVariables.print
+=========================================================
+
+.. currentmodule:: fortius_ant.FortiusAntCommand
+
+.. automethod:: CommandLineVariables.print

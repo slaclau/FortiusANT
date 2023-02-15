@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msg41\_UnassignChannel
+=============================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msg41_UnassignChannel

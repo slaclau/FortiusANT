@@ -1,0 +1,6 @@
+fortius\_ant.settings.EVT\_CHAR\_ufloat
+=======================================
+
+.. currentmodule:: fortius_ant.settings
+
+.. autofunction:: EVT_CHAR_ufloat

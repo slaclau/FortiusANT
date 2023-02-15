@@ -1,0 +1,6 @@
+fortius\_ant.settings.dlgFortiusAntSettings.\_\_init\_\_
+========================================================
+
+.. currentmodule:: fortius_ant.settings
+
+.. automethod:: dlgFortiusAntSettings.__init__

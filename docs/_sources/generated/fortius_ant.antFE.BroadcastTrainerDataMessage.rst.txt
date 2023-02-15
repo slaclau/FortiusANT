@@ -1,0 +1,6 @@
+fortius\_ant.antFE.BroadcastTrainerDataMessage
+==============================================
+
+.. currentmodule:: fortius_ant.antFE
+
+.. autofunction:: BroadcastTrainerDataMessage

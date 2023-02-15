@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgPage172\_TacxVortexHU\_ChangeHeadunitMode
+===================================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgPage172_TacxVortexHU_ChangeHeadunitMode

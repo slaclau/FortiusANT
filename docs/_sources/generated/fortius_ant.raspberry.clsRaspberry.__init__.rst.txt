@@ -1,0 +1,6 @@
+fortius\_ant.raspberry.clsRaspberry.\_\_init\_\_
+================================================
+
+.. currentmodule:: fortius_ant.raspberry
+
+.. automethod:: clsRaspberry.__init__

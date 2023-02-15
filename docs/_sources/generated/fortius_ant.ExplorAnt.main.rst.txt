@@ -1,0 +1,6 @@
+fortius\_ant.ExplorAnt.main
+===========================
+
+.. currentmodule:: fortius_ant.ExplorAnt
+
+.. autofunction:: main

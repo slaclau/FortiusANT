@@ -1,0 +1,34 @@
+﻿clsTacxAntBushidoTrainer
+========================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoclass:: fortius_ant.usbTrainer.clsTacxAntBushidoTrainer
+   :show-inheritance:
+
+   .. inheritance-diagram:: clsTacxAntBushidoTrainer
+   
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~clsTacxAntBushidoTrainer.DisplayStateTable
+      ~clsTacxAntBushidoTrainer.HandleANTmessage
+      ~clsTacxAntBushidoTrainer.SendToTrainer
+      ~clsTacxAntBushidoTrainer.__init__
+   
+   
+
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+      :toctree:
+   
+   
+   

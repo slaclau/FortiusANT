@@ -1,0 +1,37 @@
+﻿clsTacxUsbTrainer
+=================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoclass:: fortius_ant.usbTrainer.clsTacxUsbTrainer
+   :show-inheritance:
+
+   .. inheritance-diagram:: clsTacxUsbTrainer
+   
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~clsTacxUsbTrainer.SendToTrainer
+      ~clsTacxUsbTrainer.SendToTrainerUSBData
+      ~clsTacxUsbTrainer.SendToTrainerUSBData_MotorBrake
+      ~clsTacxUsbTrainer.Speed2Wheel
+      ~clsTacxUsbTrainer.USB_Read
+      ~clsTacxUsbTrainer.USB_Read_retry4x40
+      ~clsTacxUsbTrainer.Wheel2Speed
+   
+   
+
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+      :toctree:
+   
+   
+   

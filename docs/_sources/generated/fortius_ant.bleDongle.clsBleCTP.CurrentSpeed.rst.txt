@@ -1,0 +1,6 @@
+fortius\_ant.bleDongle.clsBleCTP.CurrentSpeed
+=============================================
+
+.. currentmodule:: fortius_ant.bleDongle
+
+.. autoattribute:: clsBleCTP.CurrentSpeed

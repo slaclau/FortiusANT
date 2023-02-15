@@ -1,0 +1,6 @@
+fortius\_ant.TCXexport.clsTcxExport.Stop
+========================================
+
+.. currentmodule:: fortius_ant.TCXexport
+
+.. automethod:: clsTcxExport.Stop
