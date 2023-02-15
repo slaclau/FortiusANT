@@ -96,6 +96,16 @@ cmd_SetLeds             = 19599         # Main->Child; No response expected
 # being bothered by the actual FortiusAntBody/usbTrainer/antDongle functionality.
 # ==============================================================================
 def Settings(self, pRestartApplication, pclv):
+    """ If in test mode write to console otherwise call FortiusAntBody.Settings(self, pRestartApplication, pclv)
+    
+    Parameters
+    ----------       
+    pRestartApplication : bool
+        Value to be set to FortiusAnt.RestartApplication
+    pclv : FortiusAntCommand.CommandLineVariables
+        Command line variables to be set to FortiusAnt.clv
+    """
+    
     global RestartApplication, clv
     RestartApplication = pRestartApplication
     clv                = pclv

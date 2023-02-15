@@ -260,14 +260,14 @@ class frmFortiusAntGui(wx.Frame):
         self.CassetteY      = self.HeartRateY - self.HeartRateWH - Margin
         
         # ----------------------------------------------------------------------
-		# Calculate location of Cranckset image
+		# Calculate location of Crankset image
         # Positioned above Cassette_img, equally wide/heigh
-        # Re-positioned later under txtAntHRM (find self.CrancksetY)
+        # Re-positioned later under txtAntHRM (find self.CranksetY)
         # ----------------------------------------------------------------------
-        self.CrancksetIndex = self.clv.CrancksetStart
-        self.CrancksetWH    = self.CassetteWH
-        self.CrancksetX     = self.CassetteX
-        self.CrancksetY     = self.CassetteY - self.CassetteWH - Margin
+        self.CranksetIndex = self.clv.CranksetStart
+        self.CranksetWH    = self.CassetteWH
+        self.CranksetX     = self.CassetteX
+        self.CranksetY     = self.CassetteY - self.CassetteWH - Margin
 
         # ----------------------------------------------------------------------
         # Idea to generate the bitmap, but the "Cassette" can as easily be drawn
@@ -562,12 +562,12 @@ class frmFortiusAntGui(wx.Frame):
         self.txtAntHRM.SetBackgroundColour(bg)
 
         # ----------------------------------------------------------------------
-		# Change location of Cranckset image (see initial values above)
+		# Change location of Crankset image (see initial values above)
         #        position under txtAntHRM (like RadarGraph below)
-        # Then move Cranckset in the middle between Heartrate and Cassette
+        # Then move Crankset in the middle between Heartrate and Cassette
         # ----------------------------------------------------------------------
-        self.CrancksetY     = self.txtAntHRM.Position    [1] + self.txtAntHRM.Size    [1] + 5
-        self.CassetteY      = int((self.HeartRateY + self.HeartRateWH + self.CrancksetY - TextCtrlH) / 2)
+        self.CranksetY     = self.txtAntHRM.Position    [1] + self.txtAntHRM.Size    [1] + 5
+        self.CassetteY      = int((self.HeartRateY + self.HeartRateWH + self.CranksetY - TextCtrlH) / 2)
 
         # ----------------------------------------------------------------------
 		# self.HeartRate, shown to the right of the Heartrate image
@@ -579,11 +579,11 @@ class frmFortiusAntGui(wx.Frame):
         self.txtHeartRateSpace = ((self.HeartRateY - self.CassetteY)/2)
 
         # ----------------------------------------------------------------------
-		# self.Cranckset, shown to the right of the Cranckset image
+		# self.Crankset, shown to the right of the Crankset image
         # ----------------------------------------------------------------------
-        self.txtCranckset = wx.TextCtrl(self.panel, value="456", size=(int(self.CrancksetWH*2),TextCtrlH), style=wx.TE_CENTER | wx.TE_READONLY)
-        self.txtCranckset.SetBackgroundColour(bg)
-        self.txtCranckset.SetPosition(( self.CrancksetX + self.CrancksetWH + Margin, self.CrancksetY))
+        self.txtCrankset = wx.TextCtrl(self.panel, value="456", size=(int(self.CranksetWH*2),TextCtrlH), style=wx.TE_CENTER | wx.TE_READONLY)
+        self.txtCrankset.SetBackgroundColour(bg)
+        self.txtCrankset.SetPosition(( self.CranksetX + self.CranksetWH + Margin, self.CranksetY))
 
         # ----------------------------------------------------------------------
 		# self.Cassette, shown to the right of the Cassette image
@@ -621,7 +621,7 @@ class frmFortiusAntGui(wx.Frame):
         self.txtTarget.SetFont(TextCtrlFont)
         self.txtTacx.SetFont(TextCtrlFont)
         self.txtHeartRate.SetFont(TextCtrlFont)
-        self.txtCranckset.SetFont(TextCtrlFont)
+        self.txtCrankset.SetFont(TextCtrlFont)
         self.txtCassette.SetFont(TextCtrlFont)
         
         self.txtUsbTrainer.SetFont(TextCtrlFont2)
@@ -869,7 +869,7 @@ class frmFortiusAntGui(wx.Frame):
     #               fTargetGrade    Target Grade in %
     #               iTacx           Target resistance for the Tacx
     #               iHeartRate      Heartrate in beats/min
-    #               iCrancksetIndex, iCassetteIndex
+    #               iCranksetIndex, iCassetteIndex
     #                               Index position of the virtual gearbox.
     #
     # Description:  Show the values in SpeedoMeter and text-fields
@@ -881,23 +881,23 @@ class frmFortiusAntGui(wx.Frame):
 
     def SetValues(self, fSpeed, iRevs, iPower, iTargetMode, iTargetPower, fTargetGrade, \
                     iTacx, iHeartRate, \
-                    iCrancksetIndex, iCassetteIndex, fReduction):  # Tread safe
+                    iCranksetIndex, iCassetteIndex, fReduction):  # Tread safe
         wx.CallAfter(
                     self.SetValuesGUI, \
                     fSpeed, iRevs, iPower, iTargetMode, iTargetPower, fTargetGrade, \
                     iTacx, iHeartRate, \
-                    iCrancksetIndex, iCassetteIndex, fReduction)
+                    iCranksetIndex, iCassetteIndex, fReduction)
 
     def SetValuesGUI(self, fSpeed, iRevs, iPower, iTargetMode, iTargetPower, fTargetGrade, \
                         iTacx, iHeartRate, \
-                        iCrancksetIndex, iCassetteIndex, fReduction):
+                        iCranksetIndex, iCassetteIndex, fReduction):
 
         # ----------------------------------------------------------------------
         # When zero, display default setting
         # ----------------------------------------------------------------------
         if fReduction == 0:
             fReduction      = 1  # Aviod DivideByZero
-            iCrancksetIndex = self.clv.CrancksetStart
+            iCranksetIndex = self.clv.CranksetStart
             iCassetteIndex  = self.clv.CassetteStart
 
         # ----------------------------------------------------------------------
@@ -923,11 +923,11 @@ class frmFortiusAntGui(wx.Frame):
             self.HeartRate    = 0
 
         if iTargetMode in (mode_Grade, mode_Power): # issue #195 asked for power-mode as well
-            self.CrancksetIndex = iCrancksetIndex
+            self.CranksetIndex = iCranksetIndex
             self.CassetteIndex  = iCassetteIndex
             self.Reduction      = fReduction
         else:
-            self.CrancksetIndex = None              # Not valid in other modes
+            self.CranksetIndex = None              # Not valid in other modes
             self.CassetteIndex  = None
             self.Reduction      = 1
 
@@ -1018,8 +1018,8 @@ class frmFortiusAntGui(wx.Frame):
                     # If txtHeartrate not shown; move the cassette/crankset up
                     if self.txtHeartRateShown == False:
                         self.CassetteY  -= self.txtHeartRateSpace
-                        self.CrancksetY -= self.txtHeartRateSpace
-                        self.txtCranckset.SetPosition(( int(self.txtCranckset.Position[0]), int(self.CrancksetY)))
+                        self.CranksetY -= self.txtHeartRateSpace
+                        self.txtCrankset.SetPosition(( int(self.txtCrankset.Position[0]), int(self.CranksetY)))
                         self.txtCassette .SetPosition(( int(self.txtCassette .Position[0]), int(self.CassetteY )))
                     self.txtHeartRate.Show()
                     self.txtHeartRateShown = True
@@ -1042,8 +1042,8 @@ class frmFortiusAntGui(wx.Frame):
                     # If txtHeartrate not shown; move the cassette/crankset down
                     if self.txtHeartRateShown == True:
                         self.CassetteY  += self.txtHeartRateSpace
-                        self.CrancksetY += self.txtHeartRateSpace
-                        self.txtCranckset.SetPosition(( int(self.txtCranckset.Position[0]), int(self.CrancksetY)))
+                        self.CranksetY += self.txtHeartRateSpace
+                        self.txtCrankset.SetPosition(( int(self.txtCrankset.Position[0]), int(self.CranksetY)))
                         self.txtCassette .SetPosition(( int(self.txtCassette .Position[0]), int(self.CassetteY )))
                     self.txtHeartRate.Hide()
                     self.txtHeartRateShown = False
@@ -1054,16 +1054,16 @@ class frmFortiusAntGui(wx.Frame):
         # Show the size of the selected sprocket & chainring.
         # The cassette and cranckset are displayed in OnPaint()!
         # ----------------------------------------------------------------------
-        if self.CrancksetIndex != None:
-            if not self.txtCranckset.IsShown():
-                self.txtCranckset.Show()
+        if self.CranksetIndex != None:
+            if not self.txtCrankset.IsShown():
+                self.txtCrankset.Show()
 
-            self.txtCranckset.SetValue  ("%i" % self.clv.Cranckset[self.CrancksetIndex])
-            bRefreshRequired  = True            # So that Cranckset is painted
+            self.txtCrankset.SetValue  ("%i" % self.clv.Crankset[self.CranksetIndex])
+            bRefreshRequired  = True            # So that Crankset is painted
             
         else:
-            if self.txtCranckset.IsShown():
-                self.txtCranckset.Hide()
+            if self.txtCrankset.IsShown():
+                self.txtCrankset.Hide()
                 bRefreshRequired  = True
 
         if self.CassetteIndex != None:
@@ -1156,7 +1156,7 @@ class frmFortiusAntGui(wx.Frame):
             pass
 
         # ----------------------------------------------------------------------
-        # Draw Digital Cranckset and Cassette with Max 12 sprockets since 12*3
+        # Draw Digital Crankset and Cassette with Max 12 sprockets since 12*3
         # pixels fits in the 40x40 area we have chosen to use
         # ----------------------------------------------------------------------
         ChainX1 = False
@@ -1200,30 +1200,30 @@ class frmFortiusAntGui(wx.Frame):
                 dc.DrawRectangle(int(x), int(y), int(w), int(h))
 
         # ----------------------------------------------------------------------
-        # Draw Cranckset
+        # Draw Crankset
         # ----------------------------------------------------------------------
-        if self.CrancksetIndex != None:
+        if self.CranksetIndex != None:
             # ------------------------------------------------------------------
             # The chainring is 2 pixels wide, 2 space = 4 per chainring
             # Since max 3 chainrings, this always fits
             # ------------------------------------------------------------------
-            margin    = int((self.CrancksetWH - len(self.clv.Cranckset) * 4) / 2)
+            margin    = int((self.CranksetWH - len(self.clv.Crankset) * 4) / 2)
             
             # ------------------------------------------------------------------
             # Draw chainrings, expected 1, 2 or 3
             # ------------------------------------------------------------------
-            for i in range(0, len(self.clv.Cranckset)):
-                x = self.CrancksetX + margin + i * 4                    # horizontal position
+            for i in range(0, len(self.clv.Crankset)):
+                x = self.CranksetX + margin + i * 4                    # horizontal position
                 w = 2                                                               # width
-                h = int(self.clv.Cranckset[i] / self.clv.CrancksetMax * self.CrancksetWH )  # heigth
-                y = self.CrancksetY + int((self.CrancksetWH - h) / 2)   # vertical
+                h = int(self.clv.Crankset[i] / self.clv.CranksetMax * self.CranksetWH )  # heigth
+                y = self.CranksetY + int((self.CranksetWH - h) / 2)   # vertical
 
                 # --------------------------------------------------------------
                 # The selected one is red, the other default colour
                 # --------------------------------------------------------------
-                if i == self.CrancksetIndex \
-                    or ( i == 0                           and self.CrancksetIndex < 0                        )\
-                    or ( i == len(self.clv.Cranckset) - 1 and self.CrancksetIndex >= len(self.clv.Cranckset) ):
+                if i == self.CranksetIndex \
+                    or ( i == 0                           and self.CranksetIndex < 0                        )\
+                    or ( i == len(self.clv.Crankset) - 1 and self.CranksetIndex >= len(self.clv.Crankset) ):
                     dc.SetPen(wx.Pen(wx.RED))                           # Selected gear
                     ChainX2 = x
                     ChainY2 = y + h
