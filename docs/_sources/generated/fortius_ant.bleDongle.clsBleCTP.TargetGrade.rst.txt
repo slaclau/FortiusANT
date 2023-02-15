@@ -1,0 +1,6 @@
+fortius\_ant.bleDongle.clsBleCTP.TargetGrade
+============================================
+
+.. currentmodule:: fortius_ant.bleDongle
+
+.. autoattribute:: clsBleCTP.TargetGrade

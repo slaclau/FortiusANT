@@ -1,0 +1,6 @@
+fortius\_ant.bleBleak.serverInspection
+======================================
+
+.. currentmodule:: fortius_ant.bleBleak
+
+.. autofunction:: serverInspection

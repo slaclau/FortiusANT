@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.BicycleWeight
+====================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoattribute:: clsTacxTrainer.BicycleWeight

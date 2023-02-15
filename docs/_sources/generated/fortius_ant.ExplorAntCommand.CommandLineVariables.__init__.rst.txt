@@ -1,0 +1,6 @@
+fortius\_ant.ExplorAntCommand.CommandLineVariables.\_\_init\_\_
+===============================================================
+
+.. currentmodule:: fortius_ant.ExplorAntCommand
+
+.. automethod:: CommandLineVariables.__init__

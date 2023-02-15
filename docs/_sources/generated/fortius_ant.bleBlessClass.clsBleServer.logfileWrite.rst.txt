@@ -1,0 +1,6 @@
+fortius\_ant.bleBlessClass.clsBleServer.logfileWrite
+====================================================
+
+.. currentmodule:: fortius_ant.bleBlessClass
+
+.. automethod:: clsBleServer.logfileWrite

@@ -1,0 +1,34 @@
+clsFortiusAntParent
+===================
+
+.. currentmodule:: fortius_ant.FortiusAnt
+
+.. autoclass:: fortius_ant.FortiusAnt.clsFortiusAntParent
+   :show-inheritance:
+
+   .. inheritance-diagram:: clsFortiusAntParent
+   
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~clsFortiusAntParent.ListenToChild
+      ~clsFortiusAntParent.MainCommandFromGui
+      ~clsFortiusAntParent.MainRespondToGUI
+      ~clsFortiusAntParent.PedalStrokeAnalysis
+      ~clsFortiusAntParent.RunoffThread
+      ~clsFortiusAntParent.SetLeds
+      ~clsFortiusAntParent.SetMessages
+      ~clsFortiusAntParent.SetValues
+      ~clsFortiusAntParent.Tacx2DongleThread
+      ~clsFortiusAntParent.__init__
+   
+   
+
+
+   
+   
+   

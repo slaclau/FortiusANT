@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAnt.frmFortiusAntChild.callIdleFunction
+===========================================================
+
+.. currentmodule:: fortius_ant.FortiusAnt
+
+.. automethod:: frmFortiusAntChild.callIdleFunction

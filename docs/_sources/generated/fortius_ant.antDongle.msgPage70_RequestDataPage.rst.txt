@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgPage70\_RequestDataPage
+=================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgPage70_RequestDataPage

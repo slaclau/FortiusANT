@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAntGui.frmFortiusAntGui.DrawLed
+===================================================
+
+.. currentmodule:: fortius_ant.FortiusAntGui
+
+.. automethod:: frmFortiusAntGui.DrawLed

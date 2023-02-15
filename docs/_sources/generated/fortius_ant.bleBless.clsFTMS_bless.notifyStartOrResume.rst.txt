@@ -1,0 +1,6 @@
+fortius\_ant.bleBless.clsFTMS\_bless.notifyStartOrResume
+========================================================
+
+.. currentmodule:: fortius_ant.bleBless
+
+.. automethod:: clsFTMS_bless.notifyStartOrResume

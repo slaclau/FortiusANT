@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgUnpage02\_TacxVortexDataVersion
+=========================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgUnpage02_TacxVortexDataVersion

@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msg4D\_RequestMessage
+============================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msg4D_RequestMessage

@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAntGui.frmFortiusAntGui.OnClick\_btnStart\_Done
+===================================================================
+
+.. currentmodule:: fortius_ant.FortiusAntGui
+
+.. automethod:: frmFortiusAntGui.OnClick_btnStart_Done

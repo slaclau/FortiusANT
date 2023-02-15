@@ -1,0 +1,6 @@
+fortius\_ant.logfile.HexSpaceL
+==============================
+
+.. currentmodule:: fortius_ant.logfile
+
+.. autofunction:: HexSpaceL

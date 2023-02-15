@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAnt.cmd\_SetLeds
+====================================
+
+.. currentmodule:: fortius_ant.FortiusAnt
+
+.. autodata:: cmd_SetLeds

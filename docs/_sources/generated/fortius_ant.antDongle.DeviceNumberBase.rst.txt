@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.DeviceNumberBase
+=======================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: DeviceNumberBase

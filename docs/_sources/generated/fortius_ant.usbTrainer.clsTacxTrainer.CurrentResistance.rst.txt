@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.CurrentResistance
+========================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoattribute:: clsTacxTrainer.CurrentResistance

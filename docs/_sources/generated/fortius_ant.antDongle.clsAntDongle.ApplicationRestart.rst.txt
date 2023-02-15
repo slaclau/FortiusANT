@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.clsAntDongle.ApplicationRestart
+======================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. automethod:: clsAntDongle.ApplicationRestart

@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.GearRatio
+================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoattribute:: clsTacxTrainer.GearRatio

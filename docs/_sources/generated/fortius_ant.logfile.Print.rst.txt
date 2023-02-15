@@ -1,0 +1,6 @@
+fortius\_ant.logfile.Print
+==========================
+
+.. currentmodule:: fortius_ant.logfile
+
+.. autofunction:: Print

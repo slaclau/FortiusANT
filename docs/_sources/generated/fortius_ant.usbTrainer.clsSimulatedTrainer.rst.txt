@@ -1,0 +1,32 @@
+﻿clsSimulatedTrainer
+===================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoclass:: fortius_ant.usbTrainer.clsSimulatedTrainer
+   :show-inheritance:
+
+   .. inheritance-diagram:: clsSimulatedTrainer
+   
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~clsSimulatedTrainer.Refresh
+      ~clsSimulatedTrainer.__init__
+   
+   
+
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+      :toctree:
+   
+   
+   

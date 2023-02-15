@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsSimulatedTrainer.Refresh
+===================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. automethod:: clsSimulatedTrainer.Refresh

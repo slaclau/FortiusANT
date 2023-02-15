@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgUnpage00\_TacxVortexDataSpeed
+=======================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgUnpage00_TacxVortexDataSpeed

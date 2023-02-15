@@ -1,0 +1,6 @@
+fortius\_ant.logfile.clsLogfileJson.Close
+=========================================
+
+.. currentmodule:: fortius_ant.logfile
+
+.. automethod:: clsLogfileJson.Close

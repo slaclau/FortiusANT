@@ -1,0 +1,88 @@
+﻿CommandLineVariables
+====================
+
+.. currentmodule:: fortius_ant.FortiusAntCommand
+
+.. autoclass:: fortius_ant.FortiusAntCommand.CommandLineVariables
+   :show-inheritance:
+
+   .. inheritance-diagram:: CommandLineVariables
+   
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~CommandLineVariables.__init__
+      ~CommandLineVariables.print
+   
+   
+
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+      :toctree:
+   
+      ~CommandLineVariables.CTRL_SerialL
+      ~CommandLineVariables.CTRL_SerialR
+      ~CommandLineVariables.CalibrateRR
+      ~CommandLineVariables.Cassette
+      ~CommandLineVariables.CassetteMax
+      ~CommandLineVariables.CassetteStart
+      ~CommandLineVariables.Crankset
+      ~CommandLineVariables.CranksetMax
+      ~CommandLineVariables.CranksetStart
+      ~CommandLineVariables.DeviceNumberBase
+      ~CommandLineVariables.GradeAdjust
+      ~CommandLineVariables.GradeFactor
+      ~CommandLineVariables.GradeFactorDH
+      ~CommandLineVariables.GradeShift
+      ~CommandLineVariables.OutputDisplay
+      ~CommandLineVariables.OutputDisplayR
+      ~CommandLineVariables.PedalStrokeAnalysis
+      ~CommandLineVariables.PowerFactor
+      ~CommandLineVariables.PowerMode
+      ~CommandLineVariables.Resistance
+      ~CommandLineVariables.RunoffDip
+      ~CommandLineVariables.RunoffMaxSpeed
+      ~CommandLineVariables.RunoffMinSpeed
+      ~CommandLineVariables.RunoffPower
+      ~CommandLineVariables.RunoffTime
+      ~CommandLineVariables.SettingsOnly
+      ~CommandLineVariables.SimulateTrainer
+      ~CommandLineVariables.StatusLeds
+      ~CommandLineVariables.TacxType
+      ~CommandLineVariables.Tacx_Bushido
+      ~CommandLineVariables.Tacx_Cadence
+      ~CommandLineVariables.Tacx_Genius
+      ~CommandLineVariables.Tacx_MagneticBrake
+      ~CommandLineVariables.Tacx_MotorBrake
+      ~CommandLineVariables.Tacx_Vortex
+      ~CommandLineVariables.Transmission
+      ~CommandLineVariables.antDeviceID
+      ~CommandLineVariables.args
+      ~CommandLineVariables.autostart
+      ~CommandLineVariables.ble
+      ~CommandLineVariables.calibrate
+      ~CommandLineVariables.debug
+      ~CommandLineVariables.exportTCX
+      ~CommandLineVariables.gui
+      ~CommandLineVariables.homeTrainer
+      ~CommandLineVariables.hrm
+      ~CommandLineVariables.imperial
+      ~CommandLineVariables.manual
+      ~CommandLineVariables.manualGrade
+      ~CommandLineVariables.rpiANT
+      ~CommandLineVariables.rpiBLE
+      ~CommandLineVariables.rpiButton
+      ~CommandLineVariables.rpiCadence
+      ~CommandLineVariables.rpiShutdown
+      ~CommandLineVariables.rpiTacx
+      ~CommandLineVariables.scs
+   
+   

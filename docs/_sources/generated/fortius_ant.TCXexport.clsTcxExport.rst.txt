@@ -1,0 +1,30 @@
+﻿clsTcxExport
+============
+
+.. currentmodule:: fortius_ant.TCXexport
+
+.. autoclass:: fortius_ant.TCXexport.clsTcxExport
+   :show-inheritance:
+
+   .. inheritance-diagram:: clsTcxExport
+   
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~clsTcxExport.Start
+      ~clsTcxExport.Stop
+      ~clsTcxExport.TcxTime
+      ~clsTcxExport.Trackpoint
+      ~clsTcxExport.TrackpointX
+      ~clsTcxExport.__init__
+   
+   
+
+
+   
+   
+   

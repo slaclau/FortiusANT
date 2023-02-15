@@ -1,0 +1,6 @@
+fortius\_ant.raspberry.clsRaspberry.LedBLEState
+===============================================
+
+.. currentmodule:: fortius_ant.raspberry
+
+.. autoattribute:: clsRaspberry.LedBLEState

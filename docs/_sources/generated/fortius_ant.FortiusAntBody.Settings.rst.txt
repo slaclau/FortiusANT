@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAntBody.Settings
+====================================
+
+.. currentmodule:: fortius_ant.FortiusAntBody
+
+.. autofunction:: Settings

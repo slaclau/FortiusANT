@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgUnpage16\_TacxVortexSetPower
+======================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgUnpage16_TacxVortexSetPower

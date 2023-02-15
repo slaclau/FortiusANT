@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAnt.frmFortiusAntChild.GuiMessageToMain
+===========================================================
+
+.. currentmodule:: fortius_ant.FortiusAnt
+
+.. automethod:: frmFortiusAntChild.GuiMessageToMain

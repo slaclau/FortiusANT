@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgPage80\_ManufacturerInfo
+==================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgPage80_ManufacturerInfo

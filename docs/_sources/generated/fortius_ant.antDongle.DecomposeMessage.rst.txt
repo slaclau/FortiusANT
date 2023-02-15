@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.DecomposeMessage
+=======================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: DecomposeMessage

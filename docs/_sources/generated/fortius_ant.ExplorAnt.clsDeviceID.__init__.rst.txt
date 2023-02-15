@@ -1,0 +1,6 @@
+fortius\_ant.ExplorAnt.clsDeviceID.\_\_init\_\_
+===============================================
+
+.. currentmodule:: fortius_ant.ExplorAnt
+
+.. automethod:: clsDeviceID.__init__

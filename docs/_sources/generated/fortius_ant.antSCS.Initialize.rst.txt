@@ -1,0 +1,6 @@
+fortius\_ant.antSCS.Initialize
+==============================
+
+.. currentmodule:: fortius_ant.antSCS
+
+.. autofunction:: Initialize

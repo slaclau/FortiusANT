@@ -1,0 +1,6 @@
+fortius\_ant.bleBlessClass.clsBleServer.BlessServer
+===================================================
+
+.. currentmodule:: fortius_ant.bleBlessClass
+
+.. autoattribute:: clsBleServer.BlessServer

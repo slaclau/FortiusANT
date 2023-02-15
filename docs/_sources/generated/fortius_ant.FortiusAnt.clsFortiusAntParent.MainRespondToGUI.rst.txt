@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAnt.clsFortiusAntParent.MainRespondToGUI
+============================================================
+
+.. currentmodule:: fortius_ant.FortiusAnt
+
+.. automethod:: clsFortiusAntParent.MainRespondToGUI

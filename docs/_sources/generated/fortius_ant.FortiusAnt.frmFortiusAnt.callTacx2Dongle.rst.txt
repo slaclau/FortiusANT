@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAnt.frmFortiusAnt.callTacx2Dongle
+=====================================================
+
+.. currentmodule:: fortius_ant.FortiusAnt
+
+.. automethod:: frmFortiusAnt.callTacx2Dongle

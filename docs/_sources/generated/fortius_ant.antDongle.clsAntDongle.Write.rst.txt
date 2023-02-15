@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.clsAntDongle.Write
+=========================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. automethod:: clsAntDongle.Write

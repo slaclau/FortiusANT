@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.WindSpeed
+================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoattribute:: clsTacxTrainer.WindSpeed

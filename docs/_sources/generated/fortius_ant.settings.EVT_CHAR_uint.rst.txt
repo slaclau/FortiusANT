@@ -1,0 +1,6 @@
+fortius\_ant.settings.EVT\_CHAR\_uint
+=====================================
+
+.. currentmodule:: fortius_ant.settings
+
+.. autofunction:: EVT_CHAR_uint

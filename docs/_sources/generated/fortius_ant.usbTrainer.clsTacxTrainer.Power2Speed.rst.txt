@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.Power2Speed
+==================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. automethod:: clsTacxTrainer.Power2Speed

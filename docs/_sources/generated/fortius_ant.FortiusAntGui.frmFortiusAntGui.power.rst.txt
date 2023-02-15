@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAntGui.frmFortiusAntGui.power
+=================================================
+
+.. currentmodule:: fortius_ant.FortiusAntGui
+
+.. autoattribute:: frmFortiusAntGui.power
