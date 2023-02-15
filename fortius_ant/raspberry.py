@@ -1,6 +1,6 @@
-#---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 # Version info
-#---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 __version__ = "2022-01-14"
 # 2022-01-14  #363 st7789b added; Waveshare 1.3 LCD with different pin layout
 #             Also, button-pins pulled-up explicitly on init.
@@ -30,31 +30,32 @@ __version__ = "2022-01-14"
 #             If the -L is set as commandline parameter it enables the
 #             RasperryPi IO functions. This is for compatibility to PC-systems.
 #             May be there exists a better way but it works
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 import os
 import subprocess
 import sys
 import time
 
 MySelf = None
-from   fortius_ant.constants            import mode_Power, mode_Grade, OnRaspberry, mile
-import fortius_ant.constants            as constants
-import fortius_ant.FortiusAntCommand    as cmd
-import fortius_ant.logfile              as logfile
+from fortius_ant.constants import mode_Power, mode_Grade, OnRaspberry, mile
+import fortius_ant.constants as constants
+import fortius_ant.FortiusAntCommand as cmd
+import fortius_ant.logfile as logfile
 
 UseOutputDisplay = False
 if OnRaspberry:
-    import gpiozero                                     # pylint: disable=import-error
+    import gpiozero  # pylint: disable=import-error
 
     try:
-        from adafruit_rgb_display.rgb import color565   # pylint: disable=import-error
-        import adafruit_rgb_display.st7789 as st7789    # pylint: disable=import-error
-        import board                                    # pylint: disable=import-error
-        import digitalio                                # pylint: disable=import-error
-        from PIL import Image, ImageDraw, ImageFont     # pylint: disable=import-error
+        from adafruit_rgb_display.rgb import color565  # pylint: disable=import-error
+        import adafruit_rgb_display.st7789 as st7789  # pylint: disable=import-error
+        import board  # pylint: disable=import-error
+        import digitalio  # pylint: disable=import-error
+        from PIL import Image, ImageDraw, ImageFont  # pylint: disable=import-error
     except:
         pass
     UseOutputDisplay = True
+
 
 # ------------------------------------------------------------------------------
 # P r e p a r e S h u t d o w n
@@ -68,6 +69,7 @@ if OnRaspberry:
 def PrepareShutdown():
     global ShutdownRequested
     ShutdownRequested = True
+
 
 # ------------------------------------------------------------------------------
 # I s S h u t d o w n R e q u e s t e d
@@ -85,6 +87,7 @@ def IsShutdownRequested():
     except:
         return False
 
+
 # ------------------------------------------------------------------------------
 # S h u t d o w n I f R e q u e s t e d
 # ------------------------------------------------------------------------------
@@ -100,27 +103,32 @@ def ShutdownIfRequested():
     if IsShutdownRequested():
         print("Powerdown raspberry now")
         if MySelf != None and MySelf.StatusLeds:
-            MySelf.LedTacx     .on()
-            MySelf.LedShutdown .on()
-            MySelf.LedCadence  .on()
-            MySelf.LedBLE      .on()
-            MySelf.LedANT      .on()
+            MySelf.LedTacx.on()
+            MySelf.LedShutdown.on()
+            MySelf.LedCadence.on()
+            MySelf.LedBLE.on()
+            MySelf.LedANT.on()
         if MySelf != None and MySelf.OutputDisplay:
-            MySelf._DrawTextTable ( [ [ '',                     None ],\
-                                      [ '',                     None ],\
-                                      [ '',                     None ],\
-                                      [ '',                     None ],\
-                                      [ '',                     None ],\
-                                      [ '',                     None ],\
-                                      [ '',                     None ],\
-                                      [ 'Power',                constants.FORTIUS ],\
-                                      [ 'can be disconnected',  constants.FORTIUS ]])
+            MySelf._DrawTextTable(
+                [
+                    ["", None],
+                    ["", None],
+                    ["", None],
+                    ["", None],
+                    ["", None],
+                    ["", None],
+                    ["", None],
+                    ["Power", constants.FORTIUS],
+                    ["can be disconnected", constants.FORTIUS],
+                ]
+            )
         subprocess.call("sudo shutdown -P now", shell=True)
+
 
 # ==============================================================================
 # Initialisation of IO-Port's for the LED's
 # ------------------------------------------------------------------------------
-#       Raspberry Pi Pin  Pin Raspberry Pi          | Default leds/buttons (-L) | OLED display 
+#       Raspberry Pi Pin  Pin Raspberry Pi          | Default leds/buttons (-L) | OLED display
 #    + 3,3 V           1  2   + 5 V                 |                           | x x
 #  (SDA1) GPIO_2       3  4   + 5 V                 |                           | x x
 #  (SCL1) GPIO_3       5  6   GND                   | clv.rpiButton  fanGround  | x x
@@ -142,7 +150,7 @@ def ShutdownIfRequested():
 #    GND              39  40  GPIO 21               | clv.rpiGround             | Gnd
 #
 # References:
-#           https://www.raspberrypi.org/documentation/usage/gpio/ 
+#           https://www.raspberrypi.org/documentation/usage/gpio/
 #           https://gpiozero.readthedocs.io/en/stable/api_output.html#led
 #           https://gpiozero.readthedocs.io/en/stable/api_input.html#button
 # ==============================================================================
@@ -150,47 +158,47 @@ class clsRaspberry:
     # --------------------------------------------------------------------------
     # External attributes
     # --------------------------------------------------------------------------
-    OK              = False  # True if raspberry AND (leds or display)
-    DisplayState    = None   # callable function
-    SetValues       = None   # callable function
-    DrawLeds        = None   # callable function
+    OK = False  # True if raspberry AND (leds or display)
+    DisplayState = None  # callable function
+    SetValues = None  # callable function
+    DrawLeds = None  # callable function
 
     # --------------------------------------------------------------------------
     # Internal attributes
     # --------------------------------------------------------------------------
-    StatusLeds      = False  # 5 status leds and one button
-    OutputDisplay   = False  # one mini TFT display connected
+    StatusLeds = False  # 5 status leds and one button
+    OutputDisplay = False  # one mini TFT display connected
 
-    LedTacx         = None
-    LedShutdown     = None
-    LedCadence      = None
-    LedBLE          = None
-    LedANT          = None
-    BtnShutdown     = None
+    LedTacx = None
+    LedShutdown = None
+    LedCadence = None
+    LedBLE = None
+    LedANT = None
+    BtnShutdown = None
 
-    LedTacxState    = False
-    LedShutdownState= False
+    LedTacxState = False
+    LedShutdownState = False
     LedCadenceState = False
-    LedBLEState     = False
-    LedANTState     = False
+    LedBLEState = False
+    LedANTState = False
 
     # --------------------------------------------------------------------------
     # Internal attributes for st7789
     # --------------------------------------------------------------------------
-    st7789          = None      # Oled display object
-    faImage         = None      # image object, with scaled FortiusAnt image
-    image           = None      # image object
-    draw            = None      # text draw object on image
-    fontS           = None      # Small font
-    fontLb          = None      # Large,Bold font
-    rotation        = 0
+    st7789 = None  # Oled display object
+    faImage = None  # image object, with scaled FortiusAnt image
+    image = None  # image object
+    draw = None  # text draw object on image
+    fontS = None  # Small font
+    fontLb = None  # Large,Bold font
+    rotation = 0
 
-    buttonA         = None
-    buttonB         = None
-    buttonUp        = False     # button was pressed, must be reset by user
-    buttonDown      = False     # same
+    buttonA = None
+    buttonB = None
+    buttonUp = False  # button was pressed, must be reset by user
+    buttonDown = False  # same
 
-    ButtonDefaultValue = True   # The value when the button is NOT pressed
+    ButtonDefaultValue = True  # The value when the button is NOT pressed
 
     def __init__(self, clv):
         global MySelf
@@ -208,8 +216,10 @@ class clsRaspberry:
         # Activate display, if -O defined
         # ----------------------------------------------------------------------
         if self.OK:
-            if OnRaspberry: self.StatusLeds    = clv.StatusLeds                         # boolean
-            if OnRaspberry: self.OutputDisplay = clv.OutputDisplay and UseOutputDisplay # string
+            if OnRaspberry:
+                self.StatusLeds = clv.StatusLeds  # boolean
+            if OnRaspberry:
+                self.OutputDisplay = clv.OutputDisplay and UseOutputDisplay  # string
 
             self.OK = self.StatusLeds or self.OutputDisplay
 
@@ -219,11 +229,11 @@ class clsRaspberry:
         # Don't forget to add the series resistor of 470 Ohm
         # ----------------------------------------------------------------------
         if self.StatusLeds:
-            self.LedTacx     = gpiozero.LED(clv.rpiTacx)        # Orange
-            self.LedShutdown = gpiozero.LED(clv.rpiShutdown)    # Red
-            self.LedCadence  = gpiozero.LED(clv.rpiCadence)     # White
-            self.LedBLE      = gpiozero.LED(clv.rpiBLE)         # Blue
-            self.LedANT      = gpiozero.LED(clv.rpiANT)         # Green
+            self.LedTacx = gpiozero.LED(clv.rpiTacx)  # Orange
+            self.LedShutdown = gpiozero.LED(clv.rpiShutdown)  # Red
+            self.LedCadence = gpiozero.LED(clv.rpiCadence)  # White
+            self.LedBLE = gpiozero.LED(clv.rpiBLE)  # Blue
+            self.LedANT = gpiozero.LED(clv.rpiANT)  # Green
 
             self.BtnShutdown = gpiozero.Button(clv.rpiButton)
 
@@ -235,27 +245,27 @@ class clsRaspberry:
         # future requests to implement other displays will reveal how much
         # must be changed to accomodate.
         # ----------------------------------------------------------------------
-        self.DisplayState = self._DisplayStateConsole   # If invalid, on console
-        self.SetValues    = self._SetValuesConsole      # If invalid, on console
-        self.DrawLeds     = self._DrawLedsConsole       # If invalid, on console
+        self.DisplayState = self._DisplayStateConsole  # If invalid, on console
+        self.SetValues = self._SetValuesConsole  # If invalid, on console
+        self.DrawLeds = self._DrawLedsConsole  # If invalid, on console
 
-        if   clv.OutputDisplay == False:                # Not specified, no output
+        if clv.OutputDisplay == False:  # Not specified, no output
             self.DisplayState = self._DisplayStateNone
-            self.SetValues    = self._SetValuesNone
-            self.DrawLeds     = self._DrawLedsNone
+            self.SetValues = self._SetValuesNone
+            self.DrawLeds = self._DrawLedsNone
 
-        elif clv.OutputDisplay == 'console':            # Test output on console
+        elif clv.OutputDisplay == "console":  # Test output on console
             pass
 
-        elif clv.OutputDisplay in ('st7789', 'st7789b'): # TFT mini OLED Display
+        elif clv.OutputDisplay in ("st7789", "st7789b"):  # TFT mini OLED Display
             self.rotation = clv.OutputDisplayR
             if self._SetupDisplaySt7789(clv.OutputDisplay):
                 self.DisplayState = self._DisplayStateSt7789
-                self.SetValues    = self._SetValuesSt7789
-                self.DrawLeds     = self._DrawLedsSt7789
+                self.SetValues = self._SetValuesSt7789
+                self.DrawLeds = self._DrawLedsSt7789
 
         else:
-            logfile.Console('Unexpected value for -O %s' % clv.OutputDisplay)
+            logfile.Console("Unexpected value for -O %s" % clv.OutputDisplay)
 
         self.DisplayState()
 
@@ -269,7 +279,7 @@ class clsRaspberry:
     # [ L E D ]   T o g g l e
     # --------------------------------------------------------------------------
     # Input     led, event, ledState
-    #           self.StatusLeds: 
+    #           self.StatusLeds:
     #
     # Function  If no event occurred, led is switched off
     #           If an event occurred, led is toggled on/off
@@ -287,10 +297,12 @@ class clsRaspberry:
     def _Toggle(self, led, event, ledState):
         rtn = None
         if not event:
-            if self.StatusLeds: led.off()
+            if self.StatusLeds:
+                led.off()
             rtn = False
         else:
-            if self.StatusLeds: led.toggle()
+            if self.StatusLeds:
+                led.toggle()
             rtn = not ledState
         return rtn
 
@@ -298,19 +310,23 @@ class clsRaspberry:
     # [ L E D ]   Toggles for the five leds
     # --------------------------------------------------------------------------
     def _ANT(self, event):
-        self.LedANTState        = self._Toggle(self.LedANT,      event,    self.LedANTState)
+        self.LedANTState = self._Toggle(self.LedANT, event, self.LedANTState)
 
     def _BLE(self, event):
-        self.LedBLEState        = self._Toggle(self.LedBLE,      event,    self.LedBLEState)
+        self.LedBLEState = self._Toggle(self.LedBLE, event, self.LedBLEState)
 
     def _Cadence(self, event):
-        self.LedCadenceState    = self._Toggle(self.LedCadence,  event,    self.LedCadenceState)
+        self.LedCadenceState = self._Toggle(
+            self.LedCadence, event, self.LedCadenceState
+        )
 
     def _Shutdown(self, event):
-        self.LedShutdownState   = self._Toggle(self.LedShutdown, event,    self.LedShutdownState)
+        self.LedShutdownState = self._Toggle(
+            self.LedShutdown, event, self.LedShutdownState
+        )
 
     def _Tacx(self, event):
-        self.LedTacxState       = self._Toggle(self.LedTacx,     event,    self.LedTacxState)
+        self.LedTacxState = self._Toggle(self.LedTacx, event, self.LedTacxState)
 
     # --------------------------------------------------------------------------
     # [ L E D ]   S e t L e d s
@@ -325,11 +341,16 @@ class clsRaspberry:
     # Returns   None
     # --------------------------------------------------------------------------
     def SetLeds(self, ANT=None, BLE=None, Cadence=None, Shutdown=None, Tacx=None):
-        if ANT      != None: self._ANT(ANT)
-        if BLE      != None: self._BLE(BLE)
-        if Cadence  != None: self._Cadence(Cadence)
-        if Shutdown != None: self._Shutdown(Shutdown)
-        if Tacx     != None: self._Tacx(Tacx)
+        if ANT != None:
+            self._ANT(ANT)
+        if BLE != None:
+            self._BLE(BLE)
+        if Cadence != None:
+            self._Cadence(Cadence)
+        if Shutdown != None:
+            self._Shutdown(Shutdown)
+        if Tacx != None:
+            self._Tacx(Tacx)
 
         # ----------------------------------------------------------------------
         # If there's a display; add leds to the image and show it
@@ -341,13 +362,18 @@ class clsRaspberry:
     # [ L E D ]   Powerup test TSCBA; blink one by one then switch off
     # --------------------------------------------------------------------------
     def PowerupTest(self):
-        self.SetLeds(False, False, False, False, False)                  # off
-        self.SetLeds(False, False, False, False, True ); time.sleep(.25) # Tacx
-        self.SetLeds(False, False, False, True,  False); time.sleep(.25) # Shutdown
-        self.SetLeds(False, False, True,  False, False); time.sleep(.25) # Cadence
-        self.SetLeds(False, True,  False, False, False); time.sleep(.25) # BLE
-        self.SetLeds(True,  False, False, False, False); time.sleep(.25) # ANT
-        self.SetLeds(False, False, False, False, False)                  # off
+        self.SetLeds(False, False, False, False, False)  # off
+        self.SetLeds(False, False, False, False, True)
+        time.sleep(0.25)  # Tacx
+        self.SetLeds(False, False, False, True, False)
+        time.sleep(0.25)  # Shutdown
+        self.SetLeds(False, False, True, False, False)
+        time.sleep(0.25)  # Cadence
+        self.SetLeds(False, True, False, False, False)
+        time.sleep(0.25)  # BLE
+        self.SetLeds(True, False, False, False, False)
+        time.sleep(0.25)  # ANT
+        self.SetLeds(False, False, False, False, False)  # off
 
     # --------------------------------------------------------------------------
     # [ L E D ]   C h e c k S h u t d o w n
@@ -357,18 +383,18 @@ class clsRaspberry:
     # Function  toggle Shutdown led during button press
     #           return True if kept pressed for the define timeout
     #
-    #           usage: when button is pressed firmly, FortiusAnt must close 
+    #           usage: when button is pressed firmly, FortiusAnt must close
     #                  down and shutdown Raspberry
     #
     # Returns   True when button pressed firmly
     # --------------------------------------------------------------------------
     def CheckShutdown(self, FortiusAntGui=None):
-        repeat = 7      # timeout = n * .25 seconds        # 5 blinks is enough
-                        # 7 because the first two cycles are blink to allow
-                        #       for a "short button press" without messages.
-        rtn    = True   # Assume button will remain pressed
-                        # If we don't use leds/buttons ==> False
-        ResetLeds= False
+        repeat = 7  # timeout = n * .25 seconds        # 5 blinks is enough
+        # 7 because the first two cycles are blink to allow
+        #       for a "short button press" without messages.
+        rtn = True  # Assume button will remain pressed
+        # If we don't use leds/buttons ==> False
+        ResetLeds = False
 
         if OnRaspberry and not IsShutdownRequested():
             # ------------------------------------------------------------------
@@ -382,12 +408,12 @@ class clsRaspberry:
             while repeat:
                 if self.ShutdownButtonIsHeld():
                     if repeat <= 5:
-                        self.SetLeds             (False, False, False, True, False)
+                        self.SetLeds(False, False, False, True, False)
                         if FortiusAntGui != None:
                             FortiusAntGui.SetLeds(False, False, False, True, False)
-                        logfile.Console('Raspberry will be shutdown ... %s ' % repeat)
+                        logfile.Console("Raspberry will be shutdown ... %s " % repeat)
                     ResetLeds = True
-                    time.sleep(.25)
+                    time.sleep(0.25)
                 else:
                     rtn = False
                     break
@@ -405,14 +431,14 @@ class clsRaspberry:
             # The application has to do it, though.
             # ------------------------------------------------------------------
             if rtn:
-                logfile.Console('Raspberry will shutdown')
+                logfile.Console("Raspberry will shutdown")
                 PrepareShutdown()
 
             # ------------------------------------------------------------------
             # If leds were touched, switch off all - application must set again
             # ------------------------------------------------------------------
             if not rtn and ResetLeds:
-                self.SetLeds             (False, False, False, False, False)
+                self.SetLeds(False, False, False, False, False)
                 if FortiusAntGui != None:
                     FortiusAntGui.SetLeds(False, False, False, False, False)
 
@@ -425,16 +451,19 @@ class clsRaspberry:
         # ----------------------------------------------------------------------
         # Self-defined button
         # ----------------------------------------------------------------------
-        if     self.StatusLeds \
-           and self.BtnShutdown.is_held: return True
+        if self.StatusLeds and self.BtnShutdown.is_held:
+            return True
 
         # ----------------------------------------------------------------------
         # Buttons on the ST7789 display
         # ----------------------------------------------------------------------
-        if     self.buttonA       != None  \
-           and self.buttonB       != None  \
-           and self.buttonA.value != self.ButtonDefaultValue \
-           and self.buttonB.value != self.ButtonDefaultValue: return True
+        if (
+            self.buttonA != None
+            and self.buttonB != None
+            and self.buttonA.value != self.ButtonDefaultValue
+            and self.buttonB.value != self.ButtonDefaultValue
+        ):
+            return True
         return False
 
     # --------------------------------------------------------------------------
@@ -459,16 +488,16 @@ class clsRaspberry:
         # ----------------------------------------------------------------------
         # Create the ST7789 display (this is 240x240 version):
         # ----------------------------------------------------------------------
-        cs_pin    = digitalio.DigitalInOut(board.CE0)
-        dc_pin    = digitalio.DigitalInOut(board.D25)
+        cs_pin = digitalio.DigitalInOut(board.CE0)
+        dc_pin = digitalio.DigitalInOut(board.D25)
         reset_pin = None
 
-        BAUDRATE  = 64000000        # Default max is 24Mhz
+        BAUDRATE = 64000000  # Default max is 24Mhz
         try:
-            spi   = board.SPI()     # Setup SPI bus using hardware SPI
+            spi = board.SPI()  # Setup SPI bus using hardware SPI
         except Exception as e:
-            logfile.Console ("OLED display st7789 cannot be initialized: %s" % e)
-            rtn   = False
+            logfile.Console("OLED display st7789 cannot be initialized: %s" % e)
+            rtn = False
         else:
             # ------------------------------------------------------------------
             # Now initialize the display
@@ -493,12 +522,12 @@ class clsRaspberry:
             self.backlight.switch_to_output()
             self.backlight.value = True
 
-            assert(clv_OutputDisplay in ('st7789', 'st7789b'))
-            if clv_OutputDisplay == 'st7789':
+            assert clv_OutputDisplay in ("st7789", "st7789b")
+            if clv_OutputDisplay == "st7789":
                 self.buttonA = digitalio.DigitalInOut(board.D23)
                 self.buttonB = digitalio.DigitalInOut(board.D24)
 
-            elif clv_OutputDisplay == 'st7789b':  # Add Waveshare 1.3 LCD 
+            elif clv_OutputDisplay == "st7789b":  # Add Waveshare 1.3 LCD
                 self.buttonA = digitalio.DigitalInOut(board.D20)
                 self.buttonB = digitalio.DigitalInOut(board.D16)
                 # --------------------------------------------------------------
@@ -523,28 +552,40 @@ class clsRaspberry:
             # ------------------------------------------------------------------
             # Scale the image to the smaller screen dimension:
             # ------------------------------------------------------------------
-            image_ratio  = self.faImage.width / self.faImage.height
-            screen_ratio = self.st7789 .width / self.st7789 .height
+            image_ratio = self.faImage.width / self.faImage.height
+            screen_ratio = self.st7789.width / self.st7789.height
             if screen_ratio < image_ratio:
-                scaled_width  = self.faImage.width  * self.st7789.height // self.faImage.height
+                scaled_width = (
+                    self.faImage.width * self.st7789.height // self.faImage.height
+                )
                 scaled_height = self.st7789.height
             else:
-                scaled_width  = self.st7789.width
-                scaled_height = self.faImage.height * self.st7789.width  // self.faImage.width
-            self.faImage = self.faImage.resize((scaled_width, scaled_height), Image.BICUBIC)
+                scaled_width = self.st7789.width
+                scaled_height = (
+                    self.faImage.height * self.st7789.width // self.faImage.width
+                )
+            self.faImage = self.faImage.resize(
+                (scaled_width, scaled_height), Image.BICUBIC
+            )
 
             # ------------------------------------------------------------------
             # Crop and center the image:
             # ------------------------------------------------------------------
-            x_jpg = scaled_width  // 2 - self.st7789.width  // 2
+            x_jpg = scaled_width // 2 - self.st7789.width // 2
             y_jpg = scaled_height // 2 - self.st7789.height // 2
-            self.faImage = self.faImage.crop((x_jpg, y_jpg, x_jpg + self.st7789.width, y_jpg + self.st7789.height))
+            self.faImage = self.faImage.crop(
+                (x_jpg, y_jpg, x_jpg + self.st7789.width, y_jpg + self.st7789.height)
+            )
 
-            #-------------------------------------------------------------------
+            # -------------------------------------------------------------------
             # Load a TTF font - other good fonts available from: http://www.dafont.com/bitmap.php
-            #-------------------------------------------------------------------
-            self.fontS  = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 22)
-            self.fontLb = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 36)
+            # -------------------------------------------------------------------
+            self.fontS = ImageFont.truetype(
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 22
+            )
+            self.fontLb = ImageFont.truetype(
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 36
+            )
 
             # ------------------------------------------------------------------
             # Display image, for at least three seconds
@@ -552,13 +593,13 @@ class clsRaspberry:
             self._ShowImage()
             time.sleep(3)
 
-            #-------------------------------------------------------------------
+            # -------------------------------------------------------------------
             # Part 2: display control text
             # Create blank image for drawing with mode 'RGB' for full color
             # Get drawing object to draw on image
-            #-------------------------------------------------------------------
-            self.image  = Image.new("RGB", (self.st7789.width, self.st7789.height))
-            self.draw   = ImageDraw.Draw(self.image)
+            # -------------------------------------------------------------------
+            self.image = Image.new("RGB", (self.st7789.width, self.st7789.height))
+            self.draw = ImageDraw.Draw(self.image)
 
         return rtn
 
@@ -574,12 +615,14 @@ class clsRaspberry:
     def _ShowImage(self):
         if False:
             # Show image without text on top
-            self.image  = self.faImage    
+            self.image = self.faImage
         else:
             # Show image with text on top
-            self.image  = self.faImage
-            self.draw   = ImageDraw.Draw(self.image)
-            self.draw.text    ( (10, 0     ), 'FortiusAnt',          font=self.fontLb, fill=constants.FORTIUS)
+            self.image = self.faImage
+            self.draw = ImageDraw.Draw(self.image)
+            self.draw.text(
+                (10, 0), "FortiusAnt", font=self.fontLb, fill=constants.FORTIUS
+            )
 
         self.st7789.image(self.faImage, self.rotation)
 
@@ -603,14 +646,16 @@ class clsRaspberry:
         # False: Draw text on top of image (as background); like this not usable
         # ----------------------------------------------------------------------
         if True:
-            self.image  = Image.new("RGB", (self.st7789.width, self.st7789.height))
-            self.draw   = ImageDraw.Draw(self.image)
+            self.image = Image.new("RGB", (self.st7789.width, self.st7789.height))
+            self.draw = ImageDraw.Draw(self.image)
             # background colour FORTIUS is not a success
             # GREY/WHITE on black background is not so bad after all
-            self.draw.rectangle((0, 0, self.st7789.width, self.st7789.height), outline=0, fill=(0, 0, 0))
+            self.draw.rectangle(
+                (0, 0, self.st7789.width, self.st7789.height), outline=0, fill=(0, 0, 0)
+            )
         else:
-            self.image  = self.faImage
-            self.draw   = ImageDraw.Draw(self.image)
+            self.image = self.faImage
+            self.draw = ImageDraw.Draw(self.image)
 
         # ----------------------------------------------------------------------
         # Draw each of supplied lines
@@ -619,19 +664,23 @@ class clsRaspberry:
         #           Note: if (many) more lines provided, it will be a mess!
         # x=0/120 = column 1, 2
         # ----------------------------------------------------------------------
-        h = int(207 / max(1,len(t)))
+        h = int(207 / max(1, len(t)))
         for i in range(0, len(t)):
             if values:
-                self.draw.text( (  0, i * h), t[i][0], font=self.fontS, fill=constants.GREY)
-                self.draw.text( (120, i * h), t[i][1], font=self.fontS, fill=constants.WHITE)
+                self.draw.text(
+                    (0, i * h), t[i][0], font=self.fontS, fill=constants.GREY
+                )
+                self.draw.text(
+                    (120, i * h), t[i][1], font=self.fontS, fill=constants.WHITE
+                )
             else:
-                self.draw.text( (  0, i * h), t[i][0], font=self.fontS, fill=t[i][1])
+                self.draw.text((0, i * h), t[i][0], font=self.fontS, fill=t[i][1])
 
         # ----------------------------------------------------------------------
         # Add leds and show image
         # ----------------------------------------------------------------------
         self.DrawLeds()
-        
+
         # ----------------------------------------------------------------------
         # Do not delay here; it delays the FortiusAntBody-loop!!
         # time.sleep(1.5)
@@ -654,47 +703,70 @@ class clsRaspberry:
     # --------------------------------------------------------------------------
     def _DrawLedsNone(self):
         pass
+
     def _DrawLedsConsole(self):
         pass
+
     def _DrawLedsSt7789(self):
         # ----------------------------------------------------------------------
         # Calculate dimensions
         # ----------------------------------------------------------------------
         nrLeds = 2
-        if self.clv.Tacx_Cadence:       nrLeds += 1
-        if self.clv.ble:                nrLeds += 1
-        if self.clv.antDeviceID != -1:  nrLeds += 1
+        if self.clv.Tacx_Cadence:
+            nrLeds += 1
+        if self.clv.ble:
+            nrLeds += 1
+        if self.clv.antDeviceID != -1:
+            nrLeds += 1
 
-        d = 10                          # Diameter of a led
-        y = self.st7789.height - 20     # Vertical top of leds
-        dx= self.st7789.width  / nrLeds # Space per led
+        d = 10  # Diameter of a led
+        y = self.st7789.height - 20  # Vertical top of leds
+        dx = self.st7789.width / nrLeds  # Space per led
 
         # ----------------------------------------------------------------------
         # Fill depending on led-state
         # ----------------------------------------------------------------------
-        f1 = constants.AMBER if self.LedTacxState     else constants.BLACK
-        f2 = constants.RED   if self.LedShutdownState else constants.BLACK
-        f3 = constants.WHITE if self.LedCadenceState  else constants.BLACK
-        f4 = constants.BLUE  if self.LedBLEState      else constants.BLACK
-        f5 = constants.GREEN if self.LedANTState      else constants.BLACK
+        f1 = constants.AMBER if self.LedTacxState else constants.BLACK
+        f2 = constants.RED if self.LedShutdownState else constants.BLACK
+        f3 = constants.WHITE if self.LedCadenceState else constants.BLACK
+        f4 = constants.BLUE if self.LedBLEState else constants.BLACK
+        f5 = constants.GREEN if self.LedANTState else constants.BLACK
 
         # ----------------------------------------------------------------------
         # Separating line
         # ----------------------------------------------------------------------
-        self.draw.line((0, y - 8, self.st7789.width, y - 8), fill=constants.FORTIUS, width=1, joint=None)
+        self.draw.line(
+            (0, y - 8, self.st7789.width, y - 8),
+            fill=constants.FORTIUS,
+            width=1,
+            joint=None,
+        )
 
         # ----------------------------------------------------------------------
         # Five circles to represent the leds
         # ----------------------------------------------------------------------
         #                                         x1 y2 x2     y2
-        x  = int(dx/2 - d/2); self.draw.ellipse( (x, y, x + d, y + d), fill=f1, outline=constants.AMBER, width=1)
-        x += int(dx);         self.draw.ellipse( (x, y, x + d, y + d), fill=f2, outline=constants.RED,   width=1)
+        x = int(dx / 2 - d / 2)
+        self.draw.ellipse(
+            (x, y, x + d, y + d), fill=f1, outline=constants.AMBER, width=1
+        )
+        x += int(dx)
+        self.draw.ellipse((x, y, x + d, y + d), fill=f2, outline=constants.RED, width=1)
         if self.clv.Tacx_Cadence:
-            x += int(dx);     self.draw.ellipse( (x, y, x + d, y + d), fill=f3, outline=constants.WHITE, width=1)
+            x += int(dx)
+            self.draw.ellipse(
+                (x, y, x + d, y + d), fill=f3, outline=constants.WHITE, width=1
+            )
         if self.clv.ble:
-            x += int(dx);     self.draw.ellipse( (x, y, x + d, y + d), fill=f4, outline=constants.BLUE,  width=1)
+            x += int(dx)
+            self.draw.ellipse(
+                (x, y, x + d, y + d), fill=f4, outline=constants.BLUE, width=1
+            )
         if self.clv.antDeviceID != -1:
-            x += int(dx);     self.draw.ellipse( (x, y, x + d, y + d), fill=f5, outline=constants.GREEN, width=1)
+            x += int(dx)
+            self.draw.ellipse(
+                (x, y, x + d, y + d), fill=f5, outline=constants.GREEN, width=1
+            )
 
         # ----------------------------------------------------------------------
         # Show the image
@@ -705,12 +777,16 @@ class clsRaspberry:
         # Translate buttons on the ST7789 display to Up/DOWN
         # Rotation-dependant: Left/Bottom = Down, Right/Top   = Up
         # ----------------------------------------------------------------------
-        if self.rotation in (180,270):
-            if self.buttonA.value != self.ButtonDefaultValue: self.buttonUp   = True
-            if self.buttonB.value != self.ButtonDefaultValue: self.buttonDown = True
+        if self.rotation in (180, 270):
+            if self.buttonA.value != self.ButtonDefaultValue:
+                self.buttonUp = True
+            if self.buttonB.value != self.ButtonDefaultValue:
+                self.buttonDown = True
         else:
-            if self.buttonA.value != self.ButtonDefaultValue: self.buttonDown = True
-            if self.buttonB.value != self.ButtonDefaultValue: self.buttonUp   = True
+            if self.buttonA.value != self.ButtonDefaultValue:
+                self.buttonDown = True
+            if self.buttonB.value != self.ButtonDefaultValue:
+                self.buttonUp = True
 
     # --------------------------------------------------------------------------
     # [ O U T P U T ] D i s p l a y S t a t e - implementations for the -L displays
@@ -733,26 +809,26 @@ class clsRaspberry:
         # One line is enough, since colouring/enhancing is not possible
         # ----------------------------------------------------------------------
         if True or self.OutputDisplay:
-            if   FortiusAntState == None:
-                print('+++++ initialized')
+            if FortiusAntState == None:
+                print("+++++ initialized")
             elif FortiusAntState == constants.faStarted:
-                print('+++++ faStarted')
+                print("+++++ faStarted")
             elif FortiusAntState == constants.faTrainer:
-                print('+++++ faTrainer')
+                print("+++++ faTrainer")
             elif FortiusAntState == constants.faWait2Calibrate:
-                print('+++++ faWait2Calibrate')
+                print("+++++ faWait2Calibrate")
             elif FortiusAntState == constants.faCalibrating:
-                print('+++++ faCalibrating')
+                print("+++++ faCalibrating")
             elif FortiusAntState == constants.faActivate:
-                print('+++++ faActivate')
+                print("+++++ faActivate")
             elif FortiusAntState == constants.faOperational:
-                print('+++++ faOperational')
+                print("+++++ faOperational")
             elif FortiusAntState == constants.faStopped:
-                print('+++++ faStopped')
+                print("+++++ faStopped")
             elif FortiusAntState == constants.faDeactivated:
-                print('+++++ faDeactivated')
+                print("+++++ faDeactivated")
             elif FortiusAntState == constants.faTerminated:
-                print('+++++ faTerminated')
+                print("+++++ faTerminated")
             else:
                 pass
 
@@ -763,7 +839,9 @@ class clsRaspberry:
         # ----------------------------------------------------------------------
         if FortiusAntState == None:
             try:
-                FortiusAntState = PreviousState   # pylint: disable=used-before-assignment
+                FortiusAntState = (
+                    PreviousState  # pylint: disable=used-before-assignment
+                )
             except:
                 FortiusAntState = constants.faStarted
 
@@ -776,23 +854,36 @@ class clsRaspberry:
                 # FortiusAnt is started, next step will be connecting to trainer
                 # FortiusAnt is stopped, no trainer ever connected
                 # First and last line according the contents in usbTrainer.py
-                c0  = constants.WHITE if FortiusAntState == constants.faStarted    else constants.BLACK
-                c0a = constants.GREY  if FortiusAntState == constants.faStarted    else constants.BLACK
-                c8  = constants.WHITE if FortiusAntState == constants.faTerminated else constants.BLACK
-                t = [[ 'FortiusAnt started', c0   ],\
-                     [ '',                   None ],\
-                     [ 'Press [Locate HW]',  c0a  ],\
-                     [ 'to continue',        c0a  ],\
-                     [ '',                   None ],\
-                     [ '',                   None ],\
-                     [ '',                   None ],\
-                     [ '',                   None ],\
-                     [ 'FortiusAnt stopped', c8   ],\
-                    ]
+                c0 = (
+                    constants.WHITE
+                    if FortiusAntState == constants.faStarted
+                    else constants.BLACK
+                )
+                c0a = (
+                    constants.GREY
+                    if FortiusAntState == constants.faStarted
+                    else constants.BLACK
+                )
+                c8 = (
+                    constants.WHITE
+                    if FortiusAntState == constants.faTerminated
+                    else constants.BLACK
+                )
+                t = [
+                    ["FortiusAnt started", c0],
+                    ["", None],
+                    ["Press [Locate HW]", c0a],
+                    ["to continue", c0a],
+                    ["", None],
+                    ["", None],
+                    ["", None],
+                    ["", None],
+                    ["FortiusAnt stopped", c8],
+                ]
             else:
                 # Show the trainer-enhanced status
                 t = TacxTrainer.DisplayStateTable(FortiusAntState)
-            self._DrawTextTable (t)
+            self._DrawTextTable(t)
         PreviousState = FortiusAntState
 
     # --------------------------------------------------------------------------
@@ -807,58 +898,100 @@ class clsRaspberry:
     def _SetValuesNone(self, *argv):
         pass
 
-    def _SetValuesConsole(self, fSpeed, iRevs, iPower, iTargetMode, iTargetPower, fTargetGrade, \
-                    iTacx, iHeartRate, \
-                    iCrancksetIndex, iCassetteIndex, fReduction):
-        print('Speed=%s, Cadence=%s, Power=%s, Mode=%s, Target Power=%s, Target Grade=%s, \
-               Tacx=%s, Cranckset=%s, Cassette=%s, Reduction=%s' % \
-                    (fSpeed, iRevs, iPower, iTargetMode, iTargetPower, fTargetGrade, \
-                    iTacx, iCrancksetIndex, iCassetteIndex, fReduction))
+    def _SetValuesConsole(
+        self,
+        fSpeed,
+        iRevs,
+        iPower,
+        iTargetMode,
+        iTargetPower,
+        fTargetGrade,
+        iTacx,
+        iHeartRate,
+        iCrancksetIndex,
+        iCassetteIndex,
+        fReduction,
+    ):
+        print(
+            "Speed=%s, Cadence=%s, Power=%s, Mode=%s, Target Power=%s, Target Grade=%s, \
+               Tacx=%s, Cranckset=%s, Cassette=%s, Reduction=%s"
+            % (
+                fSpeed,
+                iRevs,
+                iPower,
+                iTargetMode,
+                iTargetPower,
+                fTargetGrade,
+                iTacx,
+                iCrancksetIndex,
+                iCassetteIndex,
+                fReduction,
+            )
+        )
 
-    def _SetValuesSt7789(self, fSpeed, iRevs, iPower, iTargetMode, iTargetPower, fTargetGrade, \
-                    iTacx, iHeartRate, \
-                    iCrancksetIndex, iCassetteIndex, fReduction):
+    def _SetValuesSt7789(
+        self,
+        fSpeed,
+        iRevs,
+        iPower,
+        iTargetMode,
+        iTargetPower,
+        fTargetGrade,
+        iTacx,
+        iHeartRate,
+        iCrancksetIndex,
+        iCassetteIndex,
+        fReduction,
+    ):
+        # ------------------------------------------------------------------
+        # Format Speed
+        # ------------------------------------------------------------------
+        if self.clv.imperial:
+            s = "{:<4.1f}mph".format(fSpeed / mile)
+        else:
+            s = "{:<4.1f}km/h".format(fSpeed)
 
-            # ------------------------------------------------------------------
-            # Format Speed
-            # ------------------------------------------------------------------
-            if self.clv.imperial:
-                s = "{:<4.1f}mph".format(fSpeed / mile)
-            else:
-                s = "{:<4.1f}km/h".format(fSpeed)
+        # ------------------------------------------------------------------
+        # Format Power
+        # ------------------------------------------------------------------
+        if iTargetMode == mode_Power:
+            t = "{:d}Watt".format(iTargetPower)
 
-            # ------------------------------------------------------------------
-            # Format Power
-            # ------------------------------------------------------------------
-            if   iTargetMode == mode_Power:
-                t = "{:d}Watt".format(iTargetPower)
+        elif iTargetMode == mode_Grade:
+            t = "{:<2.0f}%".format(fTargetGrade)
+            t += "{:d}Watt".format(iTargetPower)  # Target power added for reference
+            # Can be negative!
+        else:
+            t = "No target"
 
-            elif iTargetMode == mode_Grade:
-                t  = "{:<2.0f}%".format(fTargetGrade)
-                t += "{:d}Watt" .format(iTargetPower)   # Target power added for reference
-                                                        # Can be negative!
-            else:
-                t = "No target"
+        # ------------------------------------------------------------------
+        # Format Gears
+        # ------------------------------------------------------------------
+        if iCassetteIndex < 0:  # IF out of bounds: Reduction <> 1
+            teeth = self.clv.Cassette[0]
+        elif iCassetteIndex >= len(self.clv.Cassette):
+            teeth = self.clv.Cassette[len(self.clv.Cassette) - 1]
+        else:
+            teeth = self.clv.Cassette[iCassetteIndex]
+        g = "%i : %i" % (
+            self.clv.Cranckset[iCrancksetIndex],
+            teeth,
+        )  # int(round(teeth / self.Reduction)
 
-            # ------------------------------------------------------------------
-            # Format Gears
-            # ------------------------------------------------------------------
-            if iCassetteIndex < 0:      # IF out of bounds: Reduction <> 1
-                teeth = self.clv.Cassette[0]
-            elif iCassetteIndex >= len(self.clv.Cassette):
-                teeth = self.clv.Cassette[len(self.clv.Cassette) - 1]
-            else:
-                teeth = self.clv.Cassette[iCassetteIndex]
-            g = "%i : %i" % (self.clv.Cranckset[iCrancksetIndex], teeth ) # int(round(teeth / self.Reduction)
+        # ------------------------------------------------------------------
+        # And draw on the display
+        # ------------------------------------------------------------------
+        self._DrawTextTable(
+            [
+                ["Speed", s],
+                ["Cadence", "{:d}/min".format(iRevs)],
+                ["Power", "{:d}Watt".format(iPower)],
+                ["Target ", t],
+                ["Gears", g],
+            ],
+            True,
+        )
 
-            # ------------------------------------------------------------------
-            # And draw on the display
-            # ------------------------------------------------------------------
-            self._DrawTextTable ( [ [ 'Speed'  , s                         ],\
-                                    [ 'Cadence', "{:d}/min".format(iRevs)  ],\
-                                    [ 'Power'  , "{:d}Watt".format(iPower) ],\
-                                    [ 'Target ', t                         ],\
-                                    [ 'Gears'  , g                         ]], True)
 
 # ------------------------------------------------------------------------------
 # Code for test-purpose
@@ -867,11 +1000,11 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
     # Get command line variables; -l, -L and -O are relevant
     # --------------------------------------------------------------------------
-    clv=cmd.CommandLineVariables()
-    if OnRaspberry:                 # switch on in testmode, so that -l -O not needed
-        clv.StatusLeds    = True
-        clv.OutputDisplay = 'st7789'
-        clv.rpiButton     = 16
+    clv = cmd.CommandLineVariables()
+    if OnRaspberry:  # switch on in testmode, so that -l -O not needed
+        clv.StatusLeds = True
+        clv.OutputDisplay = "st7789"
+        clv.rpiButton = 16
     clv.print()
 
     # --------------------------------------------------------------------------
@@ -879,49 +1012,54 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
     rpi = clsRaspberry(clv)
 
-    event   = True                        # Use same event-flag for each led
-    first   = True
-    repeat  = 5
+    event = True  # Use same event-flag for each led
+    first = True
+    repeat = 5
     while True:
         # ----------------------------------------------------------------------
         # Test leds (-l flag)
         # ----------------------------------------------------------------------
         if rpi.StatusLeds:
-            if first: print('Test leds')
+            if first:
+                print("Test leds")
             rpi.SetLeds(event, event, event, event, event)
             event = not event
 
-            if first: print('Until button pressed')
-            if rpi.CheckShutdown(): break
+            if first:
+                print("Until button pressed")
+            if rpi.CheckShutdown():
+                break
 
         # ----------------------------------------------------------------------
         # Test leds (-O flag)
         # ----------------------------------------------------------------------
         if rpi.OutputDisplay:
-            if first: print('Test OutputDisplay')
+            if first:
+                print("Test OutputDisplay")
 
-            print('a, b, repeat', rpi.buttonA.value, rpi.buttonB.value, repeat)
+            print("a, b, repeat", rpi.buttonA.value, rpi.buttonB.value, repeat)
 
             if rpi.buttonA.value and rpi.buttonB.value:
-                rpi.backlight.value = False                     # turn off backlight
+                rpi.backlight.value = False  # turn off backlight
                 repeat -= 1
-                if repeat == 0: print('break, repeat = 0')                           # Stop no powerdown
+                if repeat == 0:
+                    print("break, repeat = 0")  # Stop no powerdown
             else:
-                rpi.backlight.value = True                      # turn on backlight
+                rpi.backlight.value = True  # turn on backlight
 
-            if rpi.buttonB.value and not rpi.buttonA.value:     # just button A pressed
-                rpi.st7789.fill(color565(255, 0, 0))            # red
+            if rpi.buttonB.value and not rpi.buttonA.value:  # just button A pressed
+                rpi.st7789.fill(color565(255, 0, 0))  # red
 
-            if rpi.buttonA.value and not rpi.buttonB.value:     # just button B pressed
-                rpi.st7789.fill(color565(0, 0, 255))            # blue
+            if rpi.buttonA.value and not rpi.buttonB.value:  # just button B pressed
+                rpi.st7789.fill(color565(0, 0, 255))  # blue
 
-            if not rpi.buttonA.value and not rpi.buttonB.value: # none pressed
-                rpi.st7789.fill(color565(0, 255, 0))            # green
+            if not rpi.buttonA.value and not rpi.buttonB.value:  # none pressed
+                rpi.st7789.fill(color565(0, 255, 0))  # green
 
         # ----------------------------------------------------------------------
         # Stop for next button press
         # ----------------------------------------------------------------------
         first = False
-        time.sleep(.25)
+        time.sleep(0.25)
 
     ShutdownIfRequested()

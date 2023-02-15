@@ -1,6 +1,6 @@
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Version info
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 __version__ = "2020-12-28"
 # 2020-12-28    AccumulatedPower not negative
 # 2020-12-27    Interleave and EventCount improved according
@@ -23,59 +23,75 @@ __version__ = "2020-12-28"
 #                   9.1.1 Calculating accumulated values
 #                       NOTE: All accumulating message fields must use only positive values.
 #                   9.1.2 Receiving and Calculating Data from Accumulated Values
-#               Most important change: Interleave counting is separate from 
+#               Most important change: Interleave counting is separate from
 #                   the AccumulatedPower related EventCount.
 # 2020-06-11    First version, based upon antHRM.py
-#-------------------------------------------------------------------------------
-import fortius_ant.antDongle         as ant
+# -------------------------------------------------------------------------------
+import fortius_ant.antDongle as ant
+
 
 def Initialize():
     global AccumulatedPower, EventCount, Interleave
-    AccumulatedPower    = 0
-    EventCount          = 0
-    Interleave          = 0
+    AccumulatedPower = 0
+    EventCount = 0
+    Interleave = 0
 
-def BroadcastMessage (CurrentPower, Cadence):
+
+def BroadcastMessage(CurrentPower, Cadence):
     global AccumulatedPower, EventCount, Interleave
 
-    if   Interleave ==  61:         # Transmit page 0x52 = 82
+    if Interleave == 61:  # Transmit page 0x52 = 82
         info = ant.msgPage82_BatteryStatus(ant.channel_PWR)
-    
-    elif Interleave == 120:         # Transmit page 0x50 = 80
-        info = ant.msgPage80_ManufacturerInfo(ant.channel_PWR, 0xff, 0xff, \
-            ant.HWrevision_PWR, ant.Manufacturer_garmin, ant.ModelNumber_PWR)
 
-    elif Interleave == 121:         # Transmit page 0x51 = 81
-        info = ant.msgPage81_ProductInformation(ant.channel_PWR, 0xff, \
-            ant.SWrevisionSupp_PWR, ant.SWrevisionMain_PWR, ant.SerialNumber_PWR)
+    elif Interleave == 120:  # Transmit page 0x50 = 80
+        info = ant.msgPage80_ManufacturerInfo(
+            ant.channel_PWR,
+            0xFF,
+            0xFF,
+            ant.HWrevision_PWR,
+            ant.Manufacturer_garmin,
+            ant.ModelNumber_PWR,
+        )
 
-        Interleave = 0              # Restart after the last interleave message
+    elif Interleave == 121:  # Transmit page 0x51 = 81
+        info = ant.msgPage81_ProductInformation(
+            ant.channel_PWR,
+            0xFF,
+            ant.SWrevisionSupp_PWR,
+            ant.SWrevisionMain_PWR,
+            ant.SerialNumber_PWR,
+        )
+
+        Interleave = 0  # Restart after the last interleave message
 
     else:
-        EventCount       += 1
-        AccumulatedPower += max(0, CurrentPower)            # No decrement allowed
+        EventCount += 1
+        AccumulatedPower += max(0, CurrentPower)  # No decrement allowed
 
-        EventCount        = int(EventCount)       & 0xff    # roll-over at 255
-        AccumulatedPower  = int(AccumulatedPower) & 0xffff  # roll-over at 65535
+        EventCount = int(EventCount) & 0xFF  # roll-over at 255
+        AccumulatedPower = int(AccumulatedPower) & 0xFFFF  # roll-over at 65535
 
-        info= ant.msgPage16_PowerOnly (ant.channel_PWR, EventCount, Cadence, AccumulatedPower, CurrentPower)
+        info = ant.msgPage16_PowerOnly(
+            ant.channel_PWR, EventCount, Cadence, AccumulatedPower, CurrentPower
+        )
 
-    pwrdata = ant.ComposeMessage (ant.msgID_BroadcastData, info)
+    pwrdata = ant.ComposeMessage(ant.msgID_BroadcastData, info)
 
-    #-------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # Prepare for next event
-    #-------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     Interleave += 1
 
-    #-------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # Return message to be sent
-    #-------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     return pwrdata
 
-#-------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
 # Main program for module test
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 if __name__ == "__main__":
     Initialize()
-    pwrdata = BroadcastMessage (456.7, 123)
-    print (pwrdata)
+    pwrdata = BroadcastMessage(456.7, 123)
+    print(pwrdata)
