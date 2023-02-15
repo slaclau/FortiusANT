@@ -21,3 +21,4 @@ debian/*debhelper
 debian/*substvars
 debian/files
 wxPython-source.txt
+sphinx/source/generated/
