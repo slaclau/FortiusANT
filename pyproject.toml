@@ -1,0 +1,19 @@
+[tool.isort]
+profile = "black"
+[tool.flakeheaven]
+max_line_length = 88
+format = "grouped"
+#show_source = true
+[tool.flakeheaven.plugins]
+pyflakes = ["+*"]
+"flake8-*" = ["+*"]
+mccabe = ["+*"]
+pycodestyle = ["+*"]
+#pylint = ["+*","-C0103"]
+#flake8-docstrings = ["-*"]
+[tool.pylint.MAIN]
+load-plugins = [
+    "pylint.extensions.docparams"
+]
+[tool.pydocstyle]
+convention = "numpy"
