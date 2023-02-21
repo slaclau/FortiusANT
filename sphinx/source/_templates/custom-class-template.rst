@@ -2,7 +2,7 @@
 
 .. currentmodule:: {{ module }}
 
-.. autoclass:: {{ fullname }}
+.. autoclass:: {{ name }}
    :show-inheritance:
 
    .. inheritance-diagram:: {{ objname }}

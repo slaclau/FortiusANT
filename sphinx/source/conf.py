@@ -1,5 +1,6 @@
 import sys
 import os
+import pylint
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
@@ -22,16 +23,24 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.inheritance_diagram',
     'sphinx.ext.graphviz',
+    'sphinx_pyreverse',
 ]
 
 autosummary_generate = True
 
-autodoc_mock_imports = ["wx"]
 
 autodoc_default_options = {
     'undoc-members': True,
 }
-
+autoclass_content = "class"
+#autodoc_class_signature = "separated"
+autodoc_member_order = "bysource"
+autodoc_docstring_signature = True
+autodoc_mock_imports = [
+    "wx",
+    "multiprocessing",
+]
+autodoc_typehints = "description"
 
 templates_path = ['_templates']
 exclude_patterns = []
@@ -45,26 +54,19 @@ inheritance_graph_attrs = dict(rankdir="TB", size='""')
 
 graphviz_output_format = 'svg'
 
-autodoc_default_options = {
-    'member-order': 'bysource',
-    'undoc-members': True,
-}
-
-
 sys.path.insert(0, os.path.abspath('../'))
-
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 #html_theme = 'default'
-#html_theme = 'pydata_sphinx_theme'
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'pydata_sphinx_theme'
+#html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
-#html_theme_options = {
-#   "logo": {
-#      "image_light": "logo-light.png",
-#      "image_dark": "logo-dark.png",
-#   }
-#}
+html_theme_options = {
+   "logo": {
+      "image_light": "logo-light.png",
+      "image_dark": "logo-dark.png",
+   }
+}

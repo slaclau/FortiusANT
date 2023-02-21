@@ -10,6 +10,7 @@ Table of Contents
    :maxdepth: 2
 
    generated/fortius_ant
+   graphs
 
 Indices and tables
 ==================

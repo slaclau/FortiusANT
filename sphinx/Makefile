@@ -20,5 +20,12 @@ help:
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 github:
+	@make graphs
 	@make html
 	@cp -a build/html/. ../docs
+
+
+PYSOURCEDIR = ../fortius_ant
+
+graphs:
+	cd ..; pyreverse fortius_ant -d sphinx/source/graphviz;

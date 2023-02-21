@@ -22,3 +22,4 @@ debian/*substvars
 debian/files
 wxPython-source.txt
 sphinx/source/generated/
+flake8heavened

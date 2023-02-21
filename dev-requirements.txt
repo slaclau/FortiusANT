@@ -1,0 +1,11 @@
+flake8
+flake8-docstrings
+isort
+black
+darglint
+mypy
+pylint
+docformatter
+sphinx
+sphinx_rtd_theme
+pydata_sphinx_theme
