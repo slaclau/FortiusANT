@@ -49,8 +49,8 @@ from fortius_ant.FortiusAntTitle import githubWindowTitle
 if UseGui:
     import wx
 
-    from fortius_ant import FortiusAntGui as gui
-    from fortius_ant import RadarGraph as RadarGraph
+    from fortius_ant import FortiusAntGui as gui  # noqa: PLC0412
+    from fortius_ant import RadarGraph
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
@@ -268,12 +268,12 @@ if UseGui:
     class frmFortiusAnt(gui.frmFortiusAntGui):
         """This class extends the base GUI class with direct function calls."""
 
-        def callSettings(self, RestartApplication, pclv):
+        def callSettings(self, pRestartApplication, pclv):
             """Call FortiusAnt.Settings and return its result.
 
             Parameters
             ----------
-            RestartApplication : bool
+            pRestartApplication : bool
                 Application restart state to be set
             pclv : FortiusAntCommand.CommandLineVariables
                 Command line variables to be set
@@ -283,7 +283,7 @@ if UseGui:
             bool
                 True
             """
-            return Settings(self, RestartApplication, pclv)
+            return Settings(self, pRestartApplication, pclv)
 
         def callIdleFunction(self):
             """Call FortiusAnt.IdleFunction and act on its result.
@@ -341,16 +341,6 @@ if UseGui:
             return Tacx2Dongle(self)
 
 
-# ==============================================================================
-# Class to create a Console-GUI
-# ------------------------------------------------------------------------------
-# Functions:    Autostart() is similar to frmFortiusAntGui.autostart
-#                   and executes all program-functionality
-#               SetValues() and SetMessages() to show the progress on the console
-#
-# Called:       LocateHW() and Tacx2Dongle() are called to provide the required
-#               functionality.
-# ==============================================================================
 class clsFortiusAntConsole:
     """This class provides a console GUI.
 
@@ -375,7 +365,7 @@ class clsFortiusAntConsole:
             self.RunningSwitch = True
             Tacx2Dongle(self)
 
-    def SetValues(
+    def SetValues(  # noqa: R0913 R0914
         self,
         fSpeed,
         iRevs,
@@ -385,8 +375,8 @@ class clsFortiusAntConsole:
         fTargetGrade,
         iTacx,
         iHeartRate,
-        iCranksetIndex,
-        iCassetteIndex,
+        iCranksetIndex,  # noqa: W0613
+        iCassetteIndex,  # noqa: W0613
         fReduction,
     ):
         """Set values to display on the console once per second."""
@@ -516,7 +506,7 @@ if UseGui:
             """Init.
 
             Parameters
-            ------------
+            ----------
             conn : multiprocessing.connection.Connection
                 GUI end of multiprocessing pipe
             pclv : FortiusAntCommand.CommandLineVariables
@@ -529,6 +519,7 @@ if UseGui:
             """Send a command to the main process.
 
             If a response command is received then it is carried out.
+
 
             Parameters
             ----------
@@ -1055,7 +1046,7 @@ def mainProgram():
         logfile.Write(s % ("numpy", numpy.__version__))
         logfile.Write(s % ("os", os.name))
         if os.name == "nt":
-            v = sys.getwindowsversion()
+            v = sys.getwindowsversion()  # noqa : PLE1101
             logfile.Write((s + ".%s") % ("windows", v.major, v.minor))
         logfile.Write(s % ("pickle", pickle.format_version))
         logfile.Write(s % ("platform", platform.__version__))

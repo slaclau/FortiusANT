@@ -965,7 +965,7 @@ class frmFortiusAntGui(wx.Frame):
     #
     # The code below provides functionality so that the GUI works and can be tested
     # --------------------------------------------------------------------------
-    def callSettings(self, RestartApplication, pclv):
+    def callSettings(self, pRestartApplication, pclv):
         print("callSettings not defined by application class")
         return True
 

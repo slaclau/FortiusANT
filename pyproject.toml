@@ -1,19 +1,22 @@
 [tool.isort]
 profile = "black"
-[tool.flakeheaven]
-max_line_length = 88
-format = "grouped"
-#show_source = true
-[tool.flakeheaven.plugins]
-pyflakes = ["+*"]
-"flake8-*" = ["+*"]
-mccabe = ["+*"]
-pycodestyle = ["+*"]
-#pylint = ["+*","-C0103"]
-#flake8-docstrings = ["-*"]
 [tool.pylint.MAIN]
 load-plugins = [
     "pylint.extensions.docparams"
 ]
-[tool.pydocstyle]
-convention = "numpy"
+[tool.pylint.MESSAGES-CONTROL]
+disable = [
+    "invalid-name",
+]
+[tool.flake8]
+max-line-length = 88
+max-doc-length = 88
+count = true
+docstring-convention = "numpy"
+require-plugins = [
+    "flake8-docstyle",
+    "flake8-pylint",
+]
+extend-select = [
+    "D417",
+]
