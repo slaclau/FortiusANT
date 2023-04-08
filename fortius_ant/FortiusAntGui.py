@@ -1,6 +1,6 @@
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Version info
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 __version__ = "2022-01-05"
 # 2022-01-05    MinHeigth/MinWidth replaced by Size() for consistency
 # 2022-01-04    text-fields on top of other controls were flickering, because
@@ -13,7 +13,7 @@ __version__ = "2022-01-05"
 # 2021-02-22    Button correction removed from timer
 # 2021-02-03    Test values updated in callTacx2Dongle(self)
 #               When no heartrate shown, cassette/cranckset
-# 2021-01-28    During calibration, the Cadence speedometer will display 
+# 2021-01-28    During calibration, the Cadence speedometer will display
 #               "Calibration countdown"
 #               Help and Sponsor button added (#189)
 # 2021-01-25    Random cranckset was 0...2; should be 0..1
@@ -91,7 +91,7 @@ __version__ = "2022-01-05"
 #               If done in the thread(), the SetFocus seems not working.
 #
 #               Also, text fields are flickering, therefore updated every second
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 import array
 import math
 import numpy
@@ -104,29 +104,30 @@ import webbrowser
 import wx
 import wx.lib.agw.speedmeter as SM
 
-from   constants                    import mode_Power, mode_Grade, OnRaspberry, mile
+from constants import mode_Power, mode_Grade, OnRaspberry, mile
 import debug
 import logfile
-import FortiusAntCommand     as cmd
-from   FortiusAntTitle                  import githubWindowTitle
+import FortiusAntCommand as cmd
+from FortiusAntTitle import githubWindowTitle
 import RadarGraph
 import settings
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # constants
-#-------------------------------------------------------------------------------
-ForceRefresh        = True  # More stable with self.panel.Refresh()
-ForceRefreshDC      = False # add DOT/COMMA to force refresh
-_UseStaticText      = False # There appears to be no difference in behaviour
-                            # for StaticText() or TextCtrl() with appropriate style
+# -------------------------------------------------------------------------------
+ForceRefresh = True  # More stable with self.panel.Refresh()
+ForceRefreshDC = False  # add DOT/COMMA to force refresh
+_UseStaticText = False  # There appears to be no difference in behaviour
+# for StaticText() or TextCtrl() with appropriate style
 
-LargeTexts          = True  # 2020-02-07
+LargeTexts = True  # 2020-02-07
 
-bg                  = wx.Colour(220,220,220) # Background colour [for self.Speedometers]
-colorTacxFortius    = wx.Colour(120,148,227)
-Margin              = 4
+bg = wx.Colour(220, 220, 220)  # Background colour [for self.Speedometers]
+colorTacxFortius = wx.Colour(120, 148, 227)
+Margin = 4
 
-FixedForDocu        = False
+FixedForDocu = False
+
 
 # ------------------------------------------------------------------------------
 # Create the FortiusAnt frame
@@ -147,62 +148,67 @@ FixedForDocu        = False
 #               callTacx2Dongle(self)
 # ------------------------------------------------------------------------------
 class frmFortiusAntGui(wx.Frame):
-    Calibrating = False         # Flag that we're calibrating
-    clv        = None
+    Calibrating = False  # Flag that we're calibrating
+    clv = None
     LastFields = 0  # Time when SetValues() updated the fields
-    LastHeart  = 0  # Time when heartbeat image was updated
-    IdleDone   = 0  # Counter to warn that callIdleFunction is not redefined
-    power      = [] # Array with power-tuples
+    LastHeart = 0  # Time when heartbeat image was updated
+    IdleDone = 0  # Counter to warn that callIdleFunction is not redefined
+    power = []  # Array with power-tuples
 
-    StatusLeds   = [False,False,False,False,False]   # 5 True/False flags
-    StatusLedsXr = None # Right side of rightmost status-led-label
-    StatusLedsYb = None # Bottom of status-led-row
+    StatusLeds = [False, False, False, False, False]  # 5 True/False flags
+    StatusLedsXr = None  # Right side of rightmost status-led-label
+    StatusLedsYb = None  # Bottom of status-led-row
 
     def __init__(self, parent, pclv):
         # ----------------------------------------------------------------------
-		# Create frame and panel for TAB-handling
+        # Create frame and panel for TAB-handling
         # (First versions did not use panel, and that's why TABs did not work)
         # ----------------------------------------------------------------------
-        wx.Frame.__init__(self, parent, -1, githubWindowTitle(), \
-               style = wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
+        wx.Frame.__init__(
+            self,
+            parent,
+            -1,
+            githubWindowTitle(),
+            style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX),
+        )
         if True:
-            self.panel = wx.Panel(self) # Controls on panel for TAB-handling
+            self.panel = wx.Panel(self)  # Controls on panel for TAB-handling
         else:
-            self.panel = self           # Controls directly on the frame window
+            self.panel = self  # Controls directly on the frame window
 
         # ----------------------------------------------------------------------
-		# Save Command Line Variables in the GUI-context
+        # Save Command Line Variables in the GUI-context
         # ----------------------------------------------------------------------
         self.clv = pclv
 
         # ----------------------------------------------------------------------
-		# Images are either in directory of the .py or embedded in .exe
+        # Images are either in directory of the .py or embedded in .exe
         # ----------------------------------------------------------------------
-        if getattr(sys, 'frozen', False):
+        if getattr(sys, "frozen", False):
             dirname = sys._MEIPASS
         else:
             dirname = os.path.dirname(__file__)
 
         FortiusAnt_ico = os.path.join(dirname, "FortiusAnt.ico")
         FortiusAnt_jpg = os.path.join(dirname, "FortiusAnt.jpg")
-        Heart_jpg      = os.path.join(dirname, "heart.jpg"     )
-        settings_bmp   = os.path.join(dirname, "settings.bmp"  )
-        sponsor_bmp    = os.path.join(dirname, "sponsor.bmp"   )
+        Heart_jpg = os.path.join(dirname, "heart.jpg")
+        settings_bmp = os.path.join(dirname, "settings.bmp")
+        sponsor_bmp = os.path.join(dirname, "sponsor.bmp")
 
         try:
             ico = wx.Icon(FortiusAnt_ico, wx.BITMAP_TYPE_ICO)
             self.SetIcon(ico)
         except:
-            print('Cannot load '+ FortiusAnt_ico)
+            print("Cannot load " + FortiusAnt_ico)
             pass
 
         # ----------------------------------------------------------------------
-		# Default initial actions, bind functions to frame
+        # Default initial actions, bind functions to frame
         # ----------------------------------------------------------------------
         self.Bind(wx.EVT_CLOSE, self.OnClose)
-        self.panel.Bind(wx.EVT_PAINT, self.OnPaint)    # Draw the bitmap
-        self.Iconize(False)                            # un-iconize
-        #self.Centre() # Too early, do after all controls created
+        self.panel.Bind(wx.EVT_PAINT, self.OnPaint)  # Draw the bitmap
+        self.Iconize(False)  # un-iconize
+        # self.Centre() # Too early, do after all controls created
 
         if True:
             TIMER_ID = 250
@@ -212,62 +218,64 @@ class frmFortiusAntGui(wx.Frame):
             self.OnTimerEnabled = True
 
         # ----------------------------------------------------------------------
-		# Thread handling
+        # Thread handling
         # ----------------------------------------------------------------------
         self.RunningSwitch = False
         self.CloseButtonPressed = False
 
         # ----------------------------------------------------------------------
-		# Load Background image
+        # Load Background image
         # ----------------------------------------------------------------------
         self.BackgroundBitmap = False
         BitmapW = 900
         BitmapH = 600
         try:
-            self.BackgroundBitmap = wx.Bitmap(FortiusAnt_jpg)       # Image on the window background
+            self.BackgroundBitmap = wx.Bitmap(
+                FortiusAnt_jpg
+            )  # Image on the window background
             BitmapW = self.BackgroundBitmap.Size.GetWidth()
             BitmapH = self.BackgroundBitmap.Size.GetHeight()
         except:
-            print('Cannot load '+ FortiusAnt_jpg)
+            print("Cannot load " + FortiusAnt_jpg)
         # ----------------------------------------------------------------------
-		# Load HeartRate image
+        # Load HeartRate image
         # ----------------------------------------------------------------------
-        self.HeartRate      = 123
-        self.HeartRateWH    = 40
-                            # 2020-04-07    # 2020-02-07    # 2020-01-25
-        self.HeartRateX     = Margin        # 25            # BitmapW - 25 - self.HeartRateWH
-        self.HeartRateY     = BitmapH - 50 - self.HeartRateWH
+        self.HeartRate = 123
+        self.HeartRateWH = 40
+        # 2020-04-07    # 2020-02-07    # 2020-01-25
+        self.HeartRateX = Margin  # 25            # BitmapW - 25 - self.HeartRateWH
+        self.HeartRateY = BitmapH - 50 - self.HeartRateWH
         self.HeartRateImage = False
         try:
             self.HeartRateImage = wx.Image(Heart_jpg)  # HeartRate
 
-            img           = self.HeartRateImage.Scale(36, 36, wx.IMAGE_QUALITY_HIGH)
+            img = self.HeartRateImage.Scale(36, 36, wx.IMAGE_QUALITY_HIGH)
             self.bmp36x36 = wx.Bitmap(img)
 
-            img           = self.HeartRateImage.Scale(40, 40, wx.IMAGE_QUALITY_HIGH)
+            img = self.HeartRateImage.Scale(40, 40, wx.IMAGE_QUALITY_HIGH)
             self.bmp40x40 = wx.Bitmap(img)
 
         except:
             # print('Cannot load ' + Heart_jpg)
             pass
         # ----------------------------------------------------------------------
-		# Calculate location of Cassette image
+        # Calculate location of Cassette image
         # Positioned above HeartRate_img, equally wide/heigh
         # ----------------------------------------------------------------------
-        self.CassetteIndex  = self.clv.CassetteStart
-        self.CassetteWH     = self.HeartRateWH
-        self.CassetteX      = self.HeartRateX
-        self.CassetteY      = self.HeartRateY - self.HeartRateWH - Margin
-        
+        self.CassetteIndex = self.clv.CassetteStart
+        self.CassetteWH = self.HeartRateWH
+        self.CassetteX = self.HeartRateX
+        self.CassetteY = self.HeartRateY - self.HeartRateWH - Margin
+
         # ----------------------------------------------------------------------
-		# Calculate location of Cranckset image
+        # Calculate location of Cranckset image
         # Positioned above Cassette_img, equally wide/heigh
         # Re-positioned later under txtAntHRM (find self.CrancksetY)
         # ----------------------------------------------------------------------
         self.CrancksetIndex = self.clv.CrancksetStart
-        self.CrancksetWH    = self.CassetteWH
-        self.CrancksetX     = self.CassetteX
-        self.CrancksetY     = self.CassetteY - self.CassetteWH - Margin
+        self.CrancksetWH = self.CassetteWH
+        self.CrancksetX = self.CassetteX
+        self.CrancksetY = self.CassetteY - self.CassetteWH - Margin
 
         # ----------------------------------------------------------------------
         # Idea to generate the bitmap, but the "Cassette" can as easily be drawn
@@ -276,117 +284,168 @@ class frmFortiusAntGui(wx.Frame):
         if False:
             print(1)
             print(self.CassetteImage)
-            print('width=%s height=%s' % (self.CassetteImage.GetWidth(), self.CassetteImage.GetHeight()))
+            print(
+                "width=%s height=%s"
+                % (self.CassetteImage.GetWidth(), self.CassetteImage.GetHeight())
+            )
             print(2)
             print(self.CassetteBitmap)
-            print('width=%s height=%s' % (self.CassetteBitmap.GetWidth(), self.CassetteBitmap.GetHeight()))
+            print(
+                "width=%s height=%s"
+                % (self.CassetteBitmap.GetWidth(), self.CassetteBitmap.GetHeight())
+            )
             print(3)
 
-
-            self.CassetteBitmap  = wx.Bitmap(self.CassetteImage)
+            self.CassetteBitmap = wx.Bitmap(self.CassetteImage)
 
             bitDepth = self.CassetteBitmap.GetDepth()
             if bitDepth == 24:
                 bpp = 3  # bytes per pixel
-                buffer_length = self.CassetteBitmap.GetWidth() * self.CassetteBitmap.GetHeight() * bpp
-                buffer = array.array('B', [0] * buffer_length )
+                buffer_length = (
+                    self.CassetteBitmap.GetWidth()
+                    * self.CassetteBitmap.GetHeight()
+                    * bpp
+                )
+                buffer = array.array("B", [0] * buffer_length)
                 self.CassetteBitmap.CopyToBuffer(buffer, wx.BitmapBufferFormat_RGB)
-                
-                print ('  :0         1         2         3         ')
-                print ('  : 123456789 123456789 123456789 123456789')
+
+                print("  :0         1         2         3         ")
+                print("  : 123456789 123456789 123456789 123456789")
                 for y in range(0, self.CassetteBitmap.GetHeight()):
-                    print('%2.0f:' % y, end='')
+                    print("%2.0f:" % y, end="")
                     for x in range(0, self.CassetteBitmap.GetWidth()):
-                        index = (y * self.CassetteBitmap.GetWidth() + x ) * bpp
+                        index = (y * self.CassetteBitmap.GetWidth() + x) * bpp
                         r = buffer[index]
                         g = buffer[index + 1]
                         b = buffer[index + 2]
-                        if r==255 and g==255 and b==255: print ('.', end='')
-                        else:                            print ('x', end='')
+                        if r == 255 and g == 255 and b == 255:
+                            print(".", end="")
+                        else:
+                            print("x", end="")
                         # if r==255 and g==255 and b==255: print ('......... ', end='')
                         # else:                            print ('%3.0f%3.0f%3.0f ' % (r,g,b), end='')
-                    print('')
+                    print("")
             print(4)
-             
+
             print(5)
-            
+
         # ----------------------------------------------------------------------
-		# Calculate Width and X
+        # Calculate Width and X
         # ----------------------------------------------------------------------
         #
         # x [button] x [speed] x [revs] x [power] x
         #
         ButtonX = Margin
-        ButtonW = 85           # 2021-03-02 changed from 80 --> 85 for Raspberry
+        ButtonW = 85  # 2021-03-02 changed from 80 --> 85 for Raspberry
 
-        SpeedWH     = int((BitmapW - ButtonW - 5 * Margin) / 3) # width/height equal (square)
-        RevsWH      = SpeedWH
-        PowerWH     = SpeedWH
+        SpeedWH = int(
+            (BitmapW - ButtonW - 5 * Margin) / 3
+        )  # width/height equal (square)
+        RevsWH = SpeedWH
+        PowerWH = SpeedWH
 
-        SpeedX      = ButtonX + ButtonW + Margin
-        RevsX       = SpeedX  + SpeedWH + Margin
-        PowerX      = RevsX   + RevsWH  + Margin
+        SpeedX = ButtonX + ButtonW + Margin
+        RevsX = SpeedX + SpeedWH + Margin
+        PowerX = RevsX + RevsWH + Margin
 
-        SpeedY      = Margin
-        RevsY       = Margin
-        PowerY      = Margin
+        SpeedY = Margin
+        RevsY = Margin
+        PowerY = Margin
 
-        BitmapX     = 0
-        BitmapY     = 0
+        BitmapX = 0
+        BitmapY = 0
 
-        self.      SetSize (BitmapX + BitmapW + 15, BitmapY + BitmapH)
-        self.panel.SetSize (BitmapX + BitmapW + 15, BitmapY + BitmapH)
-
-        # ----------------------------------------------------------------------
-		# Speedometer values and colours
-        # ----------------------------------------------------------------------
-        MiddleTextFontSize  = 10
-        TicksFontSize       = 10
+        self.SetSize(BitmapX + BitmapW + 15, BitmapY + BitmapH)
+        self.panel.SetSize(BitmapX + BitmapW + 15, BitmapY + BitmapH)
 
         # ----------------------------------------------------------------------
-		# self.Speedometer
+        # Speedometer values and colours
+        # ----------------------------------------------------------------------
+        MiddleTextFontSize = 10
+        TicksFontSize = 10
+
+        # ----------------------------------------------------------------------
+        # self.Speedometer
         # ----------------------------------------------------------------------
         if True:
-            self.Speed = SM.SpeedMeter(self.panel, agwStyle=SM.SM_DRAW_HAND|SM.SM_DRAW_GRADIENT|SM.SM_DRAW_MIDDLE_TEXT|SM.SM_DRAW_SECONDARY_TICKS)
-            self.Speed.SetSize (SpeedX, SpeedY, SpeedWH, SpeedWH)
+            self.Speed = SM.SpeedMeter(
+                self.panel,
+                agwStyle=SM.SM_DRAW_HAND
+                | SM.SM_DRAW_GRADIENT
+                | SM.SM_DRAW_MIDDLE_TEXT
+                | SM.SM_DRAW_SECONDARY_TICKS,
+            )
+            self.Speed.SetSize(SpeedX, SpeedY, SpeedWH, SpeedWH)
             self.Speed.DisableFocusFromKeyboard()
 
             self.Speed.SetSpeedBackground(bg)
-            self.Speed.SetFirstGradientColour(colorTacxFortius)             # Colours for SM_DRAW_GRADIENT
+            self.Speed.SetFirstGradientColour(
+                colorTacxFortius
+            )  # Colours for SM_DRAW_GRADIENT
             self.Speed.SetSecondGradientColour(wx.WHITE)
-            self.Speed.DrawExternalArc(True)                                # Do (Not) Draw The External (Container) Arc.
+            self.Speed.DrawExternalArc(
+                True
+            )  # Do (Not) Draw The External (Container) Arc.
             self.Speed.SetArcColour(wx.BLACK)
 
-            self.Speed.SetAngleRange(-math.pi / 6, 7 * math.pi / 6)         # Set The Region Of Existence Of self.SpeedMeter (Always In Radians!!!!)
-            self.Speed.SetHandColour(wx.Colour(255, 50, 0))                	# Set The Colour For The Hand Indicator
+            self.Speed.SetAngleRange(
+                -math.pi / 6, 7 * math.pi / 6
+            )  # Set The Region Of Existence Of self.SpeedMeter (Always In Radians!!!!)
+            self.Speed.SetHandColour(
+                wx.Colour(255, 50, 0)
+            )  # Set The Colour For The Hand Indicator
 
-            self.Speed.SetMiddleText("Speed")                               # Set The Text In The Center Of self.SpeedMeter
-            self.Speed.SetMiddleTextColour(wx.BLUE)                         # Assign The Colour To The Center Text
-            self.Speed.SetMiddleTextFont(wx.Font(MiddleTextFontSize, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD))
-                                                                            # Assign A Font To The Center Text
+            self.Speed.SetMiddleText(
+                "Speed"
+            )  # Set The Text In The Center Of self.SpeedMeter
+            self.Speed.SetMiddleTextColour(
+                wx.BLUE
+            )  # Assign The Colour To The Center Text
+            self.Speed.SetMiddleTextFont(
+                wx.Font(
+                    MiddleTextFontSize,
+                    wx.FONTFAMILY_SWISS,
+                    wx.FONTSTYLE_NORMAL,
+                    wx.FONTWEIGHT_BOLD,
+                )
+            )
+            # Assign A Font To The Center Text
 
             Min = 0
             NrIntervals = 10
-            Step  = 5
-            Max   = Min + Step * NrIntervals
+            Step = 5
+            Max = Min + Step * NrIntervals
             self.SpeedMax = Max
 
-            intervals = range(Min, Max+1, Step)                             # Create The Intervals That Will Divide Our self.SpeedMeter In Sectors
+            intervals = range(
+                Min, Max + 1, Step
+            )  # Create The Intervals That Will Divide Our self.SpeedMeter In Sectors
             self.Speed.SetIntervals(intervals)
 
-#           colours = [wx.BLUE] * NrIntervals                               # Assign The Same Colours To All Sectors (We Simulate A Car Control For self.Speed)
-#           self.Speed.SetIntervalColours(colours)
+            #           colours = [wx.BLUE] * NrIntervals                               # Assign The Same Colours To All Sectors (We Simulate A Car Control For self.Speed)
+            #           self.Speed.SetIntervalColours(colours)
 
-            ticks = [str(interval) for interval in intervals]               # Assign The Ticks: Here They Are Simply The String Equivalent Of The Intervals
+            ticks = [
+                str(interval) for interval in intervals
+            ]  # Assign The Ticks: Here They Are Simply The String Equivalent Of The Intervals
             self.Speed.SetTicks(ticks)
-            self.Speed.SetTicksColour(wx.WHITE)                             # Set The Ticks/Tick Markers Colour
-            self.Speed.SetNumberOfSecondaryTicks(5)                         # We Want To Draw 5 Secondary Ticks Between The Principal Ticks
+            self.Speed.SetTicksColour(wx.WHITE)  # Set The Ticks/Tick Markers Colour
+            self.Speed.SetNumberOfSecondaryTicks(
+                5
+            )  # We Want To Draw 5 Secondary Ticks Between The Principal Ticks
 
-            self.Speed.SetTicksFont(wx.Font(TicksFontSize, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
-                                                                            # Set The Font For The Ticks Markers
+            self.Speed.SetTicksFont(
+                wx.Font(
+                    TicksFontSize,
+                    wx.FONTFAMILY_SWISS,
+                    wx.FONTSTYLE_NORMAL,
+                    wx.FONTWEIGHT_NORMAL,
+                )
+            )
+            # Set The Font For The Ticks Markers
 
         # ----------------------------------------------------------------------
-		# self.Revs
+        # self.Revs
         # ----------------------------------------------------------------------
         if True:
             # SM_ROTATE_TEXT            Draws the ticks rotated: the ticks are rotated accordingly to the tick marks positions.
@@ -400,207 +459,380 @@ class frmFortiusAntGui(wx.Frame):
             # SM_DRAW_MIDDLE_ICON       An icon is drawn in the middle of the control near the center.
             # SM_DRAW_GRADIENT          A gradient of colours will fill the control.
             # SM_DRAW_FANCY_TICKS       With this style you can use xml tags to create some custom text and draw it at the ticks position. See lib.fancytext for the tags.
-            self.Revs = SM.SpeedMeter(self.panel, agwStyle=SM.SM_DRAW_GRADIENT | SM.SM_DRAW_PARTIAL_SECTORS | SM.SM_DRAW_HAND | SM.SM_DRAW_SECONDARY_TICKS | SM.SM_DRAW_MIDDLE_TEXT)
-            self.Revs.SetSize (RevsX, RevsY, RevsWH, RevsWH) # x,y and width, height
+            self.Revs = SM.SpeedMeter(
+                self.panel,
+                agwStyle=SM.SM_DRAW_GRADIENT
+                | SM.SM_DRAW_PARTIAL_SECTORS
+                | SM.SM_DRAW_HAND
+                | SM.SM_DRAW_SECONDARY_TICKS
+                | SM.SM_DRAW_MIDDLE_TEXT,
+            )
+            self.Revs.SetSize(RevsX, RevsY, RevsWH, RevsWH)  # x,y and width, height
             self.Revs.DisableFocusFromKeyboard()
 
             self.Revs.SetSpeedBackground(bg)
-            self.Revs.SetFirstGradientColour(wx.BLUE)                       # Colours for SM_DRAW_GRADIENT
+            self.Revs.SetFirstGradientColour(wx.BLUE)  # Colours for SM_DRAW_GRADIENT
             self.Revs.SetSecondGradientColour(wx.WHITE)
-            self.Revs.DrawExternalArc(True)                                 # Do (Not) Draw The External (Container) Arc.
+            self.Revs.DrawExternalArc(
+                True
+            )  # Do (Not) Draw The External (Container) Arc.
             self.Revs.SetArcColour(wx.BLUE)
 
-            self.Revs.SetAngleRange(-math.pi / 6, 7 * math.pi / 6)          # Set The Region Of Existence Of self.RevsMeter (Always In Radians!!!!)
-            self.Revs.SetHandColour(wx.Colour(255, 50, 0))                	# Set The Colour For The Hand Indicator
+            self.Revs.SetAngleRange(
+                -math.pi / 6, 7 * math.pi / 6
+            )  # Set The Region Of Existence Of self.RevsMeter (Always In Radians!!!!)
+            self.Revs.SetHandColour(
+                wx.Colour(255, 50, 0)
+            )  # Set The Colour For The Hand Indicator
 
-            self.Revs.SetMiddleText("Cadence")                              # Set The Text In The Center Of self.RevsMeter
-            self.Revs.SetMiddleTextColour(wx.BLUE)                          # Assign The Colour To The Center Text
-            self.Revs.SetMiddleTextFont(wx.Font(MiddleTextFontSize, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD))
-                                                                            # Assign A Font To The Center Text
+            self.Revs.SetMiddleText(
+                "Cadence"
+            )  # Set The Text In The Center Of self.RevsMeter
+            self.Revs.SetMiddleTextColour(
+                wx.BLUE
+            )  # Assign The Colour To The Center Text
+            self.Revs.SetMiddleTextFont(
+                wx.Font(
+                    MiddleTextFontSize,
+                    wx.FONTFAMILY_SWISS,
+                    wx.FONTSTYLE_NORMAL,
+                    wx.FONTWEIGHT_BOLD,
+                )
+            )
+            # Assign A Font To The Center Text
 
             Min = 0
             NrIntervals = 12
-            Step  = 10                                                      # For me, 120/min is enough
-            Max   = Min + Step * NrIntervals
+            Step = 10  # For me, 120/min is enough
+            Max = Min + Step * NrIntervals
             self.RevsMax = Max
 
-            intervals = range(Min, Max+1, Step)                             # Create The Intervals That Will Divide Our self.SpeedMeter In Sectors
+            intervals = range(
+                Min, Max + 1, Step
+            )  # Create The Intervals That Will Divide Our self.SpeedMeter In Sectors
             self.Revs.SetIntervals(intervals)
 
-            colours = [wx.BLACK]                                            # Assign colours, per range
+            colours = [wx.BLACK]  # Assign colours, per range
             i = 2
             while i <= NrIntervals:
-                if i * Step <= 40:                                          # <= 40 is special case for resistance calculation
+                if i * Step <= 40:  # <= 40 is special case for resistance calculation
                     colours.append(wx.BLACK)
                 elif i * Step <= 60:
                     colours.append(wx.BLUE)
                 elif i * Step <= 90:
                     colours.append(wx.GREEN)
                 elif i * Step <= 110:
-                    colours.append(wx.Colour(244,144,44))                   # Orange
+                    colours.append(wx.Colour(244, 144, 44))  # Orange
                 else:
                     colours.append(wx.RED)
                 i += 1
             self.Revs.SetIntervalColours(colours)
 
-            ticks = [str(interval) for interval in intervals]               # Assign The Ticks: Here They Are Simply The String Equivalent Of The Intervals
+            ticks = [
+                str(interval) for interval in intervals
+            ]  # Assign The Ticks: Here They Are Simply The String Equivalent Of The Intervals
             self.Revs.SetTicks(ticks)
-            self.Revs.SetTicksColour(wx.WHITE)                        		# Set The Ticks/Tick Markers Colour
-            self.Revs.SetNumberOfSecondaryTicks(5)                        	# We Want To Draw 5 Secondary Ticks Between The Principal Ticks
+            self.Revs.SetTicksColour(wx.WHITE)  # Set The Ticks/Tick Markers Colour
+            self.Revs.SetNumberOfSecondaryTicks(
+                5
+            )  # We Want To Draw 5 Secondary Ticks Between The Principal Ticks
 
-            self.Revs.SetTicksFont(wx.Font(TicksFontSize, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
-                                                                            # Set The Font For The Ticks Markers
+            self.Revs.SetTicksFont(
+                wx.Font(
+                    TicksFontSize,
+                    wx.FONTFAMILY_SWISS,
+                    wx.FONTSTYLE_NORMAL,
+                    wx.FONTWEIGHT_NORMAL,
+                )
+            )
+            # Set The Font For The Ticks Markers
 
         # ----------------------------------------------------------------------
-		# self.Power
+        # self.Power
         # ----------------------------------------------------------------------
         if True:
-            self.Power = SM.SpeedMeter(self.panel, agwStyle=SM.SM_DRAW_HAND|SM.SM_DRAW_GRADIENT|SM.SM_DRAW_MIDDLE_TEXT|SM.SM_DRAW_SECONDARY_TICKS)
-            self.Power.SetSize (PowerX, PowerY, PowerWH, PowerWH) # x,y and width, height
+            self.Power = SM.SpeedMeter(
+                self.panel,
+                agwStyle=SM.SM_DRAW_HAND
+                | SM.SM_DRAW_GRADIENT
+                | SM.SM_DRAW_MIDDLE_TEXT
+                | SM.SM_DRAW_SECONDARY_TICKS,
+            )
+            self.Power.SetSize(
+                PowerX, PowerY, PowerWH, PowerWH
+            )  # x,y and width, height
             self.Power.DisableFocusFromKeyboard()
 
             self.Power.SetSpeedBackground(bg)
-            self.Power.SetFirstGradientColour(colorTacxFortius)             # Colours for SM_DRAW_GRADIENT
+            self.Power.SetFirstGradientColour(
+                colorTacxFortius
+            )  # Colours for SM_DRAW_GRADIENT
             self.Power.SetSecondGradientColour(wx.WHITE)
-            self.Power.DrawExternalArc(True)                                # Do (Not) Draw The External (Container) Arc.
+            self.Power.DrawExternalArc(
+                True
+            )  # Do (Not) Draw The External (Container) Arc.
             self.Power.SetArcColour(wx.BLACK)
 
-            self.Power.SetAngleRange(-math.pi / 6, 7 * math.pi / 6)         # Set The Region Of Existence Of self.PowerMeter (Always In Radians!!!!)
-            self.Power.SetHandColour(wx.Colour(255, 50, 0))                	# Set The Colour For The Hand Indicator
+            self.Power.SetAngleRange(
+                -math.pi / 6, 7 * math.pi / 6
+            )  # Set The Region Of Existence Of self.PowerMeter (Always In Radians!!!!)
+            self.Power.SetHandColour(
+                wx.Colour(255, 50, 0)
+            )  # Set The Colour For The Hand Indicator
 
-            self.Power.SetMiddleText("Power")                               # Set The Text In The Center Of self.PowerMeter
-            self.Power.SetMiddleTextColour(wx.BLUE)                         # Assign The Colour To The Center Text
-            self.Power.SetMiddleTextFont(wx.Font(MiddleTextFontSize, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD))
-                                                                            # Assign A Font To The Center Text
+            self.Power.SetMiddleText(
+                "Power"
+            )  # Set The Text In The Center Of self.PowerMeter
+            self.Power.SetMiddleTextColour(
+                wx.BLUE
+            )  # Assign The Colour To The Center Text
+            self.Power.SetMiddleTextFont(
+                wx.Font(
+                    MiddleTextFontSize,
+                    wx.FONTFAMILY_SWISS,
+                    wx.FONTSTYLE_NORMAL,
+                    wx.FONTWEIGHT_BOLD,
+                )
+            )
+            # Assign A Font To The Center Text
 
             Min = 0
             NrIntervals = 10
-            Step  = 40
-            Max   = Min + Step * NrIntervals
+            Step = 40
+            Max = Min + Step * NrIntervals
             self.PowerMax = Max
-            self.PowerArray = numpy.array([0,0,0,0,0,0,0,0,0,0])            # Array for running everage
+            self.PowerArray = numpy.array(
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            )  # Array for running everage
 
-            intervals = range(Min, Max+1, Step)                             # Create The Intervals That Will Divide Our self.SpeedMeter In Sectors
+            intervals = range(
+                Min, Max + 1, Step
+            )  # Create The Intervals That Will Divide Our self.SpeedMeter In Sectors
             self.Power.SetIntervals(intervals)
 
-#           colours = [wx.BLACK] * NrIntervals                              # Assign The Same Colours To All Sectors (We Simulate A Car Control For self.Speed)
-#           self.Power.SetIntervalColours(colours)
+            #           colours = [wx.BLACK] * NrIntervals                              # Assign The Same Colours To All Sectors (We Simulate A Car Control For self.Speed)
+            #           self.Power.SetIntervalColours(colours)
 
-            ticks = [str(interval) for interval in intervals]               # Assign The Ticks: Here They Are Simply The String Equivalent Of The Intervals
+            ticks = [
+                str(interval) for interval in intervals
+            ]  # Assign The Ticks: Here They Are Simply The String Equivalent Of The Intervals
             self.Power.SetTicks(ticks)
-            self.Power.SetTicksColour(wx.WHITE)                        		# Set The Ticks/Tick Markers Colour
-            self.Power.SetNumberOfSecondaryTicks(5)                        	# We Want To Draw 5 Secondary Ticks Between The Principal Ticks
+            self.Power.SetTicksColour(wx.WHITE)  # Set The Ticks/Tick Markers Colour
+            self.Power.SetNumberOfSecondaryTicks(
+                5
+            )  # We Want To Draw 5 Secondary Ticks Between The Principal Ticks
 
-            self.Power.SetTicksFont(wx.Font(TicksFontSize, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
-                                                                            # Set The Font For The Ticks Markers
-
-        # ----------------------------------------------------------------------
-		# Font sizing for all measurements
-        # ----------------------------------------------------------------------
-        TextCtrlFont = wx.Font(24, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
-        TextCtrlH    = 40
-        TextCtrlW    = int(SpeedWH/2)
-
-        TextCtrlFont2= wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
-        TextCtrlH2   = 25
-        _TextCtrlW2  = int(SpeedWH/2)
+            self.Power.SetTicksFont(
+                wx.Font(
+                    TicksFontSize,
+                    wx.FONTFAMILY_SWISS,
+                    wx.FONTSTYLE_NORMAL,
+                    wx.FONTWEIGHT_NORMAL,
+                )
+            )
+            # Set The Font For The Ticks Markers
 
         # ----------------------------------------------------------------------
-		# self.Speed value; speed in km/h or mph (On top of self.Speed)
+        # Font sizing for all measurements
         # ----------------------------------------------------------------------
-        self.txtSpeed = wx.TextCtrl(self.Speed, value="99.9", size=(int(TextCtrlW * 1.2),TextCtrlH), style=wx.TE_CENTER | wx.TE_READONLY | wx.BORDER_NONE)
+        TextCtrlFont = wx.Font(
+            24, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD
+        )
+        TextCtrlH = 40
+        TextCtrlW = int(SpeedWH / 2)
+
+        TextCtrlFont2 = wx.Font(
+            12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD
+        )
+        TextCtrlH2 = 25
+        _TextCtrlW2 = int(SpeedWH / 2)
+
+        # ----------------------------------------------------------------------
+        # self.Speed value; speed in km/h or mph (On top of self.Speed)
+        # ----------------------------------------------------------------------
+        self.txtSpeed = wx.TextCtrl(
+            self.Speed,
+            value="99.9",
+            size=(int(TextCtrlW * 1.2), TextCtrlH),
+            style=wx.TE_CENTER | wx.TE_READONLY | wx.BORDER_NONE,
+        )
         self.txtSpeed.SetBackgroundColour(bg)
-        self.txtSpeed.SetPosition((int((self.Speed.Width - self.txtSpeed.Size[0]) / 2), self.Speed.Height - self.txtSpeed.Size[1]))
+        self.txtSpeed.SetPosition(
+            (
+                int((self.Speed.Width - self.txtSpeed.Size[0]) / 2),
+                self.Speed.Height - self.txtSpeed.Size[1],
+            )
+        )
 
         # ----------------------------------------------------------------------
-		# self.Revs value;  (On top of self.Revs)
+        # self.Revs value;  (On top of self.Revs)
         # ----------------------------------------------------------------------
-        self.txtRevs = wx.TextCtrl(self.Revs, value="999/min", size=(int(TextCtrlW * 1.2),TextCtrlH), style=wx.TE_CENTER | wx.TE_READONLY | wx.BORDER_NONE)
+        self.txtRevs = wx.TextCtrl(
+            self.Revs,
+            value="999/min",
+            size=(int(TextCtrlW * 1.2), TextCtrlH),
+            style=wx.TE_CENTER | wx.TE_READONLY | wx.BORDER_NONE,
+        )
         self.txtRevs.SetBackgroundColour(bg)
-        self.txtRevs.SetPosition((int((self.Revs.Width - self.txtRevs.Size[0]) / 2), self.Revs.Height - self.txtRevs.Size[1]))
+        self.txtRevs.SetPosition(
+            (
+                int((self.Revs.Width - self.txtRevs.Size[0]) / 2),
+                self.Revs.Height - self.txtRevs.Size[1],
+            )
+        )
 
         # ----------------------------------------------------------------------
-		# self.Power values; (On top of self.Power)
+        # self.Power values; (On top of self.Power)
         # ----------------------------------------------------------------------
-        self.txtPower = wx.TextCtrl(self.Power, value="999 Watt", size=(TextCtrlW,TextCtrlH), style=wx.TE_CENTER | wx.TE_READONLY | wx.BORDER_NONE)
+        self.txtPower = wx.TextCtrl(
+            self.Power,
+            value="999 Watt",
+            size=(TextCtrlW, TextCtrlH),
+            style=wx.TE_CENTER | wx.TE_READONLY | wx.BORDER_NONE,
+        )
         self.txtPower.SetBackgroundColour(bg)
-        self.txtPower.SetPosition((int((self.Power.Width - self.txtPower.Size[0]) / 2), self.Power.Height - 2 * self.txtPower.Size[1]))
+        self.txtPower.SetPosition(
+            (
+                int((self.Power.Width - self.txtPower.Size[0]) / 2),
+                self.Power.Height - 2 * self.txtPower.Size[1],
+            )
+        )
 
-        self.txtTarget = wx.TextCtrl(self.Power, value="Target=999 Watt", size=(int(TextCtrlW *1.3),TextCtrlH), style=wx.TE_LEFT | wx.TE_READONLY | wx.BORDER_NONE)
+        self.txtTarget = wx.TextCtrl(
+            self.Power,
+            value="Target=999 Watt",
+            size=(int(TextCtrlW * 1.3), TextCtrlH),
+            style=wx.TE_LEFT | wx.TE_READONLY | wx.BORDER_NONE,
+        )
         self.txtTarget.SetBackgroundColour(bg)
         self.txtTarget.SetPosition((0, self.Power.Height - self.txtTarget.Size[1]))
 
-        self.txtTacx = wx.TextCtrl(self.Power, value="Tacx=9999", size=(int(TextCtrlW * 0.7),TextCtrlH), style=wx.TE_RIGHT | wx.TE_READONLY | wx.BORDER_NONE)
+        self.txtTacx = wx.TextCtrl(
+            self.Power,
+            value="Tacx=9999",
+            size=(int(TextCtrlW * 0.7), TextCtrlH),
+            style=wx.TE_RIGHT | wx.TE_READONLY | wx.BORDER_NONE,
+        )
         self.txtTacx.SetBackgroundColour(bg)
-        self.txtTacx.SetPosition((self.Power.Width - self.txtTacx.Size[0], self.txtTarget.Position[1]))
+        self.txtTacx.SetPosition(
+            (self.Power.Width - self.txtTacx.Size[0], self.txtTarget.Position[1])
+        )
 
         # ----------------------------------------------------------------------
-		# USB Trainer
+        # USB Trainer
         # - Is positioned UNDER the Speed control
         # - Has width of Speed + Cadence control
         # ----------------------------------------------------------------------
-        self.txtUsbTrainer = wx.TextCtrl(self.panel, value="txtUsbTrainer", size=(10,TextCtrlH2), style=wx.TE_LEFT | wx.TE_READONLY)
-        self.txtUsbTrainer.SetSize((self.Revs.Position[0] + self.Revs.Size[0] - Margin, -1))
-        self.txtUsbTrainer.SetPosition((Margin, self.Speed.Position[1] + self.Speed.Size[1] + 5))
+        self.txtUsbTrainer = wx.TextCtrl(
+            self.panel,
+            value="txtUsbTrainer",
+            size=(10, TextCtrlH2),
+            style=wx.TE_LEFT | wx.TE_READONLY,
+        )
+        self.txtUsbTrainer.SetSize(
+            (self.Revs.Position[0] + self.Revs.Size[0] - Margin, -1)
+        )
+        self.txtUsbTrainer.SetPosition(
+            (Margin, self.Speed.Position[1] + self.Speed.Size[1] + 5)
+        )
         self.txtUsbTrainer.SetBackgroundColour(bg)
 
         # ----------------------------------------------------------------------
-		# ANT Dongle
+        # ANT Dongle
         # ----------------------------------------------------------------------
-        self.txtAntDongle = wx.TextCtrl(self.panel, value="txtAntDongle", size=(10,TextCtrlH2), style=wx.TE_LEFT | wx.TE_READONLY)
+        self.txtAntDongle = wx.TextCtrl(
+            self.panel,
+            value="txtAntDongle",
+            size=(10, TextCtrlH2),
+            style=wx.TE_LEFT | wx.TE_READONLY,
+        )
         self.txtAntDongle.SetSize((self.txtUsbTrainer.Size[0], -1))
-        self.txtAntDongle.SetPosition((Margin, self.txtUsbTrainer.Position[1] + self.txtUsbTrainer.Size[1] + 5))
+        self.txtAntDongle.SetPosition(
+            (Margin, self.txtUsbTrainer.Position[1] + self.txtUsbTrainer.Size[1] + 5)
+        )
         self.txtAntDongle.SetBackgroundColour(bg)
 
         # ----------------------------------------------------------------------
-		# ANT Heart Rate Monitor
+        # ANT Heart Rate Monitor
         # ----------------------------------------------------------------------
-        self.txtAntHRM = wx.TextCtrl(self.panel, value="txtAntHRM", size=(10,TextCtrlH2), style=wx.TE_LEFT | wx.TE_READONLY)
+        self.txtAntHRM = wx.TextCtrl(
+            self.panel,
+            value="txtAntHRM",
+            size=(10, TextCtrlH2),
+            style=wx.TE_LEFT | wx.TE_READONLY,
+        )
         self.txtAntHRM.SetSize((self.txtUsbTrainer.Size[0], -1))
-        self.txtAntHRM.SetPosition((Margin, self.txtAntDongle.Position[1] + self.txtAntDongle.Size[1] + 5))
+        self.txtAntHRM.SetPosition(
+            (Margin, self.txtAntDongle.Position[1] + self.txtAntDongle.Size[1] + 5)
+        )
         self.txtAntHRM.SetBackgroundColour(bg)
 
         # ----------------------------------------------------------------------
-		# Change location of Cranckset image (see initial values above)
+        # Change location of Cranckset image (see initial values above)
         #        position under txtAntHRM (like RadarGraph below)
         # Then move Cranckset in the middle between Heartrate and Cassette
         # ----------------------------------------------------------------------
-        self.CrancksetY     = self.txtAntHRM.Position    [1] + self.txtAntHRM.Size    [1] + 5
-        self.CassetteY      = int((self.HeartRateY + self.HeartRateWH + self.CrancksetY - TextCtrlH) / 2)
+        self.CrancksetY = self.txtAntHRM.Position[1] + self.txtAntHRM.Size[1] + 5
+        self.CassetteY = int(
+            (self.HeartRateY + self.HeartRateWH + self.CrancksetY - TextCtrlH) / 2
+        )
 
         # ----------------------------------------------------------------------
-		# self.HeartRate, shown to the right of the Heartrate image
+        # self.HeartRate, shown to the right of the Heartrate image
         # ----------------------------------------------------------------------
-        self.txtHeartRate = wx.TextCtrl(self.panel, value="123", size=(int(self.HeartRateWH*2),TextCtrlH), style=wx.TE_CENTER | wx.TE_READONLY)
+        self.txtHeartRate = wx.TextCtrl(
+            self.panel,
+            value="123",
+            size=(int(self.HeartRateWH * 2), TextCtrlH),
+            style=wx.TE_CENTER | wx.TE_READONLY,
+        )
         self.txtHeartRate.SetBackgroundColour(bg)
-        self.txtHeartRate.SetPosition(( self.HeartRateX + self.HeartRateWH + Margin, self.HeartRateY))
+        self.txtHeartRate.SetPosition(
+            (self.HeartRateX + self.HeartRateWH + Margin, self.HeartRateY)
+        )
         self.txtHeartRateShown = True
-        self.txtHeartRateSpace = ((self.HeartRateY - self.CassetteY)/2)
+        self.txtHeartRateSpace = (self.HeartRateY - self.CassetteY) / 2
 
         # ----------------------------------------------------------------------
-		# self.Cranckset, shown to the right of the Cranckset image
+        # self.Cranckset, shown to the right of the Cranckset image
         # ----------------------------------------------------------------------
-        self.txtCranckset = wx.TextCtrl(self.panel, value="456", size=(int(self.CrancksetWH*2),TextCtrlH), style=wx.TE_CENTER | wx.TE_READONLY)
+        self.txtCranckset = wx.TextCtrl(
+            self.panel,
+            value="456",
+            size=(int(self.CrancksetWH * 2), TextCtrlH),
+            style=wx.TE_CENTER | wx.TE_READONLY,
+        )
         self.txtCranckset.SetBackgroundColour(bg)
-        self.txtCranckset.SetPosition(( self.CrancksetX + self.CrancksetWH + Margin, self.CrancksetY))
+        self.txtCranckset.SetPosition(
+            (self.CrancksetX + self.CrancksetWH + Margin, self.CrancksetY)
+        )
 
         # ----------------------------------------------------------------------
-		# self.Cassette, shown to the right of the Cassette image
+        # self.Cassette, shown to the right of the Cassette image
         # ----------------------------------------------------------------------
-        self.txtCassette = wx.TextCtrl(self.panel, value="789", size=(int(self.CassetteWH*2),TextCtrlH), style=wx.TE_CENTER | wx.TE_READONLY)
+        self.txtCassette = wx.TextCtrl(
+            self.panel,
+            value="789",
+            size=(int(self.CassetteWH * 2), TextCtrlH),
+            style=wx.TE_CENTER | wx.TE_READONLY,
+        )
         self.txtCassette.SetBackgroundColour(bg)
-        self.txtCassette.SetPosition(( self.CassetteX + self.CassetteWH + Margin, self.CassetteY))
+        self.txtCassette.SetPosition(
+            (self.CassetteX + self.CassetteWH + Margin, self.CassetteY)
+        )
 
         # ----------------------------------------------------------------------
         # Add a radar graph for pedal stroke analysis
         # - To the right of the HeartRate text
         # - Under txtAntHRM
         # ----------------------------------------------------------------------
-        x  = self.txtHeartRate.Position [0] + self.txtHeartRate.Size [0] + Margin
-        y  = self.txtAntHRM.Position    [1] + self.txtAntHRM.Size    [1] + 5
-        wh = self.txtHeartRate.Position [1] + self.txtHeartRate.Size [1] - y
+        x = self.txtHeartRate.Position[0] + self.txtHeartRate.Size[0] + Margin
+        y = self.txtAntHRM.Position[1] + self.txtAntHRM.Size[1] + 5
+        wh = self.txtHeartRate.Position[1] + self.txtHeartRate.Size[1] - y
         if self.clv.PedalStrokeAnalysis:
-            self.RadarGraph = RadarGraph.clsRadarGraph(self.panel, "Pedal stroke analysis", x, y, wh)
+            self.RadarGraph = RadarGraph.clsRadarGraph(
+                self.panel, "Pedal stroke analysis", x, y, wh
+            )
 
         # ----------------------------------------------------------------------
         # Define position of the status leds
@@ -612,7 +844,7 @@ class frmFortiusAntGui(wx.Frame):
             self.StatusLedsYb = y + wh
 
         # ----------------------------------------------------------------------
-		# Font setting for all measurements
+        # Font setting for all measurements
         # ----------------------------------------------------------------------
         self.txtSpeed.SetFont(TextCtrlFont)
         self.txtRevs.SetFont(TextCtrlFont)
@@ -622,78 +854,102 @@ class frmFortiusAntGui(wx.Frame):
         self.txtHeartRate.SetFont(TextCtrlFont)
         self.txtCranckset.SetFont(TextCtrlFont)
         self.txtCassette.SetFont(TextCtrlFont)
-        
+
         self.txtUsbTrainer.SetFont(TextCtrlFont2)
         self.txtAntDongle.SetFont(TextCtrlFont2)
         self.txtAntHRM.SetFont(TextCtrlFont2)
 
         # ----------------------------------------------------------------------
-		# Buttons
+        # Buttons
         # ----------------------------------------------------------------------
         b = wx.Image(settings_bmp)
-        b.Rescale(16,16)
+        b.Rescale(16, 16)
         b = wx.Bitmap(b)
 
-        self.btnSettings = wx.BitmapButton(self.panel, bitmap=b, size=(ButtonW, -1), style=0) # wx.NO_BORDER)
-        self.btnSettings.SetToolTip ("Modify settings and optionally save for next session")
+        self.btnSettings = wx.BitmapButton(
+            self.panel, bitmap=b, size=(ButtonW, -1), style=0
+        )  # wx.NO_BORDER)
+        self.btnSettings.SetToolTip(
+            "Modify settings and optionally save for next session"
+        )
         self.btnSettings.SetPosition((ButtonX, self.btnSettings.Size[1]))
         self.btnSettings.SetFocus()
         self.Bind(wx.EVT_BUTTON, self.OnClick_btnSettings, self.btnSettings)
 
         self.btnLocateHW = wx.Button(self.panel, label="Locate HW", size=(ButtonW, -1))
-        self.btnLocateHW.SetToolTip ("Connect to USB-devices (Tacx trainer and/or ANTdongle)")
-        self.btnLocateHW.SetPosition((ButtonX, self.btnSettings.Position[1] + self.btnSettings.Size[1] + Margin))
+        self.btnLocateHW.SetToolTip(
+            "Connect to USB-devices (Tacx trainer and/or ANTdongle)"
+        )
+        self.btnLocateHW.SetPosition(
+            (ButtonX, self.btnSettings.Position[1] + self.btnSettings.Size[1] + Margin)
+        )
         self.btnLocateHW.SetFocus()
         self.Bind(wx.EVT_BUTTON, self.OnClick_btnLocateHW, self.btnLocateHW)
 
-        self.btnRunoff   = wx.Button(self.panel, label="Runoff", size=(ButtonW, -1))
-        self.btnRunoff.SetToolTip ("Execute runoff-procedure (recommended for magnetic brake trainers)")
-        self.btnRunoff.SetPosition((ButtonX, self.btnLocateHW.Position[1] + self.btnLocateHW.Size[1] + Margin))
+        self.btnRunoff = wx.Button(self.panel, label="Runoff", size=(ButtonW, -1))
+        self.btnRunoff.SetToolTip(
+            "Execute runoff-procedure (recommended for magnetic brake trainers)"
+        )
+        self.btnRunoff.SetPosition(
+            (ButtonX, self.btnLocateHW.Position[1] + self.btnLocateHW.Size[1] + Margin)
+        )
         self.btnRunoff.Disable()
         self.Bind(wx.EVT_BUTTON, self.OnClick_btnRunoff, self.btnRunoff)
 
-        self.btnStart    = wx.Button(self.panel, label="Start", size=(ButtonW, -1))
-        self.btnStart.SetToolTip ("Start communication with Cycle Training Program")
-        self.btnStart.SetPosition((ButtonX, self.btnRunoff.Position[1] + self.btnRunoff.Size[1] + Margin))
+        self.btnStart = wx.Button(self.panel, label="Start", size=(ButtonW, -1))
+        self.btnStart.SetToolTip("Start communication with Cycle Training Program")
+        self.btnStart.SetPosition(
+            (ButtonX, self.btnRunoff.Position[1] + self.btnRunoff.Size[1] + Margin)
+        )
         self.btnStart.Disable()
         self.Bind(wx.EVT_BUTTON, self.OnClick_btnStart, self.btnStart)
 
-        self.btnStop     = wx.Button(self.panel, label="Stop", size=(ButtonW, -1))
-        self.btnStop.SetToolTip ("Stop FortiusAnt bridge")
-        self.btnStop.SetPosition((ButtonX, self.btnStart.Position[1] + self.btnStart.Size[1] + Margin))
+        self.btnStop = wx.Button(self.panel, label="Stop", size=(ButtonW, -1))
+        self.btnStop.SetToolTip("Stop FortiusAnt bridge")
+        self.btnStop.SetPosition(
+            (ButtonX, self.btnStart.Position[1] + self.btnStart.Size[1] + Margin)
+        )
         self.btnStop.Disable()
         self.Bind(wx.EVT_BUTTON, self.OnClick_btnStop, self.btnStop)
 
-        b = wx.Image(sponsor_bmp)       # Must fit, no rescale
+        b = wx.Image(sponsor_bmp)  # Must fit, no rescale
         b = wx.Bitmap(b)
-        self.btnSponsor = wx.BitmapButton(self.panel, bitmap=b, size=(ButtonW, -1), style=0) # wx.NO_BORDER)
-        self.btnSponsor.SetToolTip ("Become a sponsor for FortiusAnt")
+        self.btnSponsor = wx.BitmapButton(
+            self.panel, bitmap=b, size=(ButtonW, -1), style=0
+        )  # wx.NO_BORDER)
+        self.btnSponsor.SetToolTip("Become a sponsor for FortiusAnt")
         self.Bind(wx.EVT_BUTTON, self.OnClick_btnSponsor, self.btnSponsor)
 
-        self.btnHelp     = wx.Button(self.panel, label="Help", size=(ButtonW, -1))
-        self.btnHelp.SetToolTip ("Open the manual on github")
+        self.btnHelp = wx.Button(self.panel, label="Help", size=(ButtonW, -1))
+        self.btnHelp.SetToolTip("Open the manual on github")
         self.Bind(wx.EVT_BUTTON, self.OnClick_btnHelp, self.btnHelp)
 
         # Move Help button above the texts
-        self.btnHelp.SetPosition((ButtonX, self.txtUsbTrainer.Position[1] - self.txtUsbTrainer.Size[1] - Margin))
+        self.btnHelp.SetPosition(
+            (
+                ButtonX,
+                self.txtUsbTrainer.Position[1] - self.txtUsbTrainer.Size[1] - Margin,
+            )
+        )
         # Move Sponsor button above Help
-        self.btnSponsor.SetPosition((ButtonX, self.btnHelp.Position[1] - self.btnHelp.Size[1] - Margin))
+        self.btnSponsor.SetPosition(
+            (ButtonX, self.btnHelp.Position[1] - self.btnHelp.Size[1] - Margin)
+        )
 
         # ----------------------------------------------------------------------
-		# Frame resizes based upon the created controles, se center here!
+        # Frame resizes based upon the created controles, se center here!
         # ----------------------------------------------------------------------
         self.Centre()
 
         # ----------------------------------------------------------------------
-		# Set initial values
+        # Set initial values
         # ----------------------------------------------------------------------
         self.ResetValues()
-        self.SetMessages(Tacx  ="Tacx Trainer")
+        self.SetMessages(Tacx="Tacx Trainer")
         self.SetMessages(Dongle="ANT+ Dongle")
-        self.SetMessages(HRM   ="ANT+ Heart Rate Monitor")
+        self.SetMessages(HRM="ANT+ Heart Rate Monitor")
 
         self.SetDoubleBuffered(True)
-
 
     # --------------------------------------------------------------------------
     # F u n c t i o n s  --  to be provided by subclass.
@@ -719,8 +975,8 @@ class frmFortiusAntGui(wx.Frame):
         print("callLocateHW not defined by application class")
 
         if self.clv.PedalStrokeAnalysis:
-            # Fill list and show it 
-            for i in range(0,360,int(9)):                           # 9 degrees
+            # Fill list and show it
+            for i in range(0, 360, int(9)):  # 9 degrees
                 self.power.append((i, random.randint(75, 125)))
             self.RadarGraph.ShowRadarGraph(self.power)
 
@@ -732,8 +988,20 @@ class frmFortiusAntGui(wx.Frame):
         while self.RunningSwitch == True:
             t = time.localtime()
             f += 1
-            self.SetValues(f/100 * self.SpeedMax, f/100 * self.RevsMax, f/100 * self.PowerMax, t[5], False, t[0] + t[5], 123, 10, random.randint(0,2), random.randint(0,12), 1)
-            time.sleep(1/8)                         # sleep 0.125 second (like Tacx2Dongle)
+            self.SetValues(
+                f / 100 * self.SpeedMax,
+                f / 100 * self.RevsMax,
+                f / 100 * self.PowerMax,
+                t[5],
+                False,
+                t[0] + t[5],
+                123,
+                10,
+                random.randint(0, 2),
+                random.randint(0, 12),
+                1,
+            )
+            time.sleep(1 / 8)  # sleep 0.125 second (like Tacx2Dongle)
             if f > 100:
                 self.RunningSwitch == False
 
@@ -747,23 +1015,35 @@ class frmFortiusAntGui(wx.Frame):
 
     def callTacx2Dongle(self):
         print("callTacx2Dongle not defined by application class")
-#       tr = 255                                    # experimental purpose only
-        led          = True
+        #       tr = 255                                    # experimental purpose only
+        led = True
         while self.RunningSwitch == True:
-            #t = time.localtime()
-            r = (90 + random.randint(1,20)) / 100   # 0.9 ... 1.1
-#           r = .5
-#           self.SetTransparent(tr)                 # frame can be made transparent
-#           self.Speed.SetTransparent(tr)           # control on frame cannot be made transparent
-#           tr -= 5
-#           self.SetValues(r * self.SpeedMax, r * self.RevsMax, r * self.PowerMax, t[5], t[0] + t[5])
-            if FixedForDocu: # Fixed value for documentation screen
+            # t = time.localtime()
+            r = (90 + random.randint(1, 20)) / 100  # 0.9 ... 1.1
+            #           r = .5
+            #           self.SetTransparent(tr)                 # frame can be made transparent
+            #           self.Speed.SetTransparent(tr)           # control on frame cannot be made transparent
+            #           tr -= 5
+            #           self.SetValues(r * self.SpeedMax, r * self.RevsMax, r * self.PowerMax, t[5], t[0] + t[5])
+            if FixedForDocu:  # Fixed value for documentation screen
                 #             (km/hr, /min, W,       mode, T=Watt, Grade, Resistance, iHeartRate, Cranck, Cassette, Factor)
-                self.SetValues(34.5,  89, 123, mode_Grade,    345,   8.5,       2345,        123,      1,        5,      1)
-                #elf.SetValues(34.5,  89, 123, mode_Power,    345,   8.5,       2345,        123,      1,        5,      1)
+                self.SetValues(34.5, 89, 123, mode_Grade, 345, 8.5, 2345, 123, 1, 5, 1)
+                # elf.SetValues(34.5,  89, 123, mode_Power,    345,   8.5,       2345,        123,      1,        5,      1)
                 self.SetLeds(led, led, led, led, led)
-            else:    # Random value for moving GUI test
-                self.SetValues(r * 35.6, r * 234, r * 123, mode_Grade, r * 345, r * 19.5, r * 2345, r * 123, random.randint(0,1), random.randint(0,12), 1)
+            else:  # Random value for moving GUI test
+                self.SetValues(
+                    r * 35.6,
+                    r * 234,
+                    r * 123,
+                    mode_Grade,
+                    r * 345,
+                    r * 19.5,
+                    r * 2345,
+                    r * 123,
+                    random.randint(0, 1),
+                    random.randint(0, 12),
+                    1,
+                )
                 self.SetLeds(led, not led, led, not led, led)
                 led = not led
 
@@ -775,7 +1055,7 @@ class frmFortiusAntGui(wx.Frame):
                         self.power[i] = (p[0], p[1] + random.uniform(-15, 15))
                 self.RadarGraph.ShowRadarGraph(self.power)
 
-            time.sleep(0.250)                       # sleep 0.250 second (like Tacx2Dongle)
+            time.sleep(0.250)  # sleep 0.250 second (like Tacx2Dongle)
         return True
 
     # --------------------------------------------------------------------------
@@ -807,33 +1087,49 @@ class frmFortiusAntGui(wx.Frame):
     # Output:       None
     # --------------------------------------------------------------------------
     def Navigate_Enter(self):
-        if   self.btnLocateHW.HasFocus(): self.OnClick_btnLocateHW(self)        # Will never occur
-        elif   self.btnRunoff.HasFocus(): self.OnClick_btnRunoff(self)
-        elif    self.btnStart.HasFocus(): self.OnClick_btnStart(self)
-        elif     self.btnStop.HasFocus(): self.OnClick_btnStop(self)
-        else:                             pass
+        if self.btnLocateHW.HasFocus():
+            self.OnClick_btnLocateHW(self)  # Will never occur
+        elif self.btnRunoff.HasFocus():
+            self.OnClick_btnRunoff(self)
+        elif self.btnStart.HasFocus():
+            self.OnClick_btnStart(self)
+        elif self.btnStop.HasFocus():
+            self.OnClick_btnStop(self)
+        else:
+            pass
 
     def Navigate_Up(self):
-        if   self.btnLocateHW.HasFocus(): pass          # is first button
-        elif   self.btnRunoff.HasFocus(): pass          # previous cannot be enabled
-        elif    self.btnStart.HasFocus(): self.btnRunoff.SetFocus()
-        elif     self.btnStop.HasFocus(): pass          # stop first
-        else:                             pass
+        if self.btnLocateHW.HasFocus():
+            pass  # is first button
+        elif self.btnRunoff.HasFocus():
+            pass  # previous cannot be enabled
+        elif self.btnStart.HasFocus():
+            self.btnRunoff.SetFocus()
+        elif self.btnStop.HasFocus():
+            pass  # stop first
+        else:
+            pass
 
     def Navigate_Down(self):
-        if   self.btnLocateHW.HasFocus(): pass          # must be done first
-        elif   self.btnRunoff.HasFocus(): self.btnStart.SetFocus()
-        elif    self.btnStart.HasFocus(): pass          # must start first
-        elif     self.btnStop.HasFocus(): pass          # is last button
-        else:                             pass
+        if self.btnLocateHW.HasFocus():
+            pass  # must be done first
+        elif self.btnRunoff.HasFocus():
+            self.btnStart.SetFocus()
+        elif self.btnStart.HasFocus():
+            pass  # must start first
+        elif self.btnStop.HasFocus():
+            pass  # is last button
+        else:
+            pass
 
     def Navigate_Back(self):
         if self.RunningSwitch == True:
-            self.RunningSwitch = False                  # Stop running thread
-            self.CloseButtonPressed = False             # Do not stop the program
+            self.RunningSwitch = False  # Stop running thread
+            self.CloseButtonPressed = False  # Do not stop the program
         else:
-            self.Close()                              # Stop program
+            self.Close()  # Stop program
             pass
+
     # --------------------------------------------------------------------------
     # S e t L e d s
     # --------------------------------------------------------------------------
@@ -843,16 +1139,23 @@ class frmFortiusAntGui(wx.Frame):
     #
     # Output:       self.StatusLeds
     # --------------------------------------------------------------------------
-    def SetLeds(self, ANT=None, BLE=None, Cadence=None, Shutdown=None, Tacx=None): #Thread safe
+    def SetLeds(
+        self, ANT=None, BLE=None, Cadence=None, Shutdown=None, Tacx=None
+    ):  # Thread safe
         wx.CallAfter(self.SetLedsGUI, ANT, BLE, Cadence, Shutdown, Tacx)
 
     def SetLedsGUI(self, ANT=None, BLE=None, Cadence=None, Shutdown=None, Tacx=None):
         # print (ANT, BLE, Cadence, Shutdown, Tacx, self.StatusLeds)
-        if Tacx     != None: self.StatusLeds[0] = not self.StatusLeds[0] if Tacx     else False
-        if Shutdown != None: self.StatusLeds[1] = not self.StatusLeds[1] if Shutdown else False
-        if Cadence  != None: self.StatusLeds[2] = not self.StatusLeds[2] if Cadence  else False
-        if BLE      != None: self.StatusLeds[3] = not self.StatusLeds[3] if BLE      else False
-        if ANT      != None: self.StatusLeds[4] = not self.StatusLeds[4] if ANT      else False
+        if Tacx != None:
+            self.StatusLeds[0] = not self.StatusLeds[0] if Tacx else False
+        if Shutdown != None:
+            self.StatusLeds[1] = not self.StatusLeds[1] if Shutdown else False
+        if Cadence != None:
+            self.StatusLeds[2] = not self.StatusLeds[2] if Cadence else False
+        if BLE != None:
+            self.StatusLeds[3] = not self.StatusLeds[3] if BLE else False
+        if ANT != None:
+            self.StatusLeds[4] = not self.StatusLeds[4] if ANT else False
         self.panel.Refresh()
 
     # --------------------------------------------------------------------------
@@ -875,131 +1178,166 @@ class frmFortiusAntGui(wx.Frame):
     # Output:       None
     # --------------------------------------------------------------------------
     def ResetValues(self):
-        self.SetValues(0,0,0,0,0,0,0,0,0,0,0)
+        self.SetValues(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
-    def SetValues(self, fSpeed, iRevs, iPower, iTargetMode, iTargetPower, fTargetGrade, \
-                    iTacx, iHeartRate, \
-                    iCrancksetIndex, iCassetteIndex, fReduction):  # Tread safe
+    def SetValues(
+        self,
+        fSpeed,
+        iRevs,
+        iPower,
+        iTargetMode,
+        iTargetPower,
+        fTargetGrade,
+        iTacx,
+        iHeartRate,
+        iCrancksetIndex,
+        iCassetteIndex,
+        fReduction,
+    ):  # Tread safe
         wx.CallAfter(
-                    self.SetValuesGUI, \
-                    fSpeed, iRevs, iPower, iTargetMode, iTargetPower, fTargetGrade, \
-                    iTacx, iHeartRate, \
-                    iCrancksetIndex, iCassetteIndex, fReduction)
+            self.SetValuesGUI,
+            fSpeed,
+            iRevs,
+            iPower,
+            iTargetMode,
+            iTargetPower,
+            fTargetGrade,
+            iTacx,
+            iHeartRate,
+            iCrancksetIndex,
+            iCassetteIndex,
+            fReduction,
+        )
 
-    def SetValuesGUI(self, fSpeed, iRevs, iPower, iTargetMode, iTargetPower, fTargetGrade, \
-                        iTacx, iHeartRate, \
-                        iCrancksetIndex, iCassetteIndex, fReduction):
-
+    def SetValuesGUI(
+        self,
+        fSpeed,
+        iRevs,
+        iPower,
+        iTargetMode,
+        iTargetPower,
+        fTargetGrade,
+        iTacx,
+        iHeartRate,
+        iCrancksetIndex,
+        iCassetteIndex,
+        fReduction,
+    ):
         # ----------------------------------------------------------------------
         # When zero, display default setting
         # ----------------------------------------------------------------------
         if fReduction == 0:
-            fReduction      = 1  # Aviod DivideByZero
+            fReduction = 1  # Aviod DivideByZero
             iCrancksetIndex = self.clv.CrancksetStart
-            iCassetteIndex  = self.clv.CassetteStart
+            iCassetteIndex = self.clv.CassetteStart
 
         # ----------------------------------------------------------------------
         # Average power over the last 10 readings
         # ----------------------------------------------------------------------
-        self.PowerArray = numpy.append(self.PowerArray, iPower)     # Add new value to array
-        self.PowerArray = numpy.delete(self.PowerArray, 0)          # Remove oldest from array
-        iPowerMean = int(numpy.mean(self.PowerArray))               # Calculate average
+        self.PowerArray = numpy.append(
+            self.PowerArray, iPower
+        )  # Add new value to array
+        self.PowerArray = numpy.delete(self.PowerArray, 0)  # Remove oldest from array
+        iPowerMean = int(numpy.mean(self.PowerArray))  # Calculate average
 
         # ----------------------------------------------------------------------
         # Force refresh to avoid ghost values at end-of-loop
         # ----------------------------------------------------------------------
         if fSpeed == 0 and iRevs == 0 and iPower == 0:
-            iPowerMean      = 0 # Avoid that meter remains > 0
-            self.LastFields = 0 # Force refresh
+            iPowerMean = 0  # Avoid that meter remains > 0
+            self.LastFields = 0  # Force refresh
 
         # ----------------------------------------------------------------------
         # Values are needed on OnPaint() event
         # ----------------------------------------------------------------------
         if iHeartRate > 40:
-            self.HeartRate    = iHeartRate
+            self.HeartRate = iHeartRate
         else:
-            self.HeartRate    = 0
+            self.HeartRate = 0
 
-        if iTargetMode in (mode_Grade, mode_Power): # issue #195 asked for power-mode as well
+        if iTargetMode in (
+            mode_Grade,
+            mode_Power,
+        ):  # issue #195 asked for power-mode as well
             self.CrancksetIndex = iCrancksetIndex
-            self.CassetteIndex  = iCassetteIndex
-            self.Reduction      = fReduction
+            self.CassetteIndex = iCassetteIndex
+            self.Reduction = fReduction
         else:
-            self.CrancksetIndex = None              # Not valid in other modes
-            self.CassetteIndex  = None
-            self.Reduction      = 1
+            self.CrancksetIndex = None  # Not valid in other modes
+            self.CassetteIndex = None
+            self.Reduction = 1
 
         # ----------------------------------------------------------------------
         # Update measurements once per second only (otherwise too much flicker)
         # .SetSpeedValue requires quite some processing, but since we are in our
         #   own process since 29-4-2020 refresh all, no optimize needed.
         # ----------------------------------------------------------------------
-        delta = time.time() - self.LastFields # Delta time since previous
-        if delta >= 1:                        # Refresh once per second
-            self.LastFields = time.time()     # Time in seconds
+        delta = time.time() - self.LastFields  # Delta time since previous
+        if delta >= 1:  # Refresh once per second
+            self.LastFields = time.time()  # Time in seconds
 
             if self.Calibrating:
                 self.Revs.SetMiddleText("Calibration countdown")
             else:
                 self.Revs.SetMiddleText("Cadence")
-            self.Speed.SetSpeedValue(float(min(max(0, fSpeed),     self.SpeedMax)))
-            self.Revs.SetSpeedValue (float(min(max(0, iRevs),      self.RevsMax )))
+            self.Speed.SetSpeedValue(float(min(max(0, fSpeed), self.SpeedMax)))
+            self.Revs.SetSpeedValue(float(min(max(0, iRevs), self.RevsMax)))
             self.Power.SetSpeedValue(float(min(max(0, iPowerMean), self.PowerMax)))
 
             if ForceRefreshDC:
                 # Alternating suffix makes the texts being refreshed
-                suffix1 = '.'                       # str(0x32) # space
-                suffix2 = ','                       # str(0xa0) # no break space
+                suffix1 = "."  # str(0x32) # space
+                suffix2 = ","  # str(0xa0) # no break space
                 suffix = self.txtSpeed.Value[-1:]
                 suffix = suffix2 if suffix == suffix1 else suffix1
             else:
                 # Such a measurement is not needed (anymore)
-                suffix = ''
+                suffix = ""
 
             # 2020-02-07: LargeTexts implemented
             if LargeTexts:
                 if self.clv.imperial:
-                    self.txtSpeed.SetValue (("%4.1fmph" % (fSpeed / mile))+ suffix)
+                    self.txtSpeed.SetValue(("%4.1fmph" % (fSpeed / mile)) + suffix)
                 else:
-                    self.txtSpeed.SetValue ("%4.1fkm/h"% fSpeed           + suffix)
+                    self.txtSpeed.SetValue("%4.1fkm/h" % fSpeed + suffix)
 
                 if self.Calibrating:
-                    self.txtRevs.SetValue  ("%i"       % iRevs            + suffix)
+                    self.txtRevs.SetValue("%i" % iRevs + suffix)
                 else:
-                    self.txtRevs.SetValue  ("%i/min"   % iRevs            + suffix)
+                    self.txtRevs.SetValue("%i/min" % iRevs + suffix)
 
-                self.txtPower.SetValue     ("%iW"      % iPower           + suffix)
+                self.txtPower.SetValue("%iW" % iPower + suffix)
 
                 if iTacx == 0:
-                    self.txtTacx.SetValue  ("")
+                    self.txtTacx.SetValue("")
                 else:
-                    self.txtTacx.SetValue  ("%i"       % iTacx            + suffix)
+                    self.txtTacx.SetValue("%i" % iTacx + suffix)
                 fTargetPower = "%iW"
             else:
                 if self.clv.imperial:
-                    self.txtSpeed.SetValue (("%4.1f mph"  % (fSpeed/mile))+ suffix)
+                    self.txtSpeed.SetValue(("%4.1f mph" % (fSpeed / mile)) + suffix)
                 else:
-                    self.txtSpeed.SetValue ("%4.1f km/h" % fSpeed         + suffix)
-                self.txtRevs.SetValue  ("%i revs/min"    % iRevs          + suffix)
-                self.txtPower.SetValue ("%i Watt"        % iPower         + suffix)
-                self.txtTacx.SetValue  ("Tacx=%i"        % iTacx          + suffix)
+                    self.txtSpeed.SetValue("%4.1f km/h" % fSpeed + suffix)
+                self.txtRevs.SetValue("%i revs/min" % iRevs + suffix)
+                self.txtPower.SetValue("%i Watt" % iPower + suffix)
+                self.txtTacx.SetValue("Tacx=%i" % iTacx + suffix)
                 fTargetPower = "%i Watt"
 
-            if   iTargetMode == mode_Power:
-                self.txtTarget.SetValue(fTargetPower     % iTargetPower + suffix)
+            if iTargetMode == mode_Power:
+                self.txtTarget.SetValue(fTargetPower % iTargetPower + suffix)
 
             elif iTargetMode == mode_Grade:
                 s = "%2.0f%%" % fTargetGrade
-                s += "%iW" % iTargetPower        # Target power added for reference
-                                                 # Can be negative!
+                s += "%iW" % iTargetPower  # Target power added for reference
+                # Can be negative!
                 self.txtTarget.SetValue(s + suffix)
 
             else:
-                self.txtTarget.SetValue("No target"  + suffix)
+                self.txtTarget.SetValue("No target" + suffix)
 
             if logfile.IsOpen() and debug.on(debug.Data1 | debug.Data2):
                 Elapsed = time.time() - self.LastFields
-                logfile.Write ("SetValues() done in %s ms" % int(Elapsed*1000))
+                logfile.Write("SetValues() done in %s ms" % int(Elapsed * 1000))
 
         # ----------------------------------------------------------------------
         # If there is a HeartRate, bounce the image
@@ -1007,45 +1345,55 @@ class frmFortiusAntGui(wx.Frame):
         # Do not process more often than heartbeat
         # ----------------------------------------------------------------------
         bRefreshRequired = False
-        delta = time.time() - self.LastHeart # Delta time since previous
-        if delta >= 60 / max(60, self.HeartRate * 2):   # At HeartRate, not slower than 1/second
-                                                        # *2 because one heartbeat = 2 cycles
-            self.LastHeart = time.time()     # Time in seconds
+        delta = time.time() - self.LastHeart  # Delta time since previous
+        if delta >= 60 / max(
+            60, self.HeartRate * 2
+        ):  # At HeartRate, not slower than 1/second
+            # *2 because one heartbeat = 2 cycles
+            self.LastHeart = time.time()  # Time in seconds
             if self.HeartRate > 0:
                 if not self.txtHeartRate.IsShown():
                     # If txtHeartrate not shown; move the cassette/crankset up
                     if self.txtHeartRateShown == False:
-                        self.CassetteY  -= self.txtHeartRateSpace
+                        self.CassetteY -= self.txtHeartRateSpace
                         self.CrancksetY -= self.txtHeartRateSpace
-                        self.txtCranckset.SetPosition(( int(self.txtCranckset.Position[0]), int(self.CrancksetY)))
-                        self.txtCassette .SetPosition(( int(self.txtCassette .Position[0]), int(self.CassetteY )))
+                        self.txtCranckset.SetPosition(
+                            (int(self.txtCranckset.Position[0]), int(self.CrancksetY))
+                        )
+                        self.txtCassette.SetPosition(
+                            (int(self.txtCassette.Position[0]), int(self.CassetteY))
+                        )
                     self.txtHeartRate.Show()
                     self.txtHeartRateShown = True
-                self.txtHeartRate.SetValue  ("%i" % self.HeartRate)
+                self.txtHeartRate.SetValue("%i" % self.HeartRate)
 
-                if self.HeartRateWH  == 40:             # Show 36x36 on every other passage
-                    self.HeartRateWH  = 36
-                    self.HeartRateX  += 2               # center in the 40x40 area
-                    self.HeartRateY  += 2               # center in the 40x40 area
-                    bRefreshRequired  = True
+                if self.HeartRateWH == 40:  # Show 36x36 on every other passage
+                    self.HeartRateWH = 36
+                    self.HeartRateX += 2  # center in the 40x40 area
+                    self.HeartRateY += 2  # center in the 40x40 area
+                    bRefreshRequired = True
 
-                elif self.HeartRateWH  == 36:           # Show 40x40 on every other passage
-                    self.HeartRateWH  = 40
-                    self.HeartRateX  -= 2               # use the 40x40 area
-                    self.HeartRateY  -= 2               # use the 40x40 area
-                    bRefreshRequired  = True
+                elif self.HeartRateWH == 36:  # Show 40x40 on every other passage
+                    self.HeartRateWH = 40
+                    self.HeartRateX -= 2  # use the 40x40 area
+                    self.HeartRateY -= 2  # use the 40x40 area
+                    bRefreshRequired = True
 
             else:
                 if self.txtHeartRate.IsShown():
                     # If txtHeartrate not shown; move the cassette/crankset down
                     if self.txtHeartRateShown == True:
-                        self.CassetteY  += self.txtHeartRateSpace
+                        self.CassetteY += self.txtHeartRateSpace
                         self.CrancksetY += self.txtHeartRateSpace
-                        self.txtCranckset.SetPosition(( int(self.txtCranckset.Position[0]), int(self.CrancksetY)))
-                        self.txtCassette .SetPosition(( int(self.txtCassette .Position[0]), int(self.CassetteY )))
+                        self.txtCranckset.SetPosition(
+                            (int(self.txtCranckset.Position[0]), int(self.CrancksetY))
+                        )
+                        self.txtCassette.SetPosition(
+                            (int(self.txtCassette.Position[0]), int(self.CassetteY))
+                        )
                     self.txtHeartRate.Hide()
                     self.txtHeartRateShown = False
-                    bRefreshRequired  = True
+                    bRefreshRequired = True
 
         # ----------------------------------------------------------------------
         # Gearbox
@@ -1056,47 +1404,48 @@ class frmFortiusAntGui(wx.Frame):
             if not self.txtCranckset.IsShown():
                 self.txtCranckset.Show()
 
-            self.txtCranckset.SetValue  ("%i" % self.clv.Cranckset[self.CrancksetIndex])
-            bRefreshRequired  = True            # So that Cranckset is painted
-            
+            self.txtCranckset.SetValue("%i" % self.clv.Cranckset[self.CrancksetIndex])
+            bRefreshRequired = True  # So that Cranckset is painted
+
         else:
             if self.txtCranckset.IsShown():
                 self.txtCranckset.Hide()
-                bRefreshRequired  = True
+                bRefreshRequired = True
 
         if self.CassetteIndex != None:
             if not self.txtCassette.IsShown():
                 self.txtCassette.Show()
 
-            if self.CassetteIndex < 0:      # IF out of bounds: Reduction <> 1
+            if self.CassetteIndex < 0:  # IF out of bounds: Reduction <> 1
                 teeth = self.clv.Cassette[0]
             elif self.CassetteIndex >= len(self.clv.Cassette):
                 teeth = self.clv.Cassette[len(self.clv.Cassette) - 1]
             else:
                 teeth = self.clv.Cassette[self.CassetteIndex]
 
-            self.txtCassette.SetValue  ("%i" % int(round(teeth / self.Reduction) ) )
-            bRefreshRequired  = True            # So that Cassette is painted
-            
+            self.txtCassette.SetValue("%i" % int(round(teeth / self.Reduction)))
+            bRefreshRequired = True  # So that Cassette is painted
+
         else:
             if self.txtCassette.IsShown():
                 self.txtCassette.Hide()
-                bRefreshRequired  = True
+                bRefreshRequired = True
 
         # ----------------------------------------------------------------------
         # Refresh if required; so that JPGs are drawn in the OnPaint() event
         # ----------------------------------------------------------------------
-        if ForceRefresh and bRefreshRequired: self.panel.Refresh()
+        if ForceRefresh and bRefreshRequired:
+            self.panel.Refresh()
 
-    def SetMessages(self, Tacx=None, Dongle=None, HRM=None):       # Tread safe
+    def SetMessages(self, Tacx=None, Dongle=None, HRM=None):  # Tread safe
         wx.CallAfter(self.SetMessagesGUI, Tacx, Dongle, HRM)
 
     def SetMessagesGUI(self, Tacx=None, Dongle=None, HRM=None):
-        if Tacx   != None:
-            if Tacx[:4] == '* * ':                         # We're calibrating!
+        if Tacx != None:
+            if Tacx[:4] == "* * ":  # We're calibrating!
                 self.Calibrating = True
                 self.txtUsbTrainer.SetForegroundColour(wx.BLUE)
-            else:                  
+            else:
                 self.Calibrating = False
                 self.txtUsbTrainer.SetForegroundColour(wx.BLACK)
             self.txtUsbTrainer.SetValue(Tacx)
@@ -1106,7 +1455,7 @@ class frmFortiusAntGui(wx.Frame):
 
         if HRM != None:
             self.txtAntHRM.SetValue(HRM)
-            
+
     # --------------------------------------------------------------------------
     # P e d a l S t r o k e A n a l y s i s
     # --------------------------------------------------------------------------
@@ -1117,7 +1466,7 @@ class frmFortiusAntGui(wx.Frame):
     #
     # Output:       None
     # --------------------------------------------------------------------------
-    def PedalStrokeAnalysis(self, info, Cadence):                   # Tread safe
+    def PedalStrokeAnalysis(self, info, Cadence):  # Tread safe
         wx.CallAfter(self.RadarGraph.PedalStrokeAnalysis, info, Cadence)
 
     # --------------------------------------------------------------------------
@@ -1135,16 +1484,16 @@ class frmFortiusAntGui(wx.Frame):
         # Draw background (to be done on every OnPaint() otherwise disappears!
         # ----------------------------------------------------------------------
         dc = wx.PaintDC(self.panel)
-        dc.DrawBitmap(self.BackgroundBitmap, 0, 0)          # LeftTop in pixels
+        dc.DrawBitmap(self.BackgroundBitmap, 0, 0)  # LeftTop in pixels
 
         # ----------------------------------------------------------------------
         # Draw HeartRate
         #       Image functions done once, instead of every OnPaint()
         # ----------------------------------------------------------------------
         if self.HeartRateImage and self.HeartRate > 40:
-#           img = self.HeartRateImage.Scale(self.HeartRateWH, self.HeartRateWH, wx.IMAGE_QUALITY_HIGH)
-#           bmp = wx.Bitmap(img)
-            if   self.HeartRateWH == 36:
+            #           img = self.HeartRateImage.Scale(self.HeartRateWH, self.HeartRateWH, wx.IMAGE_QUALITY_HIGH)
+            #           bmp = wx.Bitmap(img)
+            if self.HeartRateWH == 36:
                 dc.DrawBitmap(self.bmp36x36, self.HeartRateX, self.HeartRateY)
             elif self.HeartRateWH == 40:
                 dc.DrawBitmap(self.bmp40x40, self.HeartRateX, self.HeartRateY)
@@ -1169,28 +1518,35 @@ class frmFortiusAntGui(wx.Frame):
             # The sprocket is 2 pixels wide, 1 space = 3 per sprocket
             # With 40 pixels and 13 sprockets: 3 * 13 = 39 which fits
             # ------------------------------------------------------------------
-            margin    = int((self.CassetteWH - len(self.clv.Cassette) * 3) / 2)
-            
+            margin = int((self.CassetteWH - len(self.clv.Cassette) * 3) / 2)
+
             # ------------------------------------------------------------------
             # Draw sprockets, expected 10, 11, 12
             # ------------------------------------------------------------------
             for i in range(0, len(self.clv.Cassette)):
-                x = self.CassetteX + margin + i * 3                    # horizontal position
-                w = 2                                                               # width
-                h = int(self.clv.Cassette[i] / self.clv.CassetteMax * self.CassetteWH )  # heigth
-                y = self.CassetteY + int((self.CassetteWH - h) / 2)   # vertical
+                x = self.CassetteX + margin + i * 3  # horizontal position
+                w = 2  # width
+                h = int(
+                    self.clv.Cassette[i] / self.clv.CassetteMax * self.CassetteWH
+                )  # heigth
+                y = self.CassetteY + int((self.CassetteWH - h) / 2)  # vertical
 
                 # --------------------------------------------------------------
                 # The selected one is red, the other default colour
                 # --------------------------------------------------------------
-                if i == self.CassetteIndex \
-                    or ( i == 0                          and self.CassetteIndex < 0                       )\
-                    or ( i == len(self.clv.Cassette) - 1 and self.CassetteIndex >= len(self.clv.Cassette) ):
-                    dc.SetPen(wx.Pen(wx.RED))                           # Selected gear
+                if (
+                    i == self.CassetteIndex
+                    or (i == 0 and self.CassetteIndex < 0)
+                    or (
+                        i == len(self.clv.Cassette) - 1
+                        and self.CassetteIndex >= len(self.clv.Cassette)
+                    )
+                ):
+                    dc.SetPen(wx.Pen(wx.RED))  # Selected gear
                     ChainX1 = x
                     ChainY1 = y
                 else:
-                    dc.SetPen(wx.Pen(colorTacxFortius))                 # Other gears
+                    dc.SetPen(wx.Pen(colorTacxFortius))  # Other gears
 
                 # --------------------------------------------------------------
                 # Draw the chainring
@@ -1205,28 +1561,35 @@ class frmFortiusAntGui(wx.Frame):
             # The chainring is 2 pixels wide, 2 space = 4 per chainring
             # Since max 3 chainrings, this always fits
             # ------------------------------------------------------------------
-            margin    = int((self.CrancksetWH - len(self.clv.Cranckset) * 4) / 2)
-            
+            margin = int((self.CrancksetWH - len(self.clv.Cranckset) * 4) / 2)
+
             # ------------------------------------------------------------------
             # Draw chainrings, expected 1, 2 or 3
             # ------------------------------------------------------------------
             for i in range(0, len(self.clv.Cranckset)):
-                x = self.CrancksetX + margin + i * 4                    # horizontal position
-                w = 2                                                               # width
-                h = int(self.clv.Cranckset[i] / self.clv.CrancksetMax * self.CrancksetWH )  # heigth
-                y = self.CrancksetY + int((self.CrancksetWH - h) / 2)   # vertical
+                x = self.CrancksetX + margin + i * 4  # horizontal position
+                w = 2  # width
+                h = int(
+                    self.clv.Cranckset[i] / self.clv.CrancksetMax * self.CrancksetWH
+                )  # heigth
+                y = self.CrancksetY + int((self.CrancksetWH - h) / 2)  # vertical
 
                 # --------------------------------------------------------------
                 # The selected one is red, the other default colour
                 # --------------------------------------------------------------
-                if i == self.CrancksetIndex \
-                    or ( i == 0                           and self.CrancksetIndex < 0                        )\
-                    or ( i == len(self.clv.Cranckset) - 1 and self.CrancksetIndex >= len(self.clv.Cranckset) ):
-                    dc.SetPen(wx.Pen(wx.RED))                           # Selected gear
+                if (
+                    i == self.CrancksetIndex
+                    or (i == 0 and self.CrancksetIndex < 0)
+                    or (
+                        i == len(self.clv.Cranckset) - 1
+                        and self.CrancksetIndex >= len(self.clv.Cranckset)
+                    )
+                ):
+                    dc.SetPen(wx.Pen(wx.RED))  # Selected gear
                     ChainX2 = x
                     ChainY2 = y + h
                 else:
-                    dc.SetPen(wx.Pen(colorTacxFortius))                 # Other gears
+                    dc.SetPen(wx.Pen(colorTacxFortius))  # Other gears
 
                 # --------------------------------------------------------------
                 # Draw the chainring
@@ -1255,45 +1618,49 @@ class frmFortiusAntGui(wx.Frame):
         # ----------------------------------------------------------------------
         if True or self.clv.StatusLeds:
             all = FixedForDocu
-            x   = self.StatusLedsXr         # Right side of rightmost label
-            y   = self.StatusLedsYb - 10    # Upper size of status leds
-            r   = 3
+            x = self.StatusLedsXr  # Right side of rightmost label
+            y = self.StatusLedsYb - 10  # Upper size of status leds
+            r = 3
             distance = 70
 
             if all or self.clv.antDeviceID != -1:  # Led 5 = ANT CTP
                 x -= distance
-                self.DrawLed(dc,   0,   0,255, x, y, r, self.StatusLeds[4], 'ANT CTP'  )
+                self.DrawLed(dc, 0, 0, 255, x, y, r, self.StatusLeds[4], "ANT CTP")
 
-            if all or self.clv.ble:                # Led 4 = Bluetooth CTP
+            if all or self.clv.ble:  # Led 4 = Bluetooth CTP
                 x -= distance
-                self.DrawLed(dc,   0, 255,255, x, y, r, self.StatusLeds[3], 'BLE CTP'  )
+                self.DrawLed(dc, 0, 255, 255, x, y, r, self.StatusLeds[3], "BLE CTP")
 
-            if all or self.clv.Tacx_Cadence:       # Led 3 = Cadence sensor (black because backgroup is white)
+            if (
+                all or self.clv.Tacx_Cadence
+            ):  # Led 3 = Cadence sensor (black because backgroup is white)
                 x -= distance
-                self.DrawLed(dc,    0,  0,  0, x, y, r, self.StatusLeds[2], 'Cadence'  )
+                self.DrawLed(dc, 0, 0, 0, x, y, r, self.StatusLeds[2], "Cadence")
 
-            if all or OnRaspberry:                 # Led 2 = on raspberry only
+            if all or OnRaspberry:  # Led 2 = on raspberry only
                 x -= distance
-                self.DrawLed(dc, 255,   0,  0, x, y, r, self.StatusLeds[1], 'Shutdown' )
+                self.DrawLed(dc, 255, 0, 0, x, y, r, self.StatusLeds[1], "Shutdown")
 
-            if all or True:                        # Led 1 = Tacx trainer; USB, ANT or Simulated
+            if all or True:  # Led 1 = Tacx trainer; USB, ANT or Simulated
                 x -= distance
-                self.DrawLed(dc, 255, 140,  0, x, y, r, self.StatusLeds[0], 'Tacx'     )
+                self.DrawLed(dc, 255, 140, 0, x, y, r, self.StatusLeds[0], "Tacx")
 
     # --------------------------------------------------------------------------
     # D r a w L e d
     # --------------------------------------------------------------------------
-    def DrawLed (self, dc, r,g,b, x, y, radius, on, label):
-        c = wx.Colour(r,g,b)                        # pylint: disable=maybe-no-member
-        dc.SetPen(wx.Pen(c))                        # Circle line, pylint: disable=maybe-no-member
+    def DrawLed(self, dc, r, g, b, x, y, radius, on, label):
+        c = wx.Colour(r, g, b)  # pylint: disable=maybe-no-member
+        dc.SetPen(wx.Pen(c))  # Circle line, pylint: disable=maybe-no-member
         if on == True or FixedForDocu:
-            dc.SetBrush(wx.Brush(c))                # Circle fill, pylint: disable=maybe-no-member
+            dc.SetBrush(wx.Brush(c))  # Circle fill, pylint: disable=maybe-no-member
         else:
-            dc.SetBrush(wx.TRANSPARENT_BRUSH)       # Circle fill transparent
+            dc.SetBrush(wx.TRANSPARENT_BRUSH)  # Circle fill transparent
         dc.DrawCircle(x, y, radius)
 
-        dc.SetFont   (wx.Font(8, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
-        dc.DrawText  (label, x + radius + 2, y - 7)
+        dc.SetFont(
+            wx.Font(8, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        )
+        dc.DrawText(label, x + radius + 2, y - 7)
 
     # --------------------------------------------------------------------------
     # O n T i m e r
@@ -1318,7 +1685,8 @@ class frmFortiusAntGui(wx.Frame):
     # Output:       None
     # --------------------------------------------------------------------------
     def OnClick_btnSettings(self, event=False):
-        if __name__ == "__main__": print ("OnClick_btnSettings()")
+        if __name__ == "__main__":
+            print("OnClick_btnSettings()")
         self.OnTimerEnabled = False
         # app is not available here, use None
         RestartApplication, clvReturned = settings.OpenDialog(None, self, self.clv)
@@ -1335,10 +1703,12 @@ class frmFortiusAntGui(wx.Frame):
             # ------------------------------------------------------------------
             if RestartApplication == True:
                 if self.RunningSwitch == True:
-                    logfile.Console('frmFortiusAntGui.OnClick_btnSettings() unexpected situation')
+                    logfile.Console(
+                        "frmFortiusAntGui.OnClick_btnSettings() unexpected situation"
+                    )
                     pass
                 else:
-                    self.Close()                              # Stop program
+                    self.Close()  # Stop program
 
     # --------------------------------------------------------------------------
     # O n C l i c k _ b t n L o c a t e H W
@@ -1350,7 +1720,8 @@ class frmFortiusAntGui(wx.Frame):
     # Output:       None
     # --------------------------------------------------------------------------
     def OnClick_btnLocateHW(self, event=False):
-        if __name__ == "__main__": print ("OnClick_btnLocateHW()")
+        if __name__ == "__main__":
+            print("OnClick_btnLocateHW()")
 
         self.OnTimerEnabled = False
         rtn = self.callLocateHW()
@@ -1375,7 +1746,8 @@ class frmFortiusAntGui(wx.Frame):
     # Output:       None
     # --------------------------------------------------------------------------
     def OnClick_btnRunoff(self, event):
-        if __name__ == "__main__":  print ("OnClick_btnRunoff()")
+        if __name__ == "__main__":
+            print("OnClick_btnRunoff()")
 
         self.btnStop.Enable()
         self.btnStart.Disable()
@@ -1387,17 +1759,18 @@ class frmFortiusAntGui(wx.Frame):
         thread.start()
 
     def OnClick_btnRunoff_Thread(self):
-        if __name__ == "__main__": print ("OnClick_btnRunoff_Thread()")
+        if __name__ == "__main__":
+            print("OnClick_btnRunoff_Thread()")
 
-        self.RunningSwitch = True               # callRunoff() will loop
+        self.RunningSwitch = True  # callRunoff() will loop
         self.CloseButtonPressed = False
         self.OnTimerEnabled = False
         self.callRunoff()
         wx.CallAfter(self.OnClick_btnRunoff_Done)
 
     def OnClick_btnRunoff_Done(self):
-        self.OnTimerEnabled= True
-        self.RunningSwitch = False              # Just to be sure
+        self.OnTimerEnabled = True
+        self.RunningSwitch = False  # Just to be sure
 
         self.ResetValues()
         self.btnSettings.Enable()
@@ -1407,7 +1780,7 @@ class frmFortiusAntGui(wx.Frame):
         self.btnRunoff.SetFocus()
 
         if self.CloseButtonPressed == True:
-            self.CloseButtonPressed = False     # Otherwise self.Close() is blocked
+            self.CloseButtonPressed = False  # Otherwise self.Close() is blocked
             self.Close()
 
     # --------------------------------------------------------------------------
@@ -1422,7 +1795,8 @@ class frmFortiusAntGui(wx.Frame):
     # Output:       None
     # --------------------------------------------------------------------------
     def OnClick_btnStart(self, event=False):
-        if __name__ == "__main__": print ("OnClick_btnStart()")
+        if __name__ == "__main__":
+            print("OnClick_btnStart()")
 
         self.btnStop.Enable()
         self.btnStart.Disable()
@@ -1434,17 +1808,18 @@ class frmFortiusAntGui(wx.Frame):
         thread.start()
 
     def OnClick_btnStart_Thread(self):
-        if __name__ == "__main__": print ("OnClick_btnStart_Thread()")
+        if __name__ == "__main__":
+            print("OnClick_btnStart_Thread()")
 
-        self.RunningSwitch = True               # callTacx2Dongle() will loop
+        self.RunningSwitch = True  # callTacx2Dongle() will loop
         self.CloseButtonPressed = False
         self.OnTimerEnabled = False
         self.callTacx2Dongle()
         wx.CallAfter(self.OnClick_btnStart_Done)
 
     def OnClick_btnStart_Done(self):
-        self.OnTimerEnabled= True
-        self.RunningSwitch = False              # Just to be sure
+        self.OnTimerEnabled = True
+        self.RunningSwitch = False  # Just to be sure
 
         self.ResetValues()
         self.btnSettings.Enable()
@@ -1454,7 +1829,7 @@ class frmFortiusAntGui(wx.Frame):
         self.btnStart.SetFocus()
 
         if self.CloseButtonPressed == True:
-            self.CloseButtonPressed = False     # Otherwise self.Close() is blocked
+            self.CloseButtonPressed = False  # Otherwise self.Close() is blocked
             self.Close()
 
     # --------------------------------------------------------------------------
@@ -1467,7 +1842,8 @@ class frmFortiusAntGui(wx.Frame):
     # Output:       self.RunningSwitch
     # --------------------------------------------------------------------------
     def OnClick_btnStop(self, event=False):
-        if __name__ == "__main__": print ("OnClick_btnStop()")
+        if __name__ == "__main__":
+            print("OnClick_btnStop()")
         self.RunningSwitch = False
         self.btnStop.Disable()
 
@@ -1481,11 +1857,12 @@ class frmFortiusAntGui(wx.Frame):
     # Output:       None
     # --------------------------------------------------------------------------
     def OnClick_btnSponsor(self, event=False):
-        if __name__ == "__main__": print ("OnClick_btnSponsor()")
-        webbrowser.open_new_tab('https://github.com/sponsors/WouterJD')
+        if __name__ == "__main__":
+            print("OnClick_btnSponsor()")
+        webbrowser.open_new_tab("https://github.com/sponsors/WouterJD")
 
     # --------------------------------------------------------------------------
-    # O n C l i c k _ b t n H e l p 
+    # O n C l i c k _ b t n H e l p
     # --------------------------------------------------------------------------
     # input:        [Help] pressed
     #
@@ -1494,8 +1871,11 @@ class frmFortiusAntGui(wx.Frame):
     # Output:       None
     # --------------------------------------------------------------------------
     def OnClick_btnHelp(self, event=False):
-        if __name__ == "__main__": print ("OnClick_btnHelp()")
-        webbrowser.open_new_tab('https://github.com/WouterJD/FortiusANT/blob/master/doc/FortiusANTUserManual.pdf')
+        if __name__ == "__main__":
+            print("OnClick_btnHelp()")
+        webbrowser.open_new_tab(
+            "https://github.com/WouterJD/FortiusANT/blob/master/doc/FortiusANTUserManual.pdf"
+        )
 
     # --------------------------------------------------------------------------
     # O n C l o s e
@@ -1510,25 +1890,27 @@ class frmFortiusAntGui(wx.Frame):
     #               self.CloseButtonPressed
     # --------------------------------------------------------------------------
     def OnClose(self, event):
-        if __name__ == "__main__": print("OnClose()")
+        if __name__ == "__main__":
+            print("OnClose()")
 
-        if self.RunningSwitch == True:          # Thread is running
-            self.RunningSwitch = False          # Stop the thread
-                                                # More accurately: ask the thread to finish!
-            self.CloseButtonPressed = True      # Indicate to stop program
+        if self.RunningSwitch == True:  # Thread is running
+            self.RunningSwitch = False  # Stop the thread
+            # More accurately: ask the thread to finish!
+            self.CloseButtonPressed = True  # Indicate to stop program
             # Expected behaviour from the thread:
             # - stop because RunningSwitch == False
             # - check CloseButtonPressed == True and
             #       1. set CloseButtonPressed = False
             #       2. call self.Close()
             # This event will be called again and go through the else and end.
-        elif self.CloseButtonPressed:           # Waiting for thread to finish;
-                                                # Do not close again!
-            print('Please wait for thread to end...')
+        elif self.CloseButtonPressed:  # Waiting for thread to finish;
+            # Do not close again!
+            print("Please wait for thread to end...")
             pass
 
-        else:                                   # No thread is running;
-            event.Skip()				        # Do default actions (stop program)
+        else:  # No thread is running;
+            event.Skip()  # Do default actions (stop program)
+
 
 # ------------------------------------------------------------------------------
 # our normal wxApp-derived class, as usual
