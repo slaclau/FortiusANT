@@ -6,12 +6,15 @@ on:
 jobs:
   build:
     uses: ./.github/workflows/build.yaml
+    
   release:
     runs-on: "ubuntu-latest"
     
     strategy:
       matrix:
         os: [ubuntu-22.04, ubuntu-20.04]
+    
+    needs: build
         
     steps:
       - name: Get packages
