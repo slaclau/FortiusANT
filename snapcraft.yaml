@@ -4,7 +4,7 @@ description: FortiusANT BY WouterJD
 version: git
 grade: devel
 confinement: devmode
-base: core20
+base: core22
 architectures:
   - build-on: [amd64]
 
@@ -15,6 +15,6 @@ apps:
 parts:
   fortius-ant:
     plugin: python
-    requirements: [snap-requirements.txt]
+    python-requirements: [snap-requirements.txt]
     source: https://github.com/slaclau/FortiusANT.git
 
