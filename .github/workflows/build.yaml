@@ -13,6 +13,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2.7.0
+      - name: Add dh-virtualenv repository if needed
+        if: matrix.os == 'ubuntu-20.04'
+        run: |
+          sudo add-apt-repository ppa:jyrki-pulliainen/dh-virtualenv
+          sudo apt update
       - name: Install build dependencies
         run: |
           sudo apt install debhelper dh-virtualenv
