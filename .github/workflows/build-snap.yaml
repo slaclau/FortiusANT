@@ -13,6 +13,6 @@ jobs:
         id: build
       - name: Upload snap
         uses: actions/upload-artifact@v3
-          with:
-            name: snap
-            path: ${{ steps.build.outputs.snap }}
+        with:
+          name: snap
+          path: ${{ steps.build.outputs.snap }}
