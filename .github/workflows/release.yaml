@@ -1,1 +1,24 @@
 name: "Release debian packages"
+
+on:
+  push:
+    tags:
+      - "*-*ubuntu*"
+      
+jobs:
+  build:
+    uses: ./.github/workflows/build.yaml
+  release:
+    runs-on: "ubuntu-latest"
+    
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-20.04]
+        
+    steps:
+      - name: Get packages
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ matrix.os }}
+          path: test
+      - run: ls
