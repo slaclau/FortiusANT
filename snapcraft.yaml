@@ -1,1 +1,18 @@
+name: fortius-ant
+summary: FortiusANT by WouterJD
+version: git
+grade: unstable
+confinement: devmode
+base: core22
+architectures:
+  - build-on: [amd64]
+
+apps:
+  fortius-ant:
+    command: bin/fortius-ant
+
+parts:
+  fortius-ant:
+    plugin: python
+    source: https://github.com/slaclau/FortiusANT.git
 
