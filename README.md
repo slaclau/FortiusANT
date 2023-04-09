@@ -1,4 +1,6 @@
 [![Build debian packages](https://github.com/slaclau/FortiusANT/actions/workflows/build.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/build.yaml)
+![Ubuntu package version](https://img.shields.io/github/v/release/slaclau/FortiusANT?label=Ubuntu%20Package)
+
 # FortiusANT
 FortiusANT enables a pre-smart Tacx trainer (usb- or ANT-connected) to communicate with TrainerRoad, Rouvy or Zwift through ANT.
 
