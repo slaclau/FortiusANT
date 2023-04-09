@@ -1,8 +1,8 @@
-fortius-ant (6.7-0ubuntu1) replace_me; urgency=medium
+fortius-ant (6.7-0ubuntu1) replaceme; urgency=medium
 
   * Updated to match upstream.
 
-fortius-ant (6.5.1-0ubuntu2) replace_me; urgency=medium
+fortius-ant (6.5.1-0ubuntu2) replaceme; urgency=medium
 
   * Initial release.
 
