@@ -39,6 +39,10 @@ jobs:
       - name: Build package
         run: |
           dpkg-buildpackage -us -uc -b
+      - name: Install and test package
+        run: |
+          sudo dpkg -i ../fortius_ant*.deb
+          timeout 10 fortius-ant >> log.txt
       - name: Upload debian package
         uses: actions/upload-artifact@v3
         with:
