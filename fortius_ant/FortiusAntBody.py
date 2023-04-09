@@ -611,7 +611,7 @@ def Runoff(FortiusAntGui):
                     )
                 )
 
-                import steeringif (
+                if (
                     TacxTrainer.SpeedKmh > clv.RunoffMaxSpeed
                 ):  # SpeedKmh above 40, start rolldown
                     FortiusAntGui.SetMessages(Tacx=ShortMessage + "STOP PEDALLING")

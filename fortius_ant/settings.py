@@ -855,7 +855,7 @@ if constants.UseGui:
             # ----------------------------------------------------------------------
             l = "Power curve adjustment:"
             s = (500, -1)
-            p = Under(self.combo_t, 15)
+            p = Under(self.combo_S, 15)
             self.lblPower = wx.StaticText(
                 panel,
                 id=wx.ID_ANY,
