@@ -16,6 +16,7 @@ build-packages:
   - libwebkit2gtk-4.0-dev
   - libjavascriptcoregtk-4.0-dev
   - libegl-dev
+stage-packages:
   - libasound2
   - libasyncns0
   - libatk-bridge2.0-0
