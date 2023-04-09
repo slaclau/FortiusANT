@@ -26,7 +26,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag: 6.7-0ubuntu1
+          tag_name: 6.7-0ubuntu1
           files: |
             focal
             kinetic
