@@ -19,21 +19,21 @@ jobs:
         with:
           name: ubuntu-20.04
           path: focal
-      - name: Get kinetic package
+      - name: Get jammy package
         uses: actions/download-artifact@v3
         with:
           name: ubuntu-22.04
-          path: kinetic
+          path: jammy
       - name: tar packages
         run: |
           tar cf focal.tar focal
-          tar cf kinetic.tar kinetic
+          tar cf jammy.tar jammy
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
             focal.tar
-            kinetic.tar
+            jammy.tar
 
 permissions:
   contents: write
