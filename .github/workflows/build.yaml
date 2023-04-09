@@ -22,7 +22,9 @@ jobs:
         run: |
           sudo apt install debhelper dh-virtualenv
       - name: Check system python version
-        run: echo "useSystemPython=$(python3 useSystemPython.py)" >> $GITHUB_ENV
+        run: |
+          echo "useSystemPython=$(python3 useSystemPython.py)" >> $GITHUB_ENV
+          echo "${{env.useSystemPython}"
       - name: Install system python packages
         if: ${{ env.useSystemPython == 'yes' }}
         run: |
