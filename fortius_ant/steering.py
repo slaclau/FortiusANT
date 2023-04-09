@@ -9,8 +9,8 @@ __version__ = "2022-08-22"
 
 from abc import ABC
 import fortius_ant.antDongle as ant
-import fortius_ant.debug
-import fortius_ant.logfile
+import fortius_ant.debug as debug
+import fortius_ant.logfile as logfile
 import statistics
 import time
 
