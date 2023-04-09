@@ -11,13 +11,18 @@ jobs:
       - name: Build snap
         uses: snapcore/action-build@v1
         id: build
+      - name: Install snap
+        run: |
+          sudo snap install --dangerous steps.build.outputs.snap }}
+      - name: Test snap
+        run: |
+          fortius-ant -a -s
       - name: Upload snap
         uses: actions/upload-artifact@v3
         with:
           name: snap
           path: ${{ steps.build.outputs.snap }}
       - name: Publish snap
-        if: false
         uses: snapcore/action-publish@v1
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
