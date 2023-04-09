@@ -4,9 +4,18 @@ description: FortiusANT BY WouterJD
 version: git
 grade: devel
 confinement: devmode
-base: core22
+base: core20
 architectures:
   - build-on: [amd64]
+
+build-packages:
+  - libffi-dev
+  - libgstreamer-plugins-base1.0-0
+  - libnotify4
+  - libsdl2-2.0-0
+  - libwebkit2gtk-4.0-dev
+  - libjavascriptcoregtk-4.0-dev
+  - libegl-dev
 
 apps:
   fortius-ant:
