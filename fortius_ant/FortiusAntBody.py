@@ -776,7 +776,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
     # ---------------------------------------------------------------------------
     # Front/rear shifting
     # ---------------------------------------------------------------------------
-    ReductionCranckset = 1  # ratio between selected/start (front)
+    ReductionCrankset = 1  # ratio between selected/start (front)
     ReductionCassette = 1  # same, rear
     ReductionCassetteX = 1  # same, beyond cassette range
     CranksetIndex = clv.CranksetStart
@@ -1304,7 +1304,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
                     TacxTrainer.TargetGrade,
                     TacxTrainer.TargetResistance,
                     HeartRate,
-                    CrancksetIndex,
+                    CranksetIndex,
                     CassetteIndex,
                     ReductionCassetteX,
                 )
@@ -1441,7 +1441,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
                     or TacxTrainer.Buttons == usbTrainer.OKButton
                 ):
                     ReductionChanged = True
-                    CrancksetIndex = clv.CrancksetStart  # Reset both front
+                    CranksetIndex = clv.CranksetStart  # Reset both front
                     CassetteIndex = clv.CassetteStart  # and rear
 
                 elif (
@@ -1477,9 +1477,9 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
                 ):  # Switch front up (round robin)
                     ReductionChanged = True
                     # FortiusAntGui.RunningSwitch = False
-                    CrancksetIndex += 1
-                    if CrancksetIndex == len(clv.Cranckset):
-                        CrancksetIndex = 0
+                    CranksetIndex += 1
+                    if CranksetIndex == len(clv.Crankset):
+                        CranksetIndex = 0
 
                 else:
                     pass
@@ -1490,15 +1490,15 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
             # Note that, the VIRTUAL gearbox has Reduction = 1 when the indexes
             #      are in the initial position (not when front = rear!).
             #
-            # ReductionCranckset: >1 when chainring > start-value
+            # ReductionCrankset: >1 when chainring > start-value
             # ReductionCassette:  >1 when sprocket  < start-value
             # ReductionCassetteX: is a factor when index outside the cassette!
             # -------------------------------------------------------------------
             if ReductionChanged:
-                if 0 <= CrancksetIndex < len(clv.Cranckset):
-                    ReductionCranckset = (
-                        clv.Cranckset[CrancksetIndex]
-                        / clv.Cranckset[clv.CrancksetStart]
+                if 0 <= CranksetIndex < len(clv.Crankset):
+                    ReductionCrankset = (
+                        clv.Crankset[CranksetIndex]
+                        / clv.Crankset[clv.CranksetStart]
                     )
 
                 if 0 <= CassetteIndex < len(clv.Cassette):
@@ -1515,19 +1515,19 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
                     logfile.Print(
                         "gearbox changed: index=%ix%2i ratio=%ix%i R=%3.1f*%3.1f*%3.1f=%3.1f"
                         % (
-                            CrancksetIndex,
+                            CranksetIndex,
                             CassetteIndex,
-                            clv.Cranckset[CrancksetIndex],
+                            clv.Crankset[CranksetIndex],
                             clv.Cassette[i],
-                            ReductionCranckset,
+                            ReductionCrankset,
                             ReductionCassette,
                             ReductionCassetteX,
-                            ReductionCranckset * ReductionCassette * ReductionCassetteX,
+                            ReductionCrankset * ReductionCassette * ReductionCassetteX,
                         )
                     )
 
                 TacxTrainer.SetGearboxReduction(
-                    ReductionCranckset * ReductionCassette * ReductionCassetteX
+                    ReductionCrankset * ReductionCassette * ReductionCassetteX
                 )
 
             # -------------------------------------------------------------------
