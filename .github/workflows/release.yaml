@@ -22,19 +22,17 @@ jobs:
         with:
           name: ubuntu-22.04
           path: kinetic
-      - name: Rename packages
+      - name: tar packages
         run: |
-          cd focal
-          mv -- "$f" "focal_$f"
-          cd ../kinetic
-          mv -- "$f" "kinetic_$f"
+          tar cf focal.tar focal
+          tar cf kinetic.tar kinetic
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: test
           files: |
-            focal/*
-            kinetic/*
+            focal.tar
+            kinetic.tar
 
 permissions:
   contents: write
