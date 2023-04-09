@@ -1,0 +1,17 @@
+fortius-ant (6.7-0ubuntu2) replaceme; urgency=medium
+
+  * Update to desktop file
+
+ -- Sebastien Laclau <seb.laclau@gmail.com>  Sun, 09 Apr 2023 18:28:29 +0100
+
+fortius-ant (6.7-0ubuntu1) replaceme; urgency=medium
+
+  * Updated to match upstream.
+
+ -- Sebastien Laclau <seb.laclau@gmail.com>  Sun, 09 Apr 2023 17:28:29 +0100
+
+fortius-ant (6.5.1-0ubuntu2) replaceme; urgency=medium
+
+  * Initial release.
+
+ -- Sebastien Laclau <seb.laclau@gmail.com>  Sun, 09 Apr 2023 15:10:14 +0100
