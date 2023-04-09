@@ -779,7 +779,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
     ReductionCranckset = 1  # ratio between selected/start (front)
     ReductionCassette = 1  # same, rear
     ReductionCassetteX = 1  # same, beyond cassette range
-    CrancksetIndex = clv.CrancksetStart
+    CranksetIndex = clv.CranksetStart
     CassetteIndex = clv.CassetteStart
 
     # ---------------------------------------------------------------------------
