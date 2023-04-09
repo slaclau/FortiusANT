@@ -2,7 +2,7 @@ name: fortius-ant
 summary: FortiusANT by WouterJD
 description: FortiusANT BY WouterJD
 version: git
-grade: unstable
+grade: devel
 confinement: devmode
 base: core22
 architectures:
