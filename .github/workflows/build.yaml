@@ -13,6 +13,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2.7.0
+      - name: Install build dependencies
+        run: |
+          apt install debhelper dh-virtualenv
+      - name: Check system python version
+        id: sys_py_version
+        run: echo ::set-output name=key::python3 useSystemPython.py
       - name: Build package
         run: |
           dpkg-buildpackage -us -uc -b
