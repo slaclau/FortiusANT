@@ -1,6 +1,6 @@
 name: fortius-ant
 summary: FortiusANT by WouterJD
-descriptiom: FortiusANT BY WouterJD
+description: FortiusANT BY WouterJD
 version: git
 grade: unstable
 confinement: devmode
