@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxAntVortexTrainer.TargetPower2Resistance
+======================================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. automethod:: clsTacxAntVortexTrainer.TargetPower2Resistance

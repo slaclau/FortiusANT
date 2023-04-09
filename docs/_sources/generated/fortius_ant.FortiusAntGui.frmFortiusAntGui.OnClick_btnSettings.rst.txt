@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAntGui.frmFortiusAntGui.OnClick\_btnSettings
+================================================================
+
+.. currentmodule:: fortius_ant.FortiusAntGui
+
+.. automethod:: frmFortiusAntGui.OnClick_btnSettings

@@ -1,0 +1,6 @@
+fortius\_ant.bleBless.clsFTMS\_bless.TargetPower
+================================================
+
+.. currentmodule:: fortius_ant.bleBless
+
+.. autoattribute:: clsFTMS_bless.TargetPower

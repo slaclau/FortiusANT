@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.unmsg51\_ChannelID
+=========================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: unmsg51_ChannelID

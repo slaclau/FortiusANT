@@ -1,0 +1,6 @@
+fortius\_ant.TCXexport.clsTcxExport.\_\_init\_\_
+================================================
+
+.. currentmodule:: fortius_ant.TCXexport
+
+.. automethod:: clsTcxExport.__init__

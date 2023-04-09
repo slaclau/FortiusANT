@@ -1,0 +1,29 @@
+clsFortiusAntConsole
+====================
+
+.. currentmodule:: fortius_ant.FortiusAnt
+
+.. autoclass:: fortius_ant.FortiusAnt.clsFortiusAntConsole
+   :show-inheritance:
+
+   .. inheritance-diagram:: clsFortiusAntConsole
+   
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~clsFortiusAntConsole.Autostart
+      ~clsFortiusAntConsole.SetLeds
+      ~clsFortiusAntConsole.SetMessages
+      ~clsFortiusAntConsole.SetValues
+      ~clsFortiusAntConsole.__init__
+   
+   
+
+
+   
+   
+   

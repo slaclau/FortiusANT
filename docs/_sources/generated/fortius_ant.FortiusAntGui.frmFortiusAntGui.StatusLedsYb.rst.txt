@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAntGui.frmFortiusAntGui.StatusLedsYb
+========================================================
+
+.. currentmodule:: fortius_ant.FortiusAntGui
+
+.. autoattribute:: frmFortiusAntGui.StatusLedsYb

@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAntGui.frmFortiusAntGui.LastFields
+======================================================
+
+.. currentmodule:: fortius_ant.FortiusAntGui
+
+.. autoattribute:: frmFortiusAntGui.LastFields

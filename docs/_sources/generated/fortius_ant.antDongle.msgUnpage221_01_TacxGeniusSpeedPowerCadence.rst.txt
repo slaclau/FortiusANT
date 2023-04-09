@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgUnpage221\_01\_TacxGeniusSpeedPowerCadence
+====================================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgUnpage221_01_TacxGeniusSpeedPowerCadence

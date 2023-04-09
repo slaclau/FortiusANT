@@ -1,0 +1,6 @@
+fortius\_ant.raspberry.clsRaspberry.LedTacxState
+================================================
+
+.. currentmodule:: fortius_ant.raspberry
+
+.. autoattribute:: clsRaspberry.LedTacxState

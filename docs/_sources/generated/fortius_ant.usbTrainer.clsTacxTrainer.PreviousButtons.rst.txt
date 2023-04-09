@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.PreviousButtons
+======================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoattribute:: clsTacxTrainer.PreviousButtons

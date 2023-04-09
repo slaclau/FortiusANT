@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAnt.IdleFunction
+====================================
+
+.. currentmodule:: fortius_ant.FortiusAnt
+
+.. autofunction:: IdleFunction

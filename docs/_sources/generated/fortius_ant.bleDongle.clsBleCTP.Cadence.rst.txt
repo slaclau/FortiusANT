@@ -1,0 +1,6 @@
+fortius\_ant.bleDongle.clsBleCTP.Cadence
+========================================
+
+.. currentmodule:: fortius_ant.bleDongle
+
+.. autoattribute:: clsBleCTP.Cadence

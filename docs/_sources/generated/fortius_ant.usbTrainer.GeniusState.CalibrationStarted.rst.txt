@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.GeniusState.CalibrationStarted
+======================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoattribute:: GeniusState.CalibrationStarted

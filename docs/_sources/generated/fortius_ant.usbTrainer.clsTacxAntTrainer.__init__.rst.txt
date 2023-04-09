@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxAntTrainer.\_\_init\_\_
+======================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. automethod:: clsTacxAntTrainer.__init__

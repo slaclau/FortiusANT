@@ -1,0 +1,91 @@
+﻿clsTacxTrainer
+==============
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoclass:: fortius_ant.usbTrainer.clsTacxTrainer
+   :show-inheritance:
+
+   .. inheritance-diagram:: clsTacxTrainer
+   
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~clsTacxTrainer.AddGrade
+      ~clsTacxTrainer.AddPower
+      ~clsTacxTrainer.CalibrateSupported
+      ~clsTacxTrainer.DisplayStateTable
+      ~clsTacxTrainer.GetTrainer
+      ~clsTacxTrainer.MultiplyPower
+      ~clsTacxTrainer.Power2Speed
+      ~clsTacxTrainer.Refresh
+      ~clsTacxTrainer.SendToTrainer
+      ~clsTacxTrainer.SetGearboxReduction
+      ~clsTacxTrainer.SetGrade
+      ~clsTacxTrainer.SetPower
+      ~clsTacxTrainer.SetRollingResistance
+      ~clsTacxTrainer.SetUserConfiguration
+      ~clsTacxTrainer.SetWind
+      ~clsTacxTrainer.TargetPower2Resistance
+      ~clsTacxTrainer.__init__
+   
+   
+
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+      :toctree:
+   
+      ~clsTacxTrainer.AntDevice
+      ~clsTacxTrainer.Axis
+      ~clsTacxTrainer.BicycleWeight
+      ~clsTacxTrainer.BicycleWheelDiameter
+      ~clsTacxTrainer.Buttons
+      ~clsTacxTrainer.Cadence
+      ~clsTacxTrainer.CalculatedSpeedKmh
+      ~clsTacxTrainer.Calibrate
+      ~clsTacxTrainer.ControlCommand
+      ~clsTacxTrainer.CurrentPower
+      ~clsTacxTrainer.CurrentResistance
+      ~clsTacxTrainer.DraftingFactor
+      ~clsTacxTrainer.GearRatio
+      ~clsTacxTrainer.GearboxReduction
+      ~clsTacxTrainer.Header
+      ~clsTacxTrainer.Headunit
+      ~clsTacxTrainer.HeartRate
+      ~clsTacxTrainer.Message
+      ~clsTacxTrainer.MotorBrake
+      ~clsTacxTrainer.OK
+      ~clsTacxTrainer.Operational
+      ~clsTacxTrainer.PedalEcho
+      ~clsTacxTrainer.PedalEchoCount
+      ~clsTacxTrainer.PedalEchoTime
+      ~clsTacxTrainer.PreviousButtons
+      ~clsTacxTrainer.PreviousPedalEcho
+      ~clsTacxTrainer.RollingResistance
+      ~clsTacxTrainer.SpeedKmh
+      ~clsTacxTrainer.SpeedScale
+      ~clsTacxTrainer.TargetGrade
+      ~clsTacxTrainer.TargetMode
+      ~clsTacxTrainer.TargetPower
+      ~clsTacxTrainer.TargetPowerProvided
+      ~clsTacxTrainer.TargetResistance
+      ~clsTacxTrainer.TargetResistanceFT
+      ~clsTacxTrainer.UsbDevice
+      ~clsTacxTrainer.UserAndBikeWeight
+      ~clsTacxTrainer.UserWeight
+      ~clsTacxTrainer.VirtualSpeedKmh
+      ~clsTacxTrainer.WheelSpeed
+      ~clsTacxTrainer.WindResistance
+      ~clsTacxTrainer.WindSpeed
+      ~clsTacxTrainer.clv
+      ~clsTacxTrainer.tacxEvent
+   
+   

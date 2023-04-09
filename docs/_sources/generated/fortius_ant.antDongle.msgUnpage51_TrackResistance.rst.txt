@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgUnpage51\_TrackResistance
+===================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgUnpage51_TrackResistance

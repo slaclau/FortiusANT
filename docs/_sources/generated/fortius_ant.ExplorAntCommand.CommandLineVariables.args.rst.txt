@@ -1,0 +1,6 @@
+fortius\_ant.ExplorAntCommand.CommandLineVariables.args
+=======================================================
+
+.. currentmodule:: fortius_ant.ExplorAntCommand
+
+.. autoattribute:: CommandLineVariables.args

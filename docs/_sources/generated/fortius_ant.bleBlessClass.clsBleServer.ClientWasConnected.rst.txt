@@ -1,0 +1,6 @@
+fortius\_ant.bleBlessClass.clsBleServer.ClientWasConnected
+==========================================================
+
+.. currentmodule:: fortius_ant.bleBlessClass
+
+.. autoattribute:: clsBleServer.ClientWasConnected

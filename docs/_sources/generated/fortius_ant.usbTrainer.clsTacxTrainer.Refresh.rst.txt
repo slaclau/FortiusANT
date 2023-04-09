@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.Refresh
+==============================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. automethod:: clsTacxTrainer.Refresh

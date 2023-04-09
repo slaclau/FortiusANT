@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.SpeedScale
+=================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoattribute:: clsTacxTrainer.SpeedScale

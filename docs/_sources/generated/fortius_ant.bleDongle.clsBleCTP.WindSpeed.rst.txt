@@ -1,0 +1,6 @@
+fortius\_ant.bleDongle.clsBleCTP.WindSpeed
+==========================================
+
+.. currentmodule:: fortius_ant.bleDongle
+
+.. autoattribute:: clsBleCTP.WindSpeed

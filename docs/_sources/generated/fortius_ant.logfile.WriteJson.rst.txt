@@ -1,0 +1,6 @@
+fortius\_ant.logfile.WriteJson
+==============================
+
+.. currentmodule:: fortius_ant.logfile
+
+.. autofunction:: WriteJson

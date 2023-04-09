@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAntCommand.CommandLineVariables.rpiCadence
+==============================================================
+
+.. currentmodule:: fortius_ant.FortiusAntCommand
+
+.. autoattribute:: CommandLineVariables.rpiCadence

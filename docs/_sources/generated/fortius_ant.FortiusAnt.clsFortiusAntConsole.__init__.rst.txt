@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAnt.clsFortiusAntConsole.\_\_init\_\_
+=========================================================
+
+.. currentmodule:: fortius_ant.FortiusAnt
+
+.. automethod:: clsFortiusAntConsole.__init__

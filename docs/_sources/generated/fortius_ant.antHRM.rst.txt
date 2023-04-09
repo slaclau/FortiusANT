@@ -1,0 +1,31 @@
+﻿antHRM
+======
+
+.. automodule:: fortius_ant.antHRM
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      BroadcastHeartrateMessage
+      Initialize
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

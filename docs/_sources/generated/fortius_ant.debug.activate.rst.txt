@@ -1,0 +1,6 @@
+fortius\_ant.debug.activate
+===========================
+
+.. currentmodule:: fortius_ant.debug
+
+.. autofunction:: activate

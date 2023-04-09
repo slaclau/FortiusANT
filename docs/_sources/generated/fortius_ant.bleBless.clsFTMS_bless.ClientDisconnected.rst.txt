@@ -1,0 +1,6 @@
+fortius\_ant.bleBless.clsFTMS\_bless.ClientDisconnected
+=======================================================
+
+.. currentmodule:: fortius_ant.bleBless
+
+.. automethod:: clsFTMS_bless.ClientDisconnected

@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msg4B\_OpenChannel
+=========================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msg4B_OpenChannel

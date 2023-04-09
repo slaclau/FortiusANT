@@ -1,0 +1,6 @@
+fortius\_ant.bleBlessClass.clsBleServer.Open
+============================================
+
+.. currentmodule:: fortius_ant.bleBlessClass
+
+.. automethod:: clsBleServer.Open

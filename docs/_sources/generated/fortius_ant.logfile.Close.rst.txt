@@ -1,0 +1,6 @@
+fortius\_ant.logfile.Close
+==========================
+
+.. currentmodule:: fortius_ant.logfile
+
+.. autofunction:: Close

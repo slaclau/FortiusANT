@@ -1,0 +1,53 @@
+﻿dlgFortiusAntSettings
+=====================
+
+.. currentmodule:: fortius_ant.settings
+
+.. autoclass:: fortius_ant.settings.dlgFortiusAntSettings
+   :show-inheritance:
+
+   .. inheritance-diagram:: dlgFortiusAntSettings
+   
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~dlgFortiusAntSettings.EVT_BUTTON_btnCancel
+      ~dlgFortiusAntSettings.EVT_BUTTON_btnHelp
+      ~dlgFortiusAntSettings.EVT_BUTTON_btnOK
+      ~dlgFortiusAntSettings.EVT_CHAR_txt_D
+      ~dlgFortiusAntSettings.EVT_CHAR_txt_H
+      ~dlgFortiusAntSettings.EVT_CHAR_txt_d
+      ~dlgFortiusAntSettings.EVT_CHECKBOX_cb_A
+      ~dlgFortiusAntSettings.EVT_CHECKBOX_cb_M
+      ~dlgFortiusAntSettings.EVT_CHECKBOX_cb_a
+      ~dlgFortiusAntSettings.EVT_CHECKBOX_cb_b
+      ~dlgFortiusAntSettings.EVT_CHECKBOX_cb_bb
+      ~dlgFortiusAntSettings.EVT_CHECKBOX_cb_d
+      ~dlgFortiusAntSettings.EVT_CHECKBOX_cb_e
+      ~dlgFortiusAntSettings.EVT_CHECKBOX_cb_g
+      ~dlgFortiusAntSettings.EVT_CHECKBOX_cb_i
+      ~dlgFortiusAntSettings.EVT_CHECKBOX_cb_m
+      ~dlgFortiusAntSettings.EVT_CHECKBOX_cb_restart
+      ~dlgFortiusAntSettings.EVT_CHECKBOX_cb_s
+      ~dlgFortiusAntSettings.EVT_COMBOBOX_combo_t
+      ~dlgFortiusAntSettings.EVT_KILL_FOCUS_txt_G1
+      ~dlgFortiusAntSettings.EVT_KILL_FOCUS_txt_G2
+      ~dlgFortiusAntSettings.EVT_KILL_FOCUS_txt_R1
+      ~dlgFortiusAntSettings.EVT_KILL_FOCUS_txt_R2
+      ~dlgFortiusAntSettings.EVT_KILL_FOCUS_txt_R3
+      ~dlgFortiusAntSettings.EVT_KILL_FOCUS_txt_R4
+      ~dlgFortiusAntSettings.EVT_KILL_FOCUS_txt_R5
+      ~dlgFortiusAntSettings.EVT_KILL_FOCUS_txt_d
+      ~dlgFortiusAntSettings.EVT_KILL_FOCUS_txt_p
+      ~dlgFortiusAntSettings.__init__
+   
+   
+
+
+   
+   
+   

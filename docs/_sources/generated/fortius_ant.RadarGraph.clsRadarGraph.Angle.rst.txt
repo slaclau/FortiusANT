@@ -1,0 +1,6 @@
+fortius\_ant.RadarGraph.clsRadarGraph.Angle
+===========================================
+
+.. currentmodule:: fortius_ant.RadarGraph
+
+.. automethod:: clsRadarGraph.Angle

@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAnt.clsFortiusAntParent.PedalStrokeAnalysis
+===============================================================
+
+.. currentmodule:: fortius_ant.FortiusAnt
+
+.. automethod:: clsFortiusAntParent.PedalStrokeAnalysis

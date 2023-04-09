@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAntCommand.CommandLineVariables.hrm
+=======================================================
+
+.. currentmodule:: fortius_ant.FortiusAntCommand
+
+.. autoattribute:: CommandLineVariables.hrm

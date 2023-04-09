@@ -1,0 +1,37 @@
+﻿bleBleak
+========
+
+.. automodule:: fortius_ant.bleBleak
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      findBLEdevices
+      indicationFitnessMachineControlPoint
+      notificationFitnessMachineStatus
+      notificationHeartRateMeasurement
+      notificationIndoorBikeData
+      notificationPrint
+      serverInspection
+      serverInspectionSub
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

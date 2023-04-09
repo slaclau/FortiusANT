@@ -1,0 +1,6 @@
+fortius\_ant.fxload.list\_devices
+=================================
+
+.. currentmodule:: fortius_ant.fxload
+
+.. autofunction:: list_devices

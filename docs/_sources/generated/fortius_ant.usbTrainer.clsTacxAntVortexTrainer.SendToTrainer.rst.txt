@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxAntVortexTrainer.SendToTrainer
+=============================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. automethod:: clsTacxAntVortexTrainer.SendToTrainer

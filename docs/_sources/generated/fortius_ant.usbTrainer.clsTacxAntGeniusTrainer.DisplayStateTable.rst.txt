@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxAntGeniusTrainer.DisplayStateTable
+=================================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. automethod:: clsTacxAntGeniusTrainer.DisplayStateTable

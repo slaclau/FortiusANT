@@ -1,0 +1,6 @@
+fortius\_ant.TCXexport.clsTcxExport.TcxTime
+===========================================
+
+.. currentmodule:: fortius_ant.TCXexport
+
+.. automethod:: clsTcxExport.TcxTime

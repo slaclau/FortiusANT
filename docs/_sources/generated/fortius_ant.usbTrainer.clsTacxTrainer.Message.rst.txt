@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.Message
+==============================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoattribute:: clsTacxTrainer.Message

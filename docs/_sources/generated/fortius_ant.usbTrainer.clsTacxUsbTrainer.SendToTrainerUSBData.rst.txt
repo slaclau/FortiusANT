@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxUsbTrainer.SendToTrainerUSBData
+==============================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. automethod:: clsTacxUsbTrainer.SendToTrainerUSBData

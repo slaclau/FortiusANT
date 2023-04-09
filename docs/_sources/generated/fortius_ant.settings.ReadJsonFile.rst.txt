@@ -1,0 +1,6 @@
+fortius\_ant.settings.ReadJsonFile
+==================================
+
+.. currentmodule:: fortius_ant.settings
+
+.. autofunction:: ReadJsonFile

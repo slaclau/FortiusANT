@@ -1,6 +1,6 @@
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Description
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # The bless library enables python programs to access Bluetooth Low Energy
 # as a server. This enables FortiusAnt to create a FTMS (FTMS FiTness Machine Server)
 # and communicate with a CTP (which is the client, refer bleBleak.py).
@@ -8,13 +8,14 @@
 # FortiusAnt uses class clsFTMS_bless, based upon clsBleServer
 # This file can be executed and then a simulator is started for demo/test purpose.
 #
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Author        https://github.com/WouterJD
 #               wouter.dubbeldam@xs4all.nl
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Version info
-#-------------------------------------------------------------------------------
-__version__ = "2022-04-12"
+# -------------------------------------------------------------------------------
+__version__ = "2022-08-10"
+# 2022-08-10    Steering implemented according marcoveeneman and switchable's code
 # 2022-04-12    TargetMode is initially None, so that FortiusAnt knowns that no
 #               command is yet received.
 #               Issue was that, when ANT and BLE both active and a CTP is active
@@ -32,51 +33,51 @@ __version__ = "2022-04-12"
 #               examples\gattserver.py
 #               Example for a BLE 4.0 Server using a GATT dictionary of
 #               characteristics
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 import struct
 import time
 
 from typing import Any, Dict
 
 from bless import (
-        BlessServer,
-        BlessGATTCharacteristic,
-        GATTCharacteristicProperties,
-        GATTAttributePermissions
-        )
+    BlessServer,
+    BlessGATTCharacteristic,
+    GATTCharacteristicProperties,
+    GATTAttributePermissions,
+)
 
 if True:
     BlessExample = False
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Import in the FortiusAnt context
-    #---------------------------------------------------------------------------
-    import fortius_ant.debug          as debug
-    import fortius_ant.logfile        as logfile
-    from   fortius_ant.constants      import mode_Power, mode_Grade, UseBluetooth
-    from   fortius_ant.logfile        import HexSpace
-    from   fortius_ant.bleBlessClass  import clsBleServer
-    import fortius_ant.bleConstants   as bc
+    # ---------------------------------------------------------------------------
+    import fortius_ant.debug as debug
+    import fortius_ant.logfile as logfile
+    from fortius_ant.constants import mode_Power, mode_Grade, UseBluetooth
+    from fortius_ant.logfile import HexSpace
+    from fortius_ant.bleBlessClass import clsBleServer
+    import fortius_ant.bleConstants as bc
 
 else:
     BlessExample = True
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Import and Constants for bless example context
-    #---------------------------------------------------------------------------
-    from   FTMSserverClass      import clsBleServer
-    import FTMSconstants        as bc
-    from   FTMSconstants        import HexSpace
+    # ---------------------------------------------------------------------------
+    from FTMSserverClass import clsBleServer
+    import FTMSconstants as bc
+    from FTMSconstants import HexSpace
     import logging
 
-    mode_Power          = 1     # Target Power
-    mode_Grade          = 2     # Target Resistance
-    UseBluetooth        = True
+    mode_Power = 1  # Target Power
+    mode_Grade = 2  # Target Resistance
+    UseBluetooth = True
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Define the server structure with services and characteristics
 # 2022-02-22 Note, see https://github.com/kevincar/bless/issues/67
 #            Value should be with a capital, but currently bless uses "value".
 #            Therefore both Value/value are present, to avoid future issues.
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 
 """
     Is not allowed to be added in the GATT definition: failed to create entry in database
@@ -159,58 +160,139 @@ else:
 FitnessMachineGatt: Dict = {
     bc.sFitnessMachineUUID: {
         bc.cFitnessMachineFeatureUUID: {
-            "Properties":   (GATTCharacteristicProperties.read),
-            "Permissions":  (GATTAttributePermissions.readable | GATTAttributePermissions.writeable),
-            "Value":        bc.fmf_Info,                        # b'\x02\x40\x00\x00\x08\x20\x00\x00',
-            "value":        bc.fmf_Info,
-            "Description":  bc.cFitnessMachineFeatureName
+            "Properties": (GATTCharacteristicProperties.read),
+            "Permissions": (
+                GATTAttributePermissions.readable | GATTAttributePermissions.writeable
+            ),
+            "Value": bc.fmf_Info,  # b'\x02\x40\x00\x00\x08\x20\x00\x00',
+            "value": bc.fmf_Info,
+            "Description": bc.cFitnessMachineFeatureName,
         },
         bc.cIndoorBikeDataUUID: {
-            "Properties":   (GATTCharacteristicProperties.notify),
-            "Permissions":  (GATTAttributePermissions.readable | GATTAttributePermissions.writeable),
-            "Value":        bc.ibd_Info,                        # Instantaneous Cadence, Power, HeartRate
-            "value":        bc.ibd_Info,
-            "Description":  bc.cIndoorBikeDataName
+            "Properties": (GATTCharacteristicProperties.notify),
+            "Permissions": (
+                GATTAttributePermissions.readable | GATTAttributePermissions.writeable
+            ),
+            "Value": bc.ibd_Info,  # Instantaneous Cadence, Power, HeartRate
+            "value": bc.ibd_Info,
+            "Description": bc.cIndoorBikeDataName,
         },
         bc.cFitnessMachineStatusUUID: {
-            "Properties":   (GATTCharacteristicProperties.notify),
-            "Permissions":  (GATTAttributePermissions.readable | GATTAttributePermissions.writeable),
-            "value":        b'\x00\x00',                        # Status as "sent" to Cycling Training Program
-            "Value":        b'\x00\x00',
-            "Description":  bc.cFitnessMachineStatusName
+            "Properties": (GATTCharacteristicProperties.notify),
+            "Permissions": (
+                GATTAttributePermissions.readable | GATTAttributePermissions.writeable
+            ),
+            "value": b"\x00\x00",  # Status as "sent" to Cycling Training Program
+            "Value": b"\x00\x00",
+            "Description": bc.cFitnessMachineStatusName,
         },
         bc.cFitnessMachineControlPointUUID: {
-            "Properties":   (GATTCharacteristicProperties.write | GATTCharacteristicProperties.indicate),
-            "Permissions":  (GATTAttributePermissions.readable | GATTAttributePermissions.writeable),
-            "Value":        b'\x00\x00',                        # Commands as received from Cycling Training Program
-            "value":        b'\x00\x00',
-            "Description":  bc.cFitnessMachineControlPointName
+            "Properties": (
+                GATTCharacteristicProperties.write
+                | GATTCharacteristicProperties.indicate
+            ),
+            "Permissions": (
+                GATTAttributePermissions.readable | GATTAttributePermissions.writeable
+            ),
+            "Value": b"\x00\x00",  # Commands as received from Cycling Training Program
+            "value": b"\x00\x00",
+            "Description": bc.cFitnessMachineControlPointName,
         },
         bc.cSupportedPowerRangeUUID: {
-            "Properties":   (GATTCharacteristicProperties.read),
-            "Permissions":  (GATTAttributePermissions.readable | GATTAttributePermissions.writeable),
-            "Value":        bc.spr_Info,                        # Static additional properties of the FTMS
-                                                                # b'\x00\x00\xe8\x03\x01\x00'
-                                                                # min=0, max=1000, incr=1 
-                                                                # ==> 0x0000 0x03e8 0x0001 ==> 0x0000 0xe803 0x0100
-            "value":        bc.spr_Info,
-            "Description":  bc.cSupportedPowerRangeName
-        }
+            "Properties": (GATTCharacteristicProperties.read),
+            "Permissions": (
+                GATTAttributePermissions.readable | GATTAttributePermissions.writeable
+            ),
+            "Value": bc.spr_Info,  # Static additional properties of the FTMS
+            # b'\x00\x00\xe8\x03\x01\x00'
+            # min=0, max=1000, incr=1
+            # ==> 0x0000 0x03e8 0x0001 ==> 0x0000 0xe803 0x0100
+            "value": bc.spr_Info,
+            "Description": bc.cSupportedPowerRangeName,
+        },
     },
     bc.sHeartRateUUID: {
         bc.cHeartRateMeasurementUUID: {
-            "Properties":   (GATTCharacteristicProperties.notify),
-            "Permissions":  (GATTAttributePermissions.readable | GATTAttributePermissions.writeable),
-            "Value":        bc.hrm_Info,
-            "value":        bc.hrm_Info,
-            "Description":  bc.cHeartRateMeasurementName
+            "Properties": (GATTCharacteristicProperties.notify),
+            "Permissions": (
+                GATTAttributePermissions.readable | GATTAttributePermissions.writeable
+            ),
+            "Value": bc.hrm_Info,
+            "value": bc.hrm_Info,
+            "Description": bc.cHeartRateMeasurementName,
         }
-    }
+    },
+    bc.sSteeringUUID: {
+        bc.cSteeringUnknown1UUID: {
+            "Properties": (GATTCharacteristicProperties.write),
+            "Permissions": (
+                GATTAttributePermissions.readable | GATTAttributePermissions.writeable
+            ),
+            "Value": b"\x00\x00",
+            "value": b"\x00\x00",
+            "Description": bc.cSteeringUnknown1Name,
+        },
+        bc.cSteeringUnknown2UUID: {
+            "Properties": (GATTCharacteristicProperties.read),
+            "Permissions": (
+                GATTAttributePermissions.readable | GATTAttributePermissions.writeable
+            ),
+            "Value": b"\xff",
+            "value": b"\xff",
+            "Description": bc.cSteeringUnknown2Name,
+        },
+        bc.cSteeringUnknown3UUID: {
+            "Properties": (GATTCharacteristicProperties.notify),
+            "Permissions": (
+                GATTAttributePermissions.readable | GATTAttributePermissions.writeable
+            ),
+            "Value": b"\x00",
+            "value": b"\x00",
+            "Description": bc.cSteeringUnknown3Name,
+        },
+        bc.cSteeringUnknown4UUID: {
+            "Properties": (GATTCharacteristicProperties.read),
+            "Permissions": (
+                GATTAttributePermissions.readable | GATTAttributePermissions.writeable
+            ),
+            "Value": b"\xff",
+            "value": b"\xff",
+            "Description": bc.cSteeringUnknown4Name,
+        },
+        bc.cSteeringAngleUUID: {
+            "Properties": (GATTCharacteristicProperties.notify),
+            "Permissions": (
+                GATTAttributePermissions.readable | GATTAttributePermissions.writeable
+            ),
+            "Value": bc.angle_Info,
+            "value": bc.angle_Info,
+            "Description": bc.cSteeringAngleName,
+        },
+        bc.cSteeringTxUUID: {
+            "Properties": (GATTCharacteristicProperties.indicate),
+            "Permissions": (
+                GATTAttributePermissions.readable | GATTAttributePermissions.writeable
+            ),
+            "Value": b"\x00",
+            "value": b"\x00",
+            "Description": bc.cSteeringTxName,
+        },
+        bc.cSteeringRxUUID: {
+            "Properties": (GATTCharacteristicProperties.write),
+            "Permissions": (
+                GATTAttributePermissions.readable | GATTAttributePermissions.writeable
+            ),
+            "Value": b"\x00",
+            "value": b"\x00",
+            "Description": bc.cSteeringRxName,
+        },
+    },
 }
 
-#-------------------------------------------------------------------------------
-# c l s F T M S _ b l e s s 
-#-------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
+# c l s F T M S _ b l e s s
+# -------------------------------------------------------------------------------
 # Class to create an FiTnessMachineServer, based upon bless
 #
 # User methods:
@@ -224,38 +306,41 @@ FitnessMachineGatt: Dict = {
 # User attributes:
 #   See parent class AND
 #   See below
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 class clsFTMS_bless(clsBleServer):
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # CTP data, received through WriteRequest() and sent by client
-    #---------------------------------------------------------------------------
-    TargetMode          = None          # No target received; and then:
-                                        # either mode_Power or mode_Grade
-    TargetGrade         = 0             # %
-    TargetPower         = 100           # Watt
+    # ---------------------------------------------------------------------------
+    TargetMode = None  # No target received; and then:
+    # either mode_Power or mode_Grade
+    TargetGrade = 0  # %
+    TargetPower = 100  # Watt
 
-    WindResistance      = 0
-    WindSpeed           = 0
-    DraftingFactor      = 1             # Default since not supplied
-    RollingResistance   = 0
+    WindResistance = 0
+    WindSpeed = 0
+    DraftingFactor = 1  # Default since not supplied
+    RollingResistance = 0
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # data provided by SetAthleteData() as called by application
-    #---------------------------------------------------------------------------
-    HeartRate           = 0
+    # ---------------------------------------------------------------------------
+    HeartRate = 0
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # data provided by SetTrainerData() as called by application
-    #---------------------------------------------------------------------------
-    CurrentSpeed        = 0             # km/hour
-    Cadence             = 0             # /minute
-    CurrentPower        = 0             # Watt
+    # ---------------------------------------------------------------------------
+    CurrentSpeed = 0  # km/hour
+    Cadence = 0  # /minute
+    CurrentPower = 0  # Watt
+    SteeringAngle = 0  # Steering is always present,
+    # regardless the -S command-line setting
+    # If no steering, value is zero.
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Internal workflow control data
-    #---------------------------------------------------------------------------
-    HasControl          = False         # CTP is controlling the FTMS
-    Started             = False         # A CTP training is started
+    # ---------------------------------------------------------------------------
+    HasControl = False  # CTP is controlling the FTMS
+    Started = False  # A CTP training is started
 
     # --------------------------------------------------------------------------
     # _ _ i n i t _ _
@@ -271,10 +356,10 @@ class clsFTMS_bless(clsBleServer):
         if UseBluetooth and activate:
             super().__init__("FortiusAntTrainer", FitnessMachineGatt)
         else:
-            pass                        # Data structure is created, no actions
+            pass  # Data structure is created, no actions
 
     # --------------------------------------------------------------------------
-    # SetAthleteData, SetTrainerData
+    # SetAthleteData, SetTrainerData, SetSteeringAngle
     # --------------------------------------------------------------------------
     # Input     function parameters
     #
@@ -283,58 +368,97 @@ class clsFTMS_bless(clsBleServer):
     # Output    OK = False
     # --------------------------------------------------------------------------
     def SetAthleteData(self, HeartRate):
-        #-----------------------------------------------------------------------
+        # -----------------------------------------------------------------------
         # Logging
-        #-----------------------------------------------------------------------
+        # -----------------------------------------------------------------------
         self.logfileWrite("clsFTMS_bless.SetAthleteData(%s)" % HeartRate)
 
-        #-----------------------------------------------------------------------
+        # -----------------------------------------------------------------------
         # Remember provided data
-        #-----------------------------------------------------------------------
+        # -----------------------------------------------------------------------
         self.HeartRate = HeartRate
 
-        #-----------------------------------------------------------------------
+        # -----------------------------------------------------------------------
         # Update heartrate in FTMS
-        #-----------------------------------------------------------------------
+        # -----------------------------------------------------------------------
         if self.OK:
             flags = 0
-            h     = int(self.HeartRate) & 0xff      # Avoid value anomalities
-            info = struct.pack (bc.little_endian + bc.unsigned_char * 2, flags, h)
-            self.BlessServer.get_characteristic(bc.cHeartRateMeasurementUUID).value = info
-            self.BlessServer.update_value(bc.sHeartRateUUID, bc.cHeartRateMeasurementUUID)
+            h = int(self.HeartRate) & 0xFF  # Avoid value anomalities
+            info = struct.pack(bc.little_endian + bc.unsigned_char * 2, flags, h)
+            self.BlessServer.get_characteristic(
+                bc.cHeartRateMeasurementUUID
+            ).value = info
+            self.BlessServer.update_value(
+                bc.sHeartRateUUID, bc.cHeartRateMeasurementUUID
+            )
         else:
-            self.logfileConsole("clsFTMS_bless.SetAthleteData() error, interface not open")
+            self.logfileConsole(
+                "clsFTMS_bless.SetAthleteData() error, interface not open"
+            )
 
     def SetTrainerData(self, CurrentSpeed, Cadence, CurrentPower):
-        #-----------------------------------------------------------------------
+        # -----------------------------------------------------------------------
         # Logging
-        #-----------------------------------------------------------------------
-        self.logfileWrite("clsFTMS_bless.SetTrainerData(%s, %s, %s)" % (CurrentSpeed, Cadence, CurrentPower))
+        # -----------------------------------------------------------------------
+        self.logfileWrite(
+            "clsFTMS_bless.SetTrainerData(%s, %s, %s)"
+            % (CurrentSpeed, Cadence, CurrentPower)
+        )
 
-        #-----------------------------------------------------------------------
+        # -----------------------------------------------------------------------
         # Remember provided data
-        #-----------------------------------------------------------------------
+        # -----------------------------------------------------------------------
         self.CurrentSpeed = CurrentSpeed
-        self.Cadence      = Cadence
+        self.Cadence = Cadence
         self.CurrentPower = CurrentPower
 
-        #-----------------------------------------------------------------------
+        # -----------------------------------------------------------------------
         # Update trainer status in FTMS
         # Note that: Speed always present UNLESS...)
         #            HeartRate not transmitted, is not used.
-        #-----------------------------------------------------------------------
+        # -----------------------------------------------------------------------
         if self.OK:
-            flags = (bc.ibd_InstantaneousCadencePresent | bc.ibd_InstantaneousPowerPresent)
-            s     = int(self.CurrentSpeed * 100) & 0xffff      # Avoid value anomalities
-            c     = int(self.Cadence * 2)        & 0xffff      # Avoid value anomalities
-            p     = int(self.CurrentPower)       & 0xffff      # Avoid value anomalities
-            info  = struct.pack (bc.little_endian + bc.unsigned_short * 4, flags, s, c, p)
+            flags = (
+                bc.ibd_InstantaneousCadencePresent | bc.ibd_InstantaneousPowerPresent
+            )
+            s = int(self.CurrentSpeed * 100) & 0xFFFF  # Avoid value anomalities
+            c = int(self.Cadence * 2) & 0xFFFF  # Avoid value anomalities
+            p = int(self.CurrentPower) & 0xFFFF  # Avoid value anomalities
+            info = struct.pack(bc.little_endian + bc.unsigned_short * 4, flags, s, c, p)
 
             self.BlessServer.get_characteristic(bc.cIndoorBikeDataUUID).value = info
-            self.BlessServer.update_value(bc.sFitnessMachineUUID, bc.cIndoorBikeDataUUID)
+            self.BlessServer.update_value(
+                bc.sFitnessMachineUUID, bc.cIndoorBikeDataUUID
+            )
         else:
-            self.logfileConsole("clsFTMS_bless.SetTrainerData() error, interface not open")
-            
+            self.logfileConsole(
+                "clsFTMS_bless.SetTrainerData() error, interface not open"
+            )
+
+    def SetSteeringAngle(self, SteeringAngle):
+        # -----------------------------------------------------------------------
+        # Logging
+        # -----------------------------------------------------------------------
+        self.logfileWrite("clsFTMS_bless.SetSteeringAngle(%s)" % SteeringAngle)
+
+        # -----------------------------------------------------------------------
+        # Remember provided data
+        # -----------------------------------------------------------------------
+        self.SteeringAngle = SteeringAngle
+
+        # -----------------------------------------------------------------------
+        # Update angle in steering
+        # -----------------------------------------------------------------------
+        if self.OK:
+            a = SteeringAngle  # Avoid value anomalities here (if needed)
+            info = struct.pack(bc.little_endian + bc.float, a)
+            self.BlessServer.get_characteristic(bc.cSteeringAngleUUID).value = info
+            self.BlessServer.update_value(bc.sSteeringUUID, bc.cSteeringAngleUUID)
+        else:
+            self.logfileConsole(
+                "clsFTMS_bless.SetSteeringAngle() error, interface not open"
+            )
+
     # --------------------------------------------------------------------------
     # C l i e n t D i s c o n n e c t e d
     # --------------------------------------------------------------------------
@@ -347,7 +471,7 @@ class clsFTMS_bless(clsBleServer):
     # --------------------------------------------------------------------------
     def ClientDisconnected(self):
         self.HasControl = False
-        self.Started    = False
+        self.Started = False
 
     # --------------------------------------------------------------------------
     # R e f r e s h
@@ -365,200 +489,258 @@ class clsFTMS_bless(clsBleServer):
     def Refresh(self):
         return self.OK
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # l o g f i l e W r i t e / C o n s o l e / T r a c e b a c k
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Input:    text to be written to logfile
     #
     # Function  Use our own standard logging functions
     #
     # Output:   none
-    #---------------------------------------------------------------------------
-    if not BlessExample:            # As used in the FortiusAnt context
+    # ---------------------------------------------------------------------------
+    if not BlessExample:  # As used in the FortiusAnt context
+
         def logfileWrite(self, message):
-            if debug.on(debug.Ble): logfile.Write(message)
+            if debug.on(debug.Ble):
+                logfile.Write(message)
 
         def logfileConsole(self, message):
             logfile.Console(message)
 
         def logfileTraceback(self, exception):
-            if debug.on(debug.Ble): logfile.Traceback(exception)
+            if debug.on(debug.Ble):
+                logfile.Traceback(exception)
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # R e a d R e q u e s t
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Input:    characteristic for which the value is requested
     #
     # Function  Return the requested value, without further processing
     #           Replaces parent class because of enhanced logging
     #
     # Output:   characteristic.value
-    #---------------------------------------------------------------------------
-    def ReadRequest(self,
-            characteristic: BlessGATTCharacteristic,
-            **kwargs
-            ) -> bytearray:
+    # ---------------------------------------------------------------------------
+    def ReadRequest(
+        self, characteristic: BlessGATTCharacteristic, **kwargs
+    ) -> bytearray:
+        uuid = str(characteristic._uuid)
+        if uuid == bc.cFitnessMachineFeatureUUID:
+            char = bc.cFitnessMachineFeatureName
+        elif uuid == bc.cIndoorBikeDataUUID:
+            char = bc.cIndoorBikeDataName
+        elif uuid == bc.cFitnessMachineStatusUUID:
+            char = bc.cFitnessMachineStatusName
+        elif uuid == bc.cFitnessMachineControlPointUUID:
+            char = bc.cFitnessMachineControlPointName
+        elif uuid == bc.cSupportedPowerRangeUUID:
+            char = bc.cSupportedPowerRangeName
+        elif uuid == bc.cHeartRateMeasurementUUID:
+            char = bc.cHeartRateMeasurementName
+        elif uuid == bc.cSteeringAngleUUID:
+            char = bc.cSteeringAngleName
+        else:
+            char = "?"
 
-        uuid  = str(characteristic._uuid)
-        if   uuid == bc.cFitnessMachineFeatureUUID:      char = bc.cFitnessMachineFeatureName
-        elif uuid == bc.cIndoorBikeDataUUID:             char = bc.cIndoorBikeDataName
-        elif uuid == bc.cFitnessMachineStatusUUID:       char = bc.cFitnessMachineStatusName
-        elif uuid == bc.cFitnessMachineControlPointUUID: char = bc.cFitnessMachineControlPointName
-        elif uuid == bc.cSupportedPowerRangeUUID:        char = bc.cSupportedPowerRangeName
-        elif uuid == bc.cHeartRateMeasurementUUID:       char = bc.cHeartRateMeasurementUUID
-        else:                                            char = "?"
-
-        #---------------------------------------------------------------------------
+        # ---------------------------------------------------------------------------
         # Logging
-        #---------------------------------------------------------------------------
-        self.logfileWrite('clsFTMS_bless.ReadRequest(): characteristic "%s", value = %s' %
-                            (char, HexSpace(characteristic._value)))
+        # ---------------------------------------------------------------------------
+        self.logfileWrite(
+            'clsFTMS_bless.ReadRequest(): characteristic "%s", value = %s'
+            % (char, HexSpace(characteristic._value))
+        )
 
         return characteristic.value
 
-    #-------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------------
     # W r i t e R e q u e s t
-    #-------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------------
     # Input:    characteristic for which the value must be updated
     #
     # Function  Process the request
     #
     # Output:   characteristic values modified according request
     #           HasControl, Started
-    #-------------------------------------------------------------------------------
-    def WriteRequest(self,
-            characteristic: BlessGATTCharacteristic,
-            pvalue: Any,
-            **kwargs
-            ):
+    # -------------------------------------------------------------------------------
+    def WriteRequest(
+        self, characteristic: BlessGATTCharacteristic, pvalue: Any, **kwargs
+    ):
+        value = bytes(pvalue)  # at least for struct.unpack()
 
-        value = bytes(pvalue)          # at least for struct.unpack()
+        uuid = str(characteristic._uuid)
+        if uuid == bc.cFitnessMachineFeatureUUID:
+            char = bc.cFitnessMachineFeatureName
+        elif uuid == bc.cIndoorBikeDataUUID:
+            char = bc.cIndoorBikeDataName
+        elif uuid == bc.cFitnessMachineStatusUUID:
+            char = bc.cFitnessMachineStatusName
+        elif uuid == bc.cFitnessMachineControlPointUUID:
+            char = bc.cFitnessMachineControlPointName
+        elif uuid == bc.cSupportedPowerRangeUUID:
+            char = bc.cSupportedPowerRangeName
+        elif uuid == bc.cHeartRateMeasurementUUID:
+            char = bc.cHeartRateMeasurementUUID
+        elif uuid == bc.cSteeringAngleUUID:
+            char = bc.cSteeringAngleName
+        else:
+            char = "?"
 
-        uuid  = str(characteristic._uuid)
-        if   uuid == bc.cFitnessMachineFeatureUUID:      char = bc.cFitnessMachineFeatureName
-        elif uuid == bc.cIndoorBikeDataUUID:             char = bc.cIndoorBikeDataName
-        elif uuid == bc.cFitnessMachineStatusUUID:       char = bc.cFitnessMachineStatusName
-        elif uuid == bc.cFitnessMachineControlPointUUID: char = bc.cFitnessMachineControlPointName
-        elif uuid == bc.cSupportedPowerRangeUUID:        char = bc.cSupportedPowerRangeName
-        elif uuid == bc.cHeartRateMeasurementUUID:       char = bc.cHeartRateMeasurementUUID
-        else:                                            char = "?"
-        
-        #---------------------------------------------------------------------------
+        # ---------------------------------------------------------------------------
         # Logging
-        #---------------------------------------------------------------------------
-        self.logfileWrite('bleBless: Write request for characteristic "%s", actual value = %s, provided value = %s' %
-                (char, HexSpace(characteristic.value), HexSpace(value)))
+        # ---------------------------------------------------------------------------
+        self.logfileWrite(
+            'bleBless: Write request for characteristic "%s", actual value = %s, provided value = %s'
+            % (char, HexSpace(characteristic.value), HexSpace(value))
+        )
 
-        #---------------------------------------------------------------------------
+        # ---------------------------------------------------------------------------
         # MachineControlPoint modifies behaviour; the only write we expect
-        #---------------------------------------------------------------------------
+        # ---------------------------------------------------------------------------
         if not uuid == bc.cFitnessMachineControlPointUUID:
-            self.logfileConsole('bleBless error: Write request on "%s" characteristic is not supported; ignored.' % char)
+            self.logfileConsole(
+                'bleBless error: Write request on "%s" characteristic is not supported; ignored.'
+                % char
+            )
 
         else:
-            OpCode     = int(value[0])    # The operation to be performed
+            OpCode = int(value[0])  # The operation to be performed
             ResultCode = bc.fmcp_Success  # Let's assume it will be OK
 
-            UseWorkflow  = True           # A CTP must request control to be able to
-                                          # send further requests and Start before
-                                          # changing TargetPower/Grade
-                                          # If UseWorkflow == False, these checks
-                                          # are disabled.
-                                          #
-                                          # Funny things is, that HasControl suggests
-                                          # a check, but if the CTP proceeds regard-
-                                          # less, the Request would be accepted
-                                          # Unless there we would know what CTP has
-                                          # been granted access...
-                                          #
-                                          # Now that _FortiusAntServer() detects
-                                          # a disconnect, the workflow can be enabled.
-            #-----------------------------------------------------------------------
+            UseWorkflow = True  # A CTP must request control to be able to
+            # send further requests and Start before
+            # changing TargetPower/Grade
+            # If UseWorkflow == False, these checks
+            # are disabled.
+            #
+            # Funny things is, that HasControl suggests
+            # a check, but if the CTP proceeds regard-
+            # less, the Request would be accepted
+            # Unless there we would know what CTP has
+            # been granted access...
+            #
+            # Now that _FortiusAntServer() detects
+            # a disconnect, the workflow can be enabled.
+            # -----------------------------------------------------------------------
             # React on requested operation
             # - check workflow
             # - accept values and/or modify internal state (HasControl, Started)
             # - notify client that value is changed (FitnessMachineStatus)
             # - notify that operation is completed (ResultCode)
-            #-----------------------------------------------------------------------
+            # -----------------------------------------------------------------------
             if OpCode == bc.fmcp_RequestControl:
                 if not UseWorkflow or not self.HasControl:
                     self.HasControl = True
-                    self.Started    = False
+                    self.Started = False
                     self.logfileWrite("bleBless: HasControl = True")
-                    self.Message   = ", Bluetooth interface controlled"
+                    self.Message = ", Bluetooth interface controlled"
                 else:
                     ResultCode = bc.fmcp_ControlNotPermitted
-                    self.logfileConsole("bleBless error: control requested by client, control already granted")
+                    self.logfileConsole(
+                        "bleBless error: control requested by client, control already granted"
+                    )
 
             elif UseWorkflow and not self.HasControl:
                 ResultCode = bc.fmcp_ControlNotPermitted
-                self.logfileConsole("bleBless error: request received, but client has no control")
+                self.logfileConsole(
+                    "bleBless error: request received, but client has no control"
+                )
 
             else:
                 if OpCode == bc.fmcp_StartOrResume:
                     self.Started = True
                     self.logfileWrite("bleBless: Started = True")
-                    self.notifyStartOrResume()              # Confirm receipt to client
-                    self.Message   = ", Bluetooth interface training started"
+                    self.notifyStartOrResume()  # Confirm receipt to client
+                    self.Message = ", Bluetooth interface training started"
 
                 elif OpCode == bc.fmcp_SetTargetPower:
                     try:
-                        tuple  = struct.unpack (bc.little_endian + bc.unsigned_char + bc.unsigned_short, value)
+                        tuple = struct.unpack(
+                            bc.little_endian + bc.unsigned_char + bc.unsigned_short,
+                            value,
+                        )
                     except Exception as e:
-                        self.logfileConsole("bleBless error: unpack SetTargetPower %e" % e)
-                    #opcode          = tuple[0]
+                        self.logfileConsole(
+                            "bleBless error: unpack SetTargetPower %e" % e
+                        )
+                    # opcode          = tuple[0]
                     self.TargetPower = tuple[1]
                     self.TargetGrade = 0
-                    self.TargetMode  = mode_Power
+                    self.TargetMode = mode_Power
                     self.logfileWrite("bleBless: TargetPower = %s" % self.TargetPower)
-                    self.notifySetTargetPower()             # Confirm receipt to client
-                    self.Message   = ", Bluetooth interface in power mode"
+                    self.notifySetTargetPower()  # Confirm receipt to client
+                    self.Message = ", Bluetooth interface in power mode"
 
                 elif OpCode == bc.fmcp_SetIndoorBikeSimulation:
                     try:
-                        tuple  = struct.unpack (bc.little_endian + bc.unsigned_char + bc.short + bc.short + bc.unsigned_char + bc.unsigned_char, value)
+                        tuple = struct.unpack(
+                            bc.little_endian
+                            + bc.unsigned_char
+                            + bc.short
+                            + bc.short
+                            + bc.unsigned_char
+                            + bc.unsigned_char,
+                            value,
+                        )
                     except Exception as e:
-                        self.logfileConsole("bleBless error: unpack SetIndoorBikeSimulation %s" % e)
-                    #opcode                = tuple[0]
-                    self.WindSpeed         = round(tuple[1] * 0.001,  3)
-                    self.TargetGrade       = round(tuple[2] * 0.01,   2)
-                    self.TargetPower       = 0
-                    self.TargetMode        = mode_Grade
+                        self.logfileConsole(
+                            "bleBless error: unpack SetIndoorBikeSimulation %s" % e
+                        )
+                    # opcode                = tuple[0]
+                    self.WindSpeed = round(tuple[1] * 0.001, 3)
+                    self.TargetGrade = round(tuple[2] * 0.01, 2)
+                    self.TargetPower = 0
+                    self.TargetMode = mode_Grade
                     self.RollingResistance = round(tuple[3] * 0.0001, 4)
-                    self.WindResistance    = round(tuple[4] * 0.01,   2)
+                    self.WindResistance = round(tuple[4] * 0.01, 2)
                     self.logfileWrite(
-                           "bleBless: windspeed=%s, TargetGrade=%s, RollingResistance=%s, WindResistance=%s" %
-                           (self.WindSpeed, self.TargetGrade, self.RollingResistance, self.WindResistance))
-                    self.notifySetIndoorBikeSimulation()    # Confirm receipt to client
-                    self.Message   = ", Bluetooth interface in grade mode"
+                        "bleBless: windspeed=%s, TargetGrade=%s, RollingResistance=%s, WindResistance=%s"
+                        % (
+                            self.WindSpeed,
+                            self.TargetGrade,
+                            self.RollingResistance,
+                            self.WindResistance,
+                        )
+                    )
+                    self.notifySetIndoorBikeSimulation()  # Confirm receipt to client
+                    self.Message = ", Bluetooth interface in grade mode"
 
                 elif OpCode == bc.fmcp_StopOrPause:
                     self.Started = False
                     self.logfileWrite("bleBless: Started = False")
-                    self.notifyStopOrPause()                # Confirm receipt to client
-                    self.Message   = ", Bluetooth interface training stopped"
+                    self.notifyStopOrPause()  # Confirm receipt to client
+                    self.Message = ", Bluetooth interface training stopped"
 
                 elif OpCode == bc.fmcp_Reset:
-                    self.Started    = False
+                    self.Started = False
                     self.HasControl = False
                     self.logfileWrite("bleBless: HasControl = False")
-                    self.notifyReset()                      # Confirm receipt to client
-                    self.Message   = ", Bluetooth interface open"
+                    self.notifyReset()  # Confirm receipt to client
+                    self.Message = ", Bluetooth interface open"
 
                 else:
                     self.logfileConsole("bleBless error: Unknown OpCode %s" % OpCode)
                     ResultCode = bc.fmcp_ControlNotPermitted
 
-            #-----------------------------------------------------------------------
+            # -----------------------------------------------------------------------
             # Response:
-            #-----------------------------------------------------------------------
+            # -----------------------------------------------------------------------
             ResponseCode = 0x80
-            info = struct.pack(bc.little_endian + bc.unsigned_char * 3, ResponseCode, OpCode, ResultCode)
+            info = struct.pack(
+                bc.little_endian + bc.unsigned_char * 3,
+                ResponseCode,
+                OpCode,
+                ResultCode,
+            )
             characteristic.value = info
-            self.BlessServer.update_value(bc.sFitnessMachineUUID, bc.cFitnessMachineControlPointUUID)
+            self.BlessServer.update_value(
+                bc.sFitnessMachineUUID, bc.cFitnessMachineControlPointUUID
+            )
 
             if False:
-                self.logfileWrite("bleBless: New value for characteristic %s = %s" % (char, HexSpace(info)))
+                self.logfileWrite(
+                    "bleBless: New value for characteristic %s = %s"
+                    % (char, HexSpace(info))
+                )
 
     # --------------------------------------------------------------------------
     # After that a characteristic is written, it must also be confirmed through
@@ -566,40 +748,66 @@ class clsFTMS_bless(clsBleServer):
     # --------------------------------------------------------------------------
     def notifyStartOrResume(self):
         self.logfileWrite("bleBless.notifyStartOrResume()")
-        info = struct.pack(bc.little_endian + bc.unsigned_char, bc.fms_FitnessMachineStartedOrResumedByUser)
+        info = struct.pack(
+            bc.little_endian + bc.unsigned_char,
+            bc.fms_FitnessMachineStartedOrResumedByUser,
+        )
         self.BlessServer.get_characteristic(bc.cFitnessMachineStatusUUID).value = info
-        self.BlessServer.update_value(bc.sFitnessMachineUUID, bc.cFitnessMachineStatusUUID)
+        self.BlessServer.update_value(
+            bc.sFitnessMachineUUID, bc.cFitnessMachineStatusUUID
+        )
 
     def notifySetTargetPower(self):
         self.logfileWrite("bleBless.notifySetTargetPower()")
-        info = struct.pack(bc.little_endian + bc.unsigned_char + bc.unsigned_short, bc.fms_TargetPowerChanged, self.TargetPower)
+        info = struct.pack(
+            bc.little_endian + bc.unsigned_char + bc.unsigned_short,
+            bc.fms_TargetPowerChanged,
+            self.TargetPower,
+        )
         self.BlessServer.get_characteristic(bc.cFitnessMachineStatusUUID).value = info
-        self.BlessServer.update_value(bc.sFitnessMachineUUID, bc.cFitnessMachineStatusUUID)
+        self.BlessServer.update_value(
+            bc.sFitnessMachineUUID, bc.cFitnessMachineStatusUUID
+        )
 
     def notifySetIndoorBikeSimulation(self):
         self.logfileWrite("bleBless.notifySetIndoorBikeSimulation()")
 
-        windSpeed = int(self.WindSpeed         / 0.001 )
-        grade     = int(self.TargetGrade       / 0.01  )
-        crr       = int(self.RollingResistance / 0.0001)
-        cw        = int(self.WindResistance    / 0.01  )
+        windSpeed = int(self.WindSpeed / 0.001)
+        grade = int(self.TargetGrade / 0.01)
+        crr = int(self.RollingResistance / 0.0001)
+        cw = int(self.WindResistance / 0.01)
 
-        info = struct.pack(bc.little_endian + bc.unsigned_char + bc.short * 2 + bc.unsigned_char * 2,
-                            bc.fms_IndoorBikeSimulationParametersChanged, windSpeed, grade, crr, cw)
+        info = struct.pack(
+            bc.little_endian + bc.unsigned_char + bc.short * 2 + bc.unsigned_char * 2,
+            bc.fms_IndoorBikeSimulationParametersChanged,
+            windSpeed,
+            grade,
+            crr,
+            cw,
+        )
         self.BlessServer.get_characteristic(bc.cFitnessMachineStatusUUID).value = info
-        self.BlessServer.update_value(bc.sFitnessMachineUUID, bc.cFitnessMachineStatusUUID)
+        self.BlessServer.update_value(
+            bc.sFitnessMachineUUID, bc.cFitnessMachineStatusUUID
+        )
 
     def notifyStopOrPause(self):
         self.logfileWrite("bleBless.notifyStopOrPause()")
-        info = struct.pack(bc.little_endian + bc.unsigned_char, bc.fms_FitnessMachineStoppedOrPausedByUser)
+        info = struct.pack(
+            bc.little_endian + bc.unsigned_char,
+            bc.fms_FitnessMachineStoppedOrPausedByUser,
+        )
         self.BlessServer.get_characteristic(bc.cFitnessMachineStatusUUID).value = info
-        self.BlessServer.update_value(bc.sFitnessMachineUUID, bc.cFitnessMachineStatusUUID)
+        self.BlessServer.update_value(
+            bc.sFitnessMachineUUID, bc.cFitnessMachineStatusUUID
+        )
 
     def notifyReset(self):
         self.logfileWrite("bleBless.notifyReset()")
         info = struct.pack(bc.little_endian + bc.unsigned_char, bc.fms_Reset)
         self.BlessServer.get_characteristic(bc.cFitnessMachineStatusUUID).value = info
-        self.BlessServer.update_value(bc.sFitnessMachineUUID, bc.cFitnessMachineStatusUUID)
+        self.BlessServer.update_value(
+            bc.sFitnessMachineUUID, bc.cFitnessMachineStatusUUID
+        )
 
     # ------------------------------------------------------------------------------
     # S i m u l a t o r
@@ -613,27 +821,33 @@ class clsFTMS_bless(clsBleServer):
     #               SetAthleteData() and/or SetTrainerData()
     #               Refresh()
     #               use class-attributes (TargetMode, TargetPower, ...)
-    #               
+    #
     #
     # Output    The interface is used, no further output.
     # ------------------------------------------------------------------------------
     def Simulator(self):
-        self.logfileConsole("---------------------------------------------------------------------------------------")
+        self.logfileConsole(
+            "---------------------------------------------------------------------------------------"
+        )
         self.logfileConsole("FortiusAnt simulated trainer is active")
-        self.logfileConsole("Start a training in a CTP; 5 seconds after completing the training, simulation will end")
-        self.logfileConsole("---------------------------------------------------------------------------------------")
+        self.logfileConsole(
+            "Start a training in a CTP; 5 seconds after completing the training, simulation will end"
+        )
+        self.logfileConsole(
+            "---------------------------------------------------------------------------------------"
+        )
 
-        #---------------------------------------------------------------------------
+        # ---------------------------------------------------------------------------
         # FortiusAntServer is now active
         # read/write through read_Request() and write_Request() functions
-        #---------------------------------------------------------------------------
+        # ---------------------------------------------------------------------------
         ClientWasConnected = False
         i = 5
         while i:
-            #-----------------------------------------------------------------------
+            # -----------------------------------------------------------------------
             # Stop 5 seconds after a client is disconnected
             # In the meantime, Start, Power/Grade, Stop is expected....
-            #-----------------------------------------------------------------------
+            # -----------------------------------------------------------------------
             if self.ClientConnected:
                 ClientWasConnected = True
 
@@ -641,37 +855,39 @@ class clsFTMS_bless(clsBleServer):
                 i -= 1
                 pass
 
-            #-----------------------------------------------------------------------
+            # -----------------------------------------------------------------------
             # Update trainer info every second
-            #-----------------------------------------------------------------------
+            # -----------------------------------------------------------------------
             time.sleep(1)
 
-            #-----------------------------------------------------------------------
+            # -----------------------------------------------------------------------
             # Create some fancy data
-            #-----------------------------------------------------------------------
-            s = int(time.time() % 60)           # Seconds
-            HeartRate   =   int(000 + s)
-            Cadence     =   int(100 + s )
-            CurrentSpeed= round(200 + s,1)
-            CurrentPower=   int(300 + s)
+            # -----------------------------------------------------------------------
+            s = int(time.time() % 60)  # Seconds
+            HeartRate = int(000 + s)
+            Cadence = int(100 + s)
+            CurrentSpeed = round(200 + s, 1)
+            CurrentPower = int(300 + s)
+            SteeringAngle = s - 30  # -30 ... 30
 
-            #-----------------------------------------------------------------------
-            # Update actual values of Athlete and Trainer
-            #-----------------------------------------------------------------------
+            # -----------------------------------------------------------------------
+            # Update actual values of Athlete and Trainer and Steering
+            # -----------------------------------------------------------------------
             self.SetAthleteData(HeartRate)
             self.SetTrainerData(CurrentSpeed, Cadence, CurrentPower)
+            self.SetSteeringAngle(SteeringAngle)
 
-            #-----------------------------------------------------------------------
+            # -----------------------------------------------------------------------
             # Allow class to take care that attributes are accurate
-            #-----------------------------------------------------------------------
+            # -----------------------------------------------------------------------
             self.Refresh()
 
-            #-----------------------------------------------------------------------
+            # -----------------------------------------------------------------------
             # Here the real application can take action, usually adjust the
             # resistance of the bicycle and/or display the target Mode/Power/Grade.
-            #-----------------------------------------------------------------------
+            # -----------------------------------------------------------------------
 
-            #-----------------------------------------------------------------------
+            # -----------------------------------------------------------------------
             # All we do is show current status / target
             # --> Four variables are filled by ourselves, which in reality comes from
             #     the athlete's HeartRateMonitor and the fitness bike (see above).
@@ -680,37 +896,52 @@ class clsFTMS_bless(clsBleServer):
             #
             # --> TargetMode, TargetPower, TargetGrade are provided by the Cycling
             #       Trining Program (CTP), the client to this fitness machine.
-            #-----------------------------------------------------------------------
+            # -----------------------------------------------------------------------
             print(
-                "Client=%-5s HasControl=%-5s Started=%-5s TargetPower=%4s TargetGrade=%-6s Speed=%3s Cadence=%3s, Power=%3s, HeartRate=%3s" %
-                (self.ClientConnected, self.HasControl, self.Started, self.TargetPower, self.TargetGrade, self.CurrentSpeed, self.Cadence, self.CurrentPower, self.HeartRate))
+                "Client=%-5s HasControl=%-5s Started=%-5s TargetPower=%4s TargetGrade=%-6s Speed=%3s Cadence=%3s, Power=%3s, HeartRate=%3s Angle=%5s"
+                % (
+                    self.ClientConnected,
+                    self.HasControl,
+                    self.Started,
+                    self.TargetPower,
+                    self.TargetGrade,
+                    self.CurrentSpeed,
+                    self.Cadence,
+                    self.CurrentPower,
+                    self.HeartRate,
+                    self.SteeringAngle,
+                )
+            )
 
         self.logfileConsole("FortiusAnt simulated trainer is stopped")
         self.logfileConsole("---------------------------------------")
+
 
 # ==============================================================================
 # Main program
 # ==============================================================================
 if __name__ == "__main__":
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Initialization
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     if not BlessExample:
         debug.activate(debug.Ble | debug.logging_DEBUG)
         logfile.Open()
-        print('FTMS server in FortiusAnt context')
+        print("FTMS server in FortiusAnt context")
     else:
-        logging.basicConfig(level=logging.DEBUG)            # pylint:disable=invalid-name,used-before-assignment,undefined-variable
+        logging.basicConfig(
+            level=logging.DEBUG
+        )  # pylint:disable=invalid-name,used-before-assignment,undefined-variable
         logger = logging.getLogger(name=__name__)
-        print('FTMS server in bless/example context')
+        print("FTMS server in bless/example context")
 
     print("bleBless started")
     print("----------------")
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # This is what it's all about
-    #---------------------------------------------------------------------------
-    FortiusAntServer = clsFTMS_bless(True)              # clv.ble
+    # ---------------------------------------------------------------------------
+    FortiusAntServer = clsFTMS_bless(True)  # clv.ble
     print("Message=%s" % FortiusAntServer.Message)
 
     b = FortiusAntServer.Open()
@@ -721,62 +952,170 @@ if __name__ == "__main__":
         FortiusAntServer.Close()
         print("Message=%s" % FortiusAntServer.Message)
 
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Termination
-    #---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     print("bleBless ended")
 
 """
 SAMPLE OUTPUT:
 ==============
 
+FTMS server in FortiusAnt context
 bleBless started
 ----------------
 Message=, Bluetooth interface available (bless)
 Message=, Bluetooth interface open
-20:03:56,328: ---------------------------------------------------------------------------------------
-20:03:56,329: FortiusAnt simulated trainer is active
-20:03:56,329: Start a training in a CTP; 5 seconds after completing the training, simulation will end
-20:03:56,330: ---------------------------------------------------------------------------------------
-Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=257 Cadence=157, Power=357, HeartRate= 57
-Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=258 Cadence=158, Power=358, HeartRate= 58
-Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=259 Cadence=159, Power=359, HeartRate= 59
-Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=200 Cadence=100, Power=300, HeartRate=  0
-Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=201 Cadence=101, Power=301, HeartRate=  1
-Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=202 Cadence=102, Power=302, HeartRate=  2
-Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=203 Cadence=103, Power=303, HeartRate=  3
-Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=204 Cadence=104, Power=304, HeartRate=  4
-Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=205 Cadence=105, Power=305, HeartRate=  5
-Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=206 Cadence=106, Power=306, HeartRate=  6
-Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=207 Cadence=107, Power=307, HeartRate=  7
-Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=208 Cadence=108, Power=308, HeartRate=  8
-Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=209 Cadence=109, Power=309, HeartRate=  9
-Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=210 Cadence=110, Power=310, HeartRate= 10
-Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=211 Cadence=111, Power=311, HeartRate= 11
-Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=212 Cadence=112, Power=312, HeartRate= 12
-Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=213 Cadence=113, Power=313, HeartRate= 13
-Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=214 Cadence=114, Power=314, HeartRate= 14
-Client=True  HasControl=True  Started=False TargetPower= 100 TargetGrade=0      Speed=215 Cadence=115, Power=315, HeartRate= 15
-Client=True  HasControl=True  Started=True  TargetPower= 100 TargetGrade=0      Speed=216 Cadence=116, Power=316, HeartRate= 16
-Client=True  HasControl=True  Started=True  TargetPower= 324 TargetGrade=0      Speed=217 Cadence=117, Power=317, HeartRate= 17
-Client=True  HasControl=True  Started=True  TargetPower=   0 TargetGrade=4.0    Speed=218 Cadence=118, Power=318, HeartRate= 18
-Client=True  HasControl=True  Started=True  TargetPower= 323 TargetGrade=0      Speed=219 Cadence=119, Power=319, HeartRate= 19
-Client=True  HasControl=True  Started=True  TargetPower=   0 TargetGrade=3.0    Speed=220 Cadence=120, Power=320, HeartRate= 20
-Client=True  HasControl=True  Started=True  TargetPower= 322 TargetGrade=0      Speed=221 Cadence=121, Power=321, HeartRate= 21
-Client=True  HasControl=True  Started=True  TargetPower=   0 TargetGrade=2.0    Speed=222 Cadence=122, Power=322, HeartRate= 22
-Client=True  HasControl=True  Started=True  TargetPower=   0 TargetGrade=2.0    Speed=223 Cadence=123, Power=323, HeartRate= 23
-Client=True  HasControl=True  Started=True  TargetPower= 321 TargetGrade=0      Speed=224 Cadence=124, Power=324, HeartRate= 24
-Client=True  HasControl=True  Started=True  TargetPower=   0 TargetGrade=1.0    Speed=225 Cadence=125, Power=325, HeartRate= 25
-Client=True  HasControl=True  Started=True  TargetPower=  50 TargetGrade=0      Speed=226 Cadence=126, Power=326, HeartRate= 26
-Client=True  HasControl=True  Started=False TargetPower=  50 TargetGrade=0      Speed=227 Cadence=127, Power=327, HeartRate= 27
-Client=True  HasControl=False Started=False TargetPower=  50 TargetGrade=0      Speed=228 Cadence=128, Power=328, HeartRate= 28
-Client=True  HasControl=False Started=False TargetPower=  50 TargetGrade=0      Speed=229 Cadence=129, Power=329, HeartRate= 29
-Client=False HasControl=False Started=False TargetPower=  50 TargetGrade=0      Speed=230 Cadence=130, Power=330, HeartRate= 30
-Client=False HasControl=False Started=False TargetPower=  50 TargetGrade=0      Speed=231 Cadence=131, Power=331, HeartRate= 31
-Client=False HasControl=False Started=False TargetPower=  50 TargetGrade=0      Speed=232 Cadence=132, Power=332, HeartRate= 32
-Client=False HasControl=False Started=False TargetPower=  50 TargetGrade=0      Speed=233 Cadence=133, Power=333, HeartRate= 33
-Client=False HasControl=False Started=False TargetPower=  50 TargetGrade=0      Speed=234 Cadence=134, Power=334, HeartRate= 34
-Client=False HasControl=False Started=False TargetPower=  50 TargetGrade=0      Speed=235 Cadence=135, Power=335, HeartRate= 35
-20:04:35,810: FortiusAnt simulated trainer is stopped
-20:04:35,812: ---------------------------------------
+15:17:00,381: ---------------------------------------------------------------------------------------
+15:17:00,382: FortiusAnt simulated trainer is active
+15:17:00,383: Start a training in a CTP; 5 seconds after completing the training, simulation will end
+15:17:00,383: ---------------------------------------------------------------------------------------
+Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=201 Cadence=101, Power=301, HeartRate=  1 Angle=  -29
+Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=202 Cadence=102, Power=302, HeartRate=  2 Angle=  -28
+Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=203 Cadence=103, Power=303, HeartRate=  3 Angle=  -27
+...
+Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=258 Cadence=158, Power=358, HeartRate= 58 Angle=   28
+Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=259 Cadence=159, Power=359, HeartRate= 59 Angle=   29
+Client=True  HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=200 Cadence=100, Power=300, HeartRate=  0 Angle=  -30
+Client=True  HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=201 Cadence=101, Power=301, HeartRate=  1 Angle=  -29
+Client=True  HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=202 Cadence=102, Power=302, HeartRate=  2 Angle=  -28
+Client=True  HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=203 Cadence=103, Power=303, HeartRate=  3 Angle=  -27
+Client=True  HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=204 Cadence=104, Power=304, HeartRate=  4 Angle=  -26
+Client=True  HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=205 Cadence=105, Power=305, HeartRate=  5 Angle=  -25
+Client=True  HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=206 Cadence=106, Power=306, HeartRate=  6 Angle=  -24
+Client=True  HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=207 Cadence=107, Power=307, HeartRate=  7 Angle=  -23
+Client=True  HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=208 Cadence=108, Power=308, HeartRate=  8 Angle=  -22
+Client=True  HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=209 Cadence=109, Power=309, HeartRate=  9 Angle=  -21
+Client=True  HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=210 Cadence=110, Power=310, HeartRate= 10 Angle=  -20
+Client=True  HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=211 Cadence=111, Power=311, HeartRate= 11 Angle=  -19
+Client=True  HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=212 Cadence=112, Power=312, HeartRate= 12 Angle=  -18
+Client=True  HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=213 Cadence=113, Power=313, HeartRate= 13 Angle=  -17
+Client=True  HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=214 Cadence=114, Power=314, HeartRate= 14 Angle=  -16
+Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=215 Cadence=115, Power=315, HeartRate= 15 Angle=  -15
+Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=216 Cadence=116, Power=316, HeartRate= 16 Angle=  -14
+Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=217 Cadence=117, Power=317, HeartRate= 17 Angle=  -13
+Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=218 Cadence=118, Power=318, HeartRate= 18 Angle=  -12
+Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=219 Cadence=119, Power=319, HeartRate= 19 Angle=  -11
+Client=False HasControl=False Started=False TargetPower= 100 TargetGrade=0      Speed=220 Cadence=120, Power=320, HeartRate= 20 Angle=  -10
+15:18:20,624: FortiusAnt simulated trainer is stopped
+15:18:20,627: ---------------------------------------
+Message=, Bluetooth interface closed
+bleBless ended
+
+
+Information from LightBlue as BLE-sniffer
+==========================================
+LightBlue® app launched
+App foregrounded
+Connecting to 4F:69:66:13:7A:2A (LT-ENTERTAIN)
+Connected to 4F:69:66:13:7A:2A (LT-ENTERTAIN)
+Discovering services for 4F:69:66:13:7A:2A (LT-ENTERTAIN)
+Discovered 6 services for 4F:69:66:13:7A:2A.
+
+Service 00001800-0000-1000-8000-00805f9b34fb
+Characteristics:
+|--00002a00-0000-1000-8000-00805f9b34fb: Readable
+|--00002a01-0000-1000-8000-00805f9b34fb: Readable
+|--00002a04-0000-1000-8000-00805f9b34fb: Readable
+|--00002aa6-0000-1000-8000-00805f9b34fb: Readable
+
+Service 00001801-0000-1000-8000-00805f9b34fb
+Characteristics:
+|--00002a05-0000-1000-8000-00805f9b34fb: Indicate
+|------00002902-0000-1000-8000-00805f9b34fb: <EMPTY>
+|--00002b29-0000-1000-8000-00805f9b34fb: Readable, Writable
+|--00002b2a-0000-1000-8000-00805f9b34fb: Readable
+
+Service 0000180a-0000-1000-8000-00805f9b34fb
+Characteristics:
+|--00002a50-0000-1000-8000-00805f9b34fb: Readable
+
+Service 00001826-0000-1000-8000-00805f9b34fb                    == sFitnessMachineUUID
+Characteristics:
+|--00002acc-0000-1000-8000-00805f9b34fb: Readable
+|--00002ad2-0000-1000-8000-00805f9b34fb: Notify
+|------00002902-0000-1000-8000-00805f9b34fb: <EMPTY>
+|--00002ada-0000-1000-8000-00805f9b34fb: Notify
+|------00002902-0000-1000-8000-00805f9b34fb: <EMPTY>
+|--00002ad9-0000-1000-8000-00805f9b34fb: Writable, Indicate
+|------00002902-0000-1000-8000-00805f9b34fb: <EMPTY>
+|--00002ad8-0000-1000-8000-00805f9b34fb: Readable
+
+Service 0000180d-0000-1000-8000-00805f9b34fb                    == sHeartRateUUID
+Characteristics:
+|--00002a37-0000-1000-8000-00805f9b34fb: Notify
+|------00002902-0000-1000-8000-00805f9b34fb: <EMPTY>
+
+Service 347b0001-7635-408b-8918-8ff3949ce592                    == sSteeringUUID
+Characteristics:
+|--347b0012-7635-408b-8918-8ff3949ce592: Writable               == cSteeringUnknown1UUID
+|--347b0013-7635-408b-8918-8ff3949ce592: Readable               == cSteeringUnknown2UUID
+|--347b0014-7635-408b-8918-8ff3949ce592: Notify                 == cSteeringUnknown3UUID
+|------00002902-0000-1000-8000-00805f9b34fb: <EMPTY>
+|--347b0019-7635-408b-8918-8ff3949ce592: Readable               == cSteeringUnknown4UUID
+|--347b0030-7635-408b-8918-8ff3949ce592: Notify                 == cSteeringAngleUUID
+|------00002902-0000-1000-8000-00805f9b34fb: <EMPTY>
+|--347b0032-7635-408b-8918-8ff3949ce592: Indicate               == cSteeringTxUUID
+|------00002902-0000-1000-8000-00805f9b34fb: <EMPTY>
+|--347b0031-7635-408b-8918-8ff3949ce592: Writable               == cSteeringRxName
+
+Enabling notifications/indications on 347b0030-7635-408b-8918-8ff3949ce592
+Notifications or indications ENABLED on 347b0030-7635-408b-8918-8ff3949ce592
+Wrote to descriptor 00002902-0000-1000-8000-00805f9b34fb | value: 01 00
+Characteristic 347b0030-7635-408b-8918-8ff3949ce592 changed | value: 00 00 E8 41
+Characteristic 347b0030-7635-408b-8918-8ff3949ce592 changed | value: 00 00 F0 C1
+Characteristic 347b0030-7635-408b-8918-8ff3949ce592 changed | value: 00 00 E8 C1
+...
+Disconnecting from 4F:69:66:13:7A:2A (LT-ENTERTAIN)
+Disconnected from 4F:69:66:13:7A:2A (LT-ENTERTAIN)
+
+===================================================================================
+When the service is published through NodeJs, the services and characteristics are:
+===================================================================================
+
+Service 00001800-0000-1000-8000-00805f9b34fb
+Characteristics:
+|--00002a00-0000-1000-8000-00805f9b34fb: Readable
+|--00002a01-0000-1000-8000-00805f9b34fb: Readable
+
+Service 00001801-0000-1000-8000-00805f9b34fb
+Characteristics:
+|--00002a05-0000-1000-8000-00805f9b34fb: Indicate
+|------00002902-0000-1000-8000-00805f9b34fb: <EMPTY>
+
+Service 00001826-0000-1000-8000-00805f9b34fb                    == sFitnessMachineUUID
+Characteristics:
+|--00002acc-0000-1000-8000-00805f9b34fb: Readable
+|------00002901-0000-1000-8000-00805f9b34fb: <EMPTY>
+|--00002ad2-0000-1000-8000-00805f9b34fb: Notify
+|------00002902-0000-1000-8000-00805f9b34fb: <EMPTY>
+|------00002901-0000-1000-8000-00805f9b34fb: <EMPTY>
+|--00002ada-0000-1000-8000-00805f9b34fb: Notify
+|------00002902-0000-1000-8000-00805f9b34fb: <EMPTY>
+|------00002901-0000-1000-8000-00805f9b34fb: <EMPTY>
+|--00002ad9-0000-1000-8000-00805f9b34fb: Writable, Indicate
+|------00002902-0000-1000-8000-00805f9b34fb: <EMPTY>
+|------00002901-0000-1000-8000-00805f9b34fb: <EMPTY>
+|--00002ad8-0000-1000-8000-00805f9b34fb: Readable
+|------00002901-0000-1000-8000-00805f9b34fb: <EMPTY>
+
+Service 0000180d-0000-1000-8000-00805f9b34fb                    == sHeartRateUUID
+Characteristics:
+|--00002a37-0000-1000-8000-00805f9b34fb: Notify
+|------00002902-0000-1000-8000-00805f9b34fb: <EMPTY>
+|------00002901-0000-1000-8000-00805f9b34fb: <EMPTY>
+
+Service 347b0001-7635-408b-8918-8ff3949ce592                    == sSteeringUUID
+Characteristics:
+|--347b0012-7635-408b-8918-8ff3949ce592: Writable               == cSteeringUnknown1UUID
+|--347b0013-7635-408b-8918-8ff3949ce592: Readable               == cSteeringUnknown2UUID
+|--347b0014-7635-408b-8918-8ff3949ce592: Notify                 == cSteeringUnknown3UUID
+|------00002902-0000-1000-8000-00805f9b34fb: <EMPTY>
+|--347b0019-7635-408b-8918-8ff3949ce592: Readable               == cSteeringUnknown4UUID
+|--347b0030-7635-408b-8918-8ff3949ce592: Notify                 == cSteeringAngleUUID
+|------00002902-0000-1000-8000-00805f9b34fb: <EMPTY>
+|--347b0031-7635-408b-8918-8ff3949ce592: Writable               == cSteeringRxName
+|--347b0032-7635-408b-8918-8ff3949ce592: Indicate               == cSteeringTxUUID
+|------00002902-0000-1000-8000-00805f9b34fb: <EMPTY>
+
 """

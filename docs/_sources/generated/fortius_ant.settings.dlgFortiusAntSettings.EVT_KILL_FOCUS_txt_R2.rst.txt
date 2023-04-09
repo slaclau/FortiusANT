@@ -1,0 +1,6 @@
+fortius\_ant.settings.dlgFortiusAntSettings.EVT\_KILL\_FOCUS\_txt\_R2
+=====================================================================
+
+.. currentmodule:: fortius_ant.settings
+
+.. automethod:: dlgFortiusAntSettings.EVT_KILL_FOCUS_txt_R2

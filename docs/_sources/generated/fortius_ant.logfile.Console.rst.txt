@@ -1,0 +1,6 @@
+fortius\_ant.logfile.Console
+============================
+
+.. currentmodule:: fortius_ant.logfile
+
+.. autofunction:: Console

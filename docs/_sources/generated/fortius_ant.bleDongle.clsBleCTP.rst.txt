@@ -1,0 +1,44 @@
+﻿clsBleCTP
+=========
+
+.. currentmodule:: fortius_ant.bleDongle
+
+.. autoclass:: fortius_ant.bleDongle.clsBleCTP
+   :show-inheritance:
+
+   .. inheritance-diagram:: clsBleCTP
+   
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~clsBleCTP.Refresh
+      ~clsBleCTP.SetAthleteData
+      ~clsBleCTP.SetTrainerData
+   
+   
+
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+      :toctree:
+   
+      ~clsBleCTP.Cadence
+      ~clsBleCTP.CurrentPower
+      ~clsBleCTP.CurrentSpeed
+      ~clsBleCTP.DraftingFactor
+      ~clsBleCTP.HeartRate
+      ~clsBleCTP.RollingResistance
+      ~clsBleCTP.TargetGrade
+      ~clsBleCTP.TargetMode
+      ~clsBleCTP.TargetPower
+      ~clsBleCTP.WindResistance
+      ~clsBleCTP.WindSpeed
+   
+   

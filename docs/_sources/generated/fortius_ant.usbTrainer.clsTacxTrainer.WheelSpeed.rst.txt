@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.WheelSpeed
+=================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoattribute:: clsTacxTrainer.WheelSpeed

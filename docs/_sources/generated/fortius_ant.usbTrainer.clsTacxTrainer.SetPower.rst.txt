@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.SetPower
+===============================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. automethod:: clsTacxTrainer.SetPower

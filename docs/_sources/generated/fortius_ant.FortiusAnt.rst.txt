@@ -1,0 +1,55 @@
+﻿FortiusAnt
+==========
+
+.. automodule:: fortius_ant.FortiusAnt
+
+   
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+      :toctree:
+   
+      cmd_SetLeds
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      FortiusAntChild
+      IdleFunction
+      LocateHW
+      Runoff
+      Settings
+      Tacx2Dongle
+      main
+      mainProgram
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+   
+      clsFortiusAntConsole
+      clsFortiusAntParent
+      frmFortiusAnt
+      frmFortiusAntChild
+   
+   
+
+   
+   
+   
+
+
+

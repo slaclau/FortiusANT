@@ -1,0 +1,6 @@
+fortius\_ant.ExplorAntCommand.CommandLineVariables.hrm
+======================================================
+
+.. currentmodule:: fortius_ant.ExplorAntCommand
+
+.. autoattribute:: CommandLineVariables.hrm

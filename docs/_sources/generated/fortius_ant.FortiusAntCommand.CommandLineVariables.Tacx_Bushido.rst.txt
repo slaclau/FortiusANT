@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAntCommand.CommandLineVariables.Tacx\_Bushido
+=================================================================
+
+.. currentmodule:: fortius_ant.FortiusAntCommand
+
+.. autoattribute:: CommandLineVariables.Tacx_Bushido
