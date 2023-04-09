@@ -17,10 +17,16 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ubuntu-20.04
-          path: packages
+          path: focal
       - name: Get kinetic package
         uses: actions/download-artifact@v3
         with:
           name: ubuntu-22.04
-          path: packages
-      - run: ls packages
+          path: kinetic
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Test
+          files: |
+            focal
+            kinetic
