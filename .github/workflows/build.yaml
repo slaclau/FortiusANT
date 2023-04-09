@@ -48,5 +48,5 @@ jobs:
       - name: Upload debian package
         uses: actions/upload-artifact@v3
         with:
-          name: matrix.os
+          name: ${{ matrix.os }}
           path: fortius-ant*.deb
