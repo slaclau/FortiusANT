@@ -17,6 +17,7 @@ jobs:
           name: snap
           path: ${{ steps.build.outputs.snap }}
       - name: Publish snap
+        if: false
         uses: snapcore/action-publish@v1
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
