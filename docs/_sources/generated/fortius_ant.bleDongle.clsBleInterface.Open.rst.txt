@@ -1,0 +1,6 @@
+fortius\_ant.bleDongle.clsBleInterface.Open
+===========================================
+
+.. currentmodule:: fortius_ant.bleDongle
+
+.. automethod:: clsBleInterface.Open

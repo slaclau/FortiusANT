@@ -1,0 +1,48 @@
+﻿settings
+========
+
+.. automodule:: fortius_ant.settings
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      EVT_CHAR_ufloat
+      EVT_CHAR_uint
+      EVT_KILL_FOCUS_float_range
+      EVT_KILL_FOCUS_int_range
+      JsonFileExists
+      JsonFileName
+      OpenDialog
+      ReadJsonFile
+      RightOf
+      Under
+      WriteJsonFile
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+   
+      dlgFortiusAntSettings
+   
+   
+
+   
+   
+   
+
+
+

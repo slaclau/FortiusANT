@@ -24,7 +24,7 @@ if True:
     # ---------------------------------------------------------------------------
     # Import in the FortiusAnt context
     # ---------------------------------------------------------------------------
-    from structConstants import (
+    from fortius_ant.structConstants import (
         little_endian,
         unsigned_char,
         short,
@@ -32,7 +32,7 @@ if True:
         unsigned_long,
         float,
     )  # pylint: disable=import-error
-    from logfile import HexSpace
+    from fortius_ant.logfile import HexSpace
 
 else:
     BlessExample = True

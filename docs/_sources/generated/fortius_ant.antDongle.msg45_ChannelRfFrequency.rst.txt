@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msg45\_ChannelRfFrequency
+================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msg45_ChannelRfFrequency

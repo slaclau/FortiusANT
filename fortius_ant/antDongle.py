@@ -123,11 +123,10 @@ import threading
 import time
 import usb.core
 
-import debug
-import logfile
-import structConstants as sc
-
-import FortiusAntCommand as cmd
+import fortius_ant.structConstants as sc
+import fortius_ant.debug as debug
+import fortius_ant.logfile as logfile
+import fortius_ant.FortiusAntCommand as cmd
 
 # ---------------------------------------------------------------------------
 # Our own choice what channels are used

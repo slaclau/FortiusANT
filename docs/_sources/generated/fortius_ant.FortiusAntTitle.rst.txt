@@ -1,0 +1,30 @@
+﻿FortiusAntTitle
+===============
+
+.. automodule:: fortius_ant.FortiusAntTitle
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      githubWindowTitle
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

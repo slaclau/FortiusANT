@@ -1,0 +1,6 @@
+fortius\_ant.raspberry.IsShutdownRequested
+==========================================
+
+.. currentmodule:: fortius_ant.raspberry
+
+.. autofunction:: IsShutdownRequested

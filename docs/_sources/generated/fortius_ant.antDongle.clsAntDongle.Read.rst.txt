@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.clsAntDongle.Read
+========================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. automethod:: clsAntDongle.Read

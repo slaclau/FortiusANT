@@ -1,0 +1,6 @@
+fortius\_ant.bleDongle.clsBleCTP.TargetMode
+===========================================
+
+.. currentmodule:: fortius_ant.bleDongle
+
+.. autoattribute:: clsBleCTP.TargetMode

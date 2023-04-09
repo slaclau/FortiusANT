@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.HeartRate
+================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoattribute:: clsTacxTrainer.HeartRate

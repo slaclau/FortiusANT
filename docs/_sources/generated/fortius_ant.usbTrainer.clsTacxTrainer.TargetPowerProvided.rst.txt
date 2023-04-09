@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.TargetPowerProvided
+==========================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoattribute:: clsTacxTrainer.TargetPowerProvided

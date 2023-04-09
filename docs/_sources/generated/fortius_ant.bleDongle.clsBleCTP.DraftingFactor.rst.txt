@@ -1,0 +1,6 @@
+fortius\_ant.bleDongle.clsBleCTP.DraftingFactor
+===============================================
+
+.. currentmodule:: fortius_ant.bleDongle
+
+.. autoattribute:: clsBleCTP.DraftingFactor

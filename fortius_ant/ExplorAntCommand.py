@@ -10,8 +10,8 @@ __version__ = "2020-05-01"
 # 2020-01-29    first version
 # -------------------------------------------------------------------------------
 import argparse
-import debug
-import logfile
+import fortius_ant.debug as debug
+import fortius_ant.logfile as logfile
 
 
 # -------------------------------------------------------------------------------

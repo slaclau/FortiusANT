@@ -1,0 +1,6 @@
+fortius\_ant.fxload.ihxSplitTo1
+===============================
+
+.. currentmodule:: fortius_ant.fxload
+
+.. autofunction:: ihxSplitTo1

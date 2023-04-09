@@ -32,8 +32,8 @@ import time
 from datetime import datetime
 import traceback
 
-from constants import UsePythonLogging
-import debug
+from fortius_ant.constants import UsePythonLogging
+import fortius_ant.debug as debug
 
 global LogfileCreated
 LogfileCreated = False

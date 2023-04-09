@@ -1,0 +1,6 @@
+fortius\_ant.ExplorAntCommand.CommandLineVariables.autostart
+============================================================
+
+.. currentmodule:: fortius_ant.ExplorAntCommand
+
+.. autoattribute:: CommandLineVariables.autostart

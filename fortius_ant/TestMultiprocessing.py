@@ -2,8 +2,8 @@ from multiprocessing import Process, Queue, Pipe
 import os
 import time
 
-import debug
-import logfile
+import fortius_ant.debug as debug
+import fortius_ant.logfile as logfile
 
 
 def f(name, t, q):

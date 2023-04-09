@@ -12,8 +12,8 @@ __version__ = "2023-03-17"
 import time
 from datetime import datetime
 
-import logfile
-from constants import mode_Power, mode_Grade
+import fortius_ant.logfile as logfile
+from fortius_ant.constants import mode_Power, mode_Grade
 
 # -------------------------------------------------------------------------------
 # TCX template
@@ -406,7 +406,7 @@ class clsTcxExport:
         # -----------------------------------------------------------------------
         if self.TrackpointXwritten > 0:
             filename = (
-                "FortiusAnt." + self.StartTime.strftime("%Y-%m-%d %H-%M-%S") + ".tcx"
+                "FortiusANT." + self.StartTime.strftime("%Y-%m-%d %H-%M-%S") + ".tcx"
             )
             tcxFile = open(filename, "w+")
             tcxFile.write(self.tcx)

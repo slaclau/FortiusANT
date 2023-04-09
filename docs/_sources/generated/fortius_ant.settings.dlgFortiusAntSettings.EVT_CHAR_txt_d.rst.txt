@@ -1,0 +1,6 @@
+fortius\_ant.settings.dlgFortiusAntSettings.EVT\_CHAR\_txt\_d
+=============================================================
+
+.. currentmodule:: fortius_ant.settings
+
+.. automethod:: dlgFortiusAntSettings.EVT_CHAR_txt_d

@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgUnpage55\_UserConfiguration
+=====================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgUnpage55_UserConfiguration

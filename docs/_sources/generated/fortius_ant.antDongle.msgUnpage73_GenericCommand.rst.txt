@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgUnpage73\_GenericCommand
+==================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgUnpage73_GenericCommand

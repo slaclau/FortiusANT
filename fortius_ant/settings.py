@@ -30,9 +30,9 @@ import json
 import lib_programname
 import os
 import sys
-import constants
-import debug
-import logfile
+import fortius_ant.constants as constants
+import fortius_ant.debug as debug
+import fortius_ant.logfile as logfile
 
 if constants.UseGui:
     import webbrowser
@@ -115,7 +115,12 @@ def JsonFileName():
     #        dirname = os.path.realpath(sys.argv[0]) # the started executable
     #        dirname = os.path.dirname(dirname)		 # Remove /filename.exe
     #    else:
-    dirname = "."  # Current directory
+    if os.name == "posix":
+        dirname = "./.fortius-ant"
+        if not os.path.exists(dirname):
+            os.mkdir(dirname)
+    else:
+        dirname = "."  # Current directory
     return dirname + "/FortiusAntSettings.json"
 
 
@@ -141,7 +146,6 @@ def ReadJsonFile(args):
         logfile.Write("ReadJsonFile () ...")
 
     jsonLoaded = False
-
     # --------------------------------------------------------------------------
     # Open json file
     # --------------------------------------------------------------------------
@@ -304,11 +308,11 @@ def ReadJsonFile(args):
             #             values in FortiusAntCommand.py
             # ------------------------------------------------------------------
             if args.debug == "":
-                args.debug = None
+                args.debug = False
             if args.antDeviceID == "":
-                args.antDeviceID = None
-            if args.factor == "":
-                args.factor = None
+                args.antDeviceID = False
+            if args.factor == "100":
+                args.factor = False
             if args.TacxType == "":
                 args.TacxType = False
             if args.Steering == "":
@@ -361,7 +365,6 @@ def ReadJsonFile(args):
                     )
 
             jsonLoaded = True
-
         # ----------------------------------------------------------------------
         # Close json file
         # ----------------------------------------------------------------------
@@ -656,7 +659,7 @@ if constants.UseGui:
         # Output:       None
         # --------------------------------------------------------------------------
         def __init__(self, parent):
-            wx.Dialog.__init__(self, parent, -1, TitleText, size=(1000, 1000))
+            wx.Dialog.__init__(self, parent, -1, TitleText, size=(1500, 1500))
             panel = wx.Panel(self)
 
             ButtonW = 80
@@ -671,7 +674,7 @@ if constants.UseGui:
             # BASIC
             # ----------------------------------------------------------------------
             l = "Basic arguments:"
-            s = (-1, -1)
+            s = (500, -1)
             p = (Margin * 2, Margin * 2)
             self.lblBasic = wx.StaticText(
                 panel,
@@ -679,7 +682,7 @@ if constants.UseGui:
                 label=l,
                 pos=p,
                 size=s,
-                style=0,
+                style=wx.ALIGN_LEFT,
                 name=wx.StaticTextNameStr,
             )
             self.lblBasic.SetFont(GroupLabelFont)
@@ -851,15 +854,15 @@ if constants.UseGui:
             # POWER CURVE
             # ----------------------------------------------------------------------
             l = "Power curve adjustment:"
-            s = (-1, -1)
-            p = Under(self.combo_S, 15)
+            s = (500, -1)
+            p = Under(self.combo_t, 15)
             self.lblPower = wx.StaticText(
                 panel,
                 id=wx.ID_ANY,
                 label=l,
                 pos=p,
                 size=s,
-                style=wx.BOLD,
+                style=wx.ALIGN_LEFT,
                 name=wx.StaticTextNameStr,
             )
             self.lblPower.SetFont(GroupLabelFont)
@@ -934,7 +937,7 @@ if constants.UseGui:
             # ADVANCED
             # ----------------------------------------------------------------------
             l = "Advanced arguments:"
-            s = (-1, -1)
+            s = (500, -1)
             p = Under(self.txt_p, 15)
             self.lblAdvanced = wx.StaticText(
                 panel,
@@ -942,7 +945,7 @@ if constants.UseGui:
                 label=l,
                 pos=p,
                 size=s,
-                style=wx.BOLD,
+                style=wx.ALIGN_LEFT,
                 name=wx.StaticTextNameStr,
             )
             self.lblAdvanced.SetFont(GroupLabelFont)
@@ -1131,7 +1134,7 @@ if constants.UseGui:
             # DEVELOPER
             # ----------------------------------------------------------------------
             l = "Developer arguments:"
-            s = (-1, -1)
+            s = (500, -1)
             p = Under(self.cb_x, 15)
             self.lblDeveloper = wx.StaticText(
                 panel,
@@ -1139,7 +1142,7 @@ if constants.UseGui:
                 label=l,
                 pos=p,
                 size=s,
-                style=wx.BOLD,
+                style=wx.ALIGN_LEFT,
                 name=wx.StaticTextNameStr,
             )
             self.lblDeveloper.SetFont(GroupLabelFont)
@@ -1387,8 +1390,8 @@ if constants.UseGui:
             # ----------------------------------------------------------------------
             self.SetSize(
                 (
-                    self.btnHelp.Position[0] + self.btnHelp.Size[0] + Margin * 2 + 40,
-                    self.btnHelp.Position[1] + self.btnHelp.Size[1] + Margin * 2 + 50,
+                    self.btnHelp.Position[0] + self.btnHelp.Size[0] + Margin * 2 + 150,
+                    self.btnHelp.Position[1] + self.btnHelp.Size[1] + Margin * 2 + 100,
                 )
             )
 
@@ -1578,7 +1581,7 @@ if constants.UseGui:
         # Checkbox -p
         # --------------------------------------------------------------------------
         def EVT_KILL_FOCUS_txt_p(self, event):
-            EVT_KILL_FOCUS_int_range(self.txt_p, event, 20, 150, 100)  # 2022-12-28
+            EVT_KILL_FOCUS_int_range(self.txt_p, event, 50, 150, 100)
 
         # --------------------------------------------------------------------------
         # Checkbox -R

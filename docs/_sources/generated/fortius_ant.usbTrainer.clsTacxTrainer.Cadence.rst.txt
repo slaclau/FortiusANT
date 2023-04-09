@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.Cadence
+==============================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoattribute:: clsTacxTrainer.Cadence

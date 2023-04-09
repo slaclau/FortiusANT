@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxUsbTrainer.USB\_Read\_retry4x40
+==============================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. automethod:: clsTacxUsbTrainer.USB_Read_retry4x40

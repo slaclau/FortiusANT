@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.CalibrateSupported
+=========================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. automethod:: clsTacxTrainer.CalibrateSupported

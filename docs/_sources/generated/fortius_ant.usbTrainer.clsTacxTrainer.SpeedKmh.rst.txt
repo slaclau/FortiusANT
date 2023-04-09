@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.SpeedKmh
+===============================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoattribute:: clsTacxTrainer.SpeedKmh

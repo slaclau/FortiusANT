@@ -1,0 +1,41 @@
+﻿usbTrainer
+==========
+
+.. automodule:: fortius_ant.usbTrainer
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+   
+      BushidoState
+      GeniusState
+      clsSimulatedTrainer
+      clsTacxAntBushidoTrainer
+      clsTacxAntGeniusTrainer
+      clsTacxAntTrainer
+      clsTacxAntVortexTrainer
+      clsTacxLegacyUsbTrainer
+      clsTacxNewUsbTrainer
+      clsTacxTrainer
+      clsTacxUsbTrainer
+   
+   
+
+   
+   
+   
+
+
+

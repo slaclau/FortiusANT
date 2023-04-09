@@ -1,0 +1,6 @@
+fortius\_ant.bleBlessClass.clsBleServer.Close
+=============================================
+
+.. currentmodule:: fortius_ant.bleBlessClass
+
+.. automethod:: clsBleServer.Close

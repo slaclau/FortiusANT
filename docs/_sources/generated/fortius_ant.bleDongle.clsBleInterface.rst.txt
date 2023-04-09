@@ -1,0 +1,29 @@
+﻿clsBleInterface
+===============
+
+.. currentmodule:: fortius_ant.bleDongle
+
+.. autoclass:: fortius_ant.bleDongle.clsBleInterface
+   :show-inheritance:
+
+   .. inheritance-diagram:: clsBleInterface
+   
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~clsBleInterface.Close
+      ~clsBleInterface.Open
+      ~clsBleInterface.Read
+      ~clsBleInterface.Write
+      ~clsBleInterface.__init__
+   
+   
+
+
+   
+   
+   

@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.Header
+=============================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoattribute:: clsTacxTrainer.Header

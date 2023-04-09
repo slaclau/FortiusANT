@@ -33,8 +33,8 @@ WindowTitle = "Fortius Antifier v6.7"  # Double quotes, see below!
 # 2020-11-05    Version 3.5
 # 2020-11-04    First version
 # -------------------------------------------------------------------------------
-import debug
-import logfile
+import fortius_ant.debug as debug
+import fortius_ant.logfile as logfile
 import time
 import urllib.request
 

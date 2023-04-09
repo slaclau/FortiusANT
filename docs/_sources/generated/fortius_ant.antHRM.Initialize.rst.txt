@@ -1,0 +1,6 @@
+fortius\_ant.antHRM.Initialize
+==============================
+
+.. currentmodule:: fortius_ant.antHRM
+
+.. autofunction:: Initialize

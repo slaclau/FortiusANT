@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgUnpage\_Hrm
+=====================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgUnpage_Hrm

@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgPage\_Hrm
+===================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgPage_Hrm

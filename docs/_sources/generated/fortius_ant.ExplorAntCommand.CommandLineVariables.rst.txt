@@ -1,0 +1,42 @@
+﻿CommandLineVariables
+====================
+
+.. currentmodule:: fortius_ant.ExplorAntCommand
+
+.. autoclass:: fortius_ant.ExplorAntCommand.CommandLineVariables
+   :show-inheritance:
+
+   .. inheritance-diagram:: CommandLineVariables
+   
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~CommandLineVariables.__init__
+      ~CommandLineVariables.print
+   
+   
+
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+      :toctree:
+   
+      ~CommandLineVariables.SimulateTrainer
+      ~CommandLineVariables.args
+      ~CommandLineVariables.autostart
+      ~CommandLineVariables.debug
+      ~CommandLineVariables.dongle
+      ~CommandLineVariables.fe
+      ~CommandLineVariables.hrm
+      ~CommandLineVariables.scs
+      ~CommandLineVariables.vhu
+      ~CommandLineVariables.vtx
+   
+   

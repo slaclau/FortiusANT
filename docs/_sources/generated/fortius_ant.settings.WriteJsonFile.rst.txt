@@ -1,0 +1,6 @@
+fortius\_ant.settings.WriteJsonFile
+===================================
+
+.. currentmodule:: fortius_ant.settings
+
+.. autofunction:: WriteJsonFile

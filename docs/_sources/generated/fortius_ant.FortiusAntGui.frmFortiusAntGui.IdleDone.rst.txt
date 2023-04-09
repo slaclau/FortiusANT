@@ -1,0 +1,6 @@
+fortius\_ant.FortiusAntGui.frmFortiusAntGui.IdleDone
+====================================================
+
+.. currentmodule:: fortius_ant.FortiusAntGui
+
+.. autoattribute:: frmFortiusAntGui.IdleDone

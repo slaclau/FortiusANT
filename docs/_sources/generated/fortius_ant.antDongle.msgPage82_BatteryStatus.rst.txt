@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgPage82\_BatteryStatus
+===============================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgPage82_BatteryStatus

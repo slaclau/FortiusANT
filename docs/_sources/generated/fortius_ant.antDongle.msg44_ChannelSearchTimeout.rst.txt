@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msg44\_ChannelSearchTimeout
+==================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msg44_ChannelSearchTimeout

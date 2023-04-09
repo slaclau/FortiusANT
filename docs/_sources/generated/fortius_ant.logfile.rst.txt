@@ -1,0 +1,47 @@
+﻿logfile
+=======
+
+.. automodule:: fortius_ant.logfile
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      Close
+      Console
+      HexSpace
+      HexSpaceL
+      IsOpen
+      Open
+      Print
+      Traceback
+      Write
+      WriteJson
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+   
+      clsLogfileJson
+   
+   
+
+   
+   
+   
+
+
+

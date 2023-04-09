@@ -35,13 +35,13 @@ import wx
 
 from datetime import datetime
 
-import antDongle as ant
-import antHRM as hrm
-import antFE as fe
-import debug
-import ExplorAntCommand as cmd
-import logfile
-import usbTrainer
+import fortius_ant.antDongle as ant
+import fortius_ant.antHRM as hrm
+import fortius_ant.antFE as fe
+import fortius_ant.debug as debug
+import fortius_ant.ExplorAntCommand as cmd
+import fortius_ant.logfile as logfile
+import fortius_ant.usbTrainer as usbTrainer
 
 
 class clsDeviceID(object):
@@ -72,7 +72,7 @@ class clsDeviceID(object):
 #
 # Returns:      None
 # ------------------------------------------------------------------------------
-
+def main():
     debug.deactivate()
     clv = cmd.CommandLineVariables()
     debug.activate(clv.debug)
@@ -112,8 +112,10 @@ class clsDeviceID(object):
         # ---------------------------------------------------------------------------
         # We are going to look what MASTER devices there are
         # ---------------------------------------------------------------------------
-        logfile.Console("ExplorANT: We're in slave mode, listening to master ANT+ devices")
-    
+        logfile.Console(
+            "ExplorANT: We're in slave mode, listening to master ANT+ devices"
+        )
+
         # ---------------------------------------------------------------------------
         # Initialize dongle
         # ---------------------------------------------------------------------------
@@ -271,7 +273,11 @@ class clsDeviceID(object):
                         # print (Channel, end=' ')
                         if DeviceNumber == 0:  # No device paired, request again
                             AntDongle.Write(
-                                [ant.msg4D_RequestMessage(Channel, ant.msgID_ChannelID)],
+                                [
+                                    ant.msg4D_RequestMessage(
+                                        Channel, ant.msgID_ChannelID
+                                    )
+                                ],
                                 False,
                                 False,
                             )
@@ -484,8 +490,12 @@ class clsDeviceID(object):
                 VTX_S1, VTX_S2, VTX_Serial, VTX_Alarm = 0, 0, 0, 0
                 VTX_Major, VTX_Minor, VTX_Build = 0, 0, 0
                 VTX_Calibration, VTX_VortexID = 0, 0
-                VortexData = False  # Can be used to test the Tacx Vortex Unpage functions
-                VortexPower = True  # Can be used to test the Tacx Vortex setPower function
+                VortexData = (
+                    False  # Can be used to test the Tacx Vortex Unpage functions
+                )
+                VortexPower = (
+                    True  # Can be used to test the Tacx Vortex setPower function
+                )
                 Power = -1
     
                 listenCount = 0
@@ -552,7 +562,10 @@ class clsDeviceID(object):
                                     ant.ComposeMessage(
                                         ant.msgID_BroadcastData,
                                         ant.msgPage00_TacxVortexDataSpeed(
-                                            ant.channel_VTX, CurrentPower, SpeedKmh, Cadence
+                                            ant.channel_VTX,
+                                            CurrentPower,
+                                            SpeedKmh,
+                                            Cadence,
                                         ),
                                     )
                                 )
@@ -624,7 +637,17 @@ class clsDeviceID(object):
                                 # ---------------------------------------------------
                                 # Data page 0...4 HRM data
                                 # ---------------------------------------------------
-                                if DataPageNumber & 0x7F in (0, 1, 2, 3, 4, 5, 6, 7, 89):
+                                if DataPageNumber & 0x7F in (
+                                    0,
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    5,
+                                    6,
+                                    7,
+                                    89,
+                                ):
                                     Unknown = False
                                     (
                                         Channel,
@@ -802,7 +825,10 @@ class clsDeviceID(object):
                                         cadence = int(cadence)
     
                                         speed = (
-                                            (SpeedRevolutionCount - pSpeedRevolutionCount)
+                                            (
+                                                SpeedRevolutionCount
+                                                - pSpeedRevolutionCount
+                                            )
                                             * 2.096
                                             * 3.600
                                             / (EventTime - pEventTime)
@@ -842,7 +868,9 @@ class clsDeviceID(object):
                                         VTX_CalibrationState,
                                         VTX_Cadence,
                                     ) = ant.msgUnpage00_TacxVortexDataSpeed(info)
-                                    VTX_Speed = round(VTX_Speed / (100 * 1000 / 3600), 1)
+                                    VTX_Speed = round(
+                                        VTX_Speed / (100 * 1000 / 3600), 1
+                                    )
                                     # logfile.Console ('i-Vortex Page=%s UsingVirtualSpeed=%s Power=%s Speed=%s State=%s Cadence=%s' % \
                                     #   (DataPageNumber, VTX_UsingVirtualSpeed, VTX_Power, VTX_Speed, VTX_CalibrationState, VTX_Cadence) )
     
@@ -1984,7 +2012,9 @@ class clsDeviceID(object):
                                         )
                                         comment = "(Product info)"
                                     elif RequestedPageNumber == 82:
-                                        info = ant.msgPage82_BatteryStatus(ant.channel_FE)
+                                        info = ant.msgPage82_BatteryStatus(
+                                            ant.channel_FE
+                                        )
                                         comment = "(Battery status)"
                                     else:
                                         error = "Requested page not suported"
@@ -2006,7 +2036,12 @@ class clsDeviceID(object):
                         if Unknown:
                             logfile.Console(
                                 "IGNORED!! msg=%s ch=%s p=%s info=%s"
-                                % (hex(id), Channel, DataPageNumber, logfile.HexSpace(info))
+                                % (
+                                    hex(id),
+                                    Channel,
+                                    DataPageNumber,
+                                    logfile.HexSpace(info),
+                                )
                             )
     
                     # -------------------------------------------------------
@@ -2121,3 +2156,6 @@ class clsDeviceID(object):
             break
     logfile.Console("We're done")
     logfile.Console("--------------------")
+
+if __name__ == "__main__":
+    main()

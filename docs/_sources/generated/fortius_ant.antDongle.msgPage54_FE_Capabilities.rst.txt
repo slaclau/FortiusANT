@@ -1,0 +1,6 @@
+fortius\_ant.antDongle.msgPage54\_FE\_Capabilities
+==================================================
+
+.. currentmodule:: fortius_ant.antDongle
+
+.. autofunction:: msgPage54_FE_Capabilities

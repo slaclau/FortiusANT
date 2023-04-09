@@ -158,15 +158,14 @@ import struct
 import sys
 import time
 
-import antDongle as ant
-from constants import mode_Power, mode_Grade
-import constants
-import debug
-import logfile
-import steering
-import structConstants as sc
-import FortiusAntCommand as cmd
-import fxload
+import fortius_ant.antDongle as ant
+from fortius_ant.constants import mode_Power, mode_Grade
+import fortius_ant.constants as constants
+import fortius_ant.debug as debug
+import fortius_ant.logfile as logfile
+import fortius_ant.structConstants as sc
+import fortius_ant.FortiusAntCommand as cmd
+import fortius_ant.fxload as fxload
 
 # -------------------------------------------------------------------------------
 # Constants

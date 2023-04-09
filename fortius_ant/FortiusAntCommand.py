@@ -73,12 +73,12 @@ import argparse
 import sys
 import time
 
-import debug
-import logfile
+import fortius_ant.debug as debug
+import fortius_ant.logfile as logfile
 
-from constants import UseBluetooth, UseGui, OnRaspberry
-import constants
-import settings
+from fortius_ant.constants import UseBluetooth, UseGui, OnRaspberry
+import fortius_ant.constants as constants
+import fortius_ant.settings as settings
 
 if UseGui:
     import wx
@@ -140,9 +140,9 @@ class CommandLineVariables(object):
 
     Transmission = ""  # introduced 2020-01-10
 
-    Cranckset = []
-    CrancksetStart = 0  # The initial value of index
-    CrancksetMax = 0  # Corresponds to full WH of the drawing area
+    Crankset = []
+    CranksetStart = 0  # The initial value of index
+    CranksetMax = 0  # Corresponds to full WH of the drawing area
 
     Cassette = []
     CassetteStart = 0  # The initial value of index
@@ -178,6 +178,11 @@ class CommandLineVariables(object):
     RunoffMinSpeed = 1
     RunoffTime = 7
     RunoffPower = 100
+
+    # ---------------------------------------------------------------------------
+    # Launch in settings editor mode
+    # ---------------------------------------------------------------------------
+    SettingsOnly = False  # introduced 2023-02-05; allow program to be launched as settings editor only
 
     # ---------------------------------------------------------------------------
     # Define and process command line
@@ -493,14 +498,15 @@ class CommandLineVariables(object):
             required=False,
             action="store_true",
         )
-
+        parser.add_argument(
+            "--settings", dest="SettingsOnly", required=False, action="store_true"
+        )
         # -----------------------------------------------------------------------
         # Parse command line
         # Overwrite from json file if present
         # -----------------------------------------------------------------------
         self.args = parser.parse_args()
         jsonLoaded = settings.ReadJsonFile(self.args)
-
         # -----------------------------------------------------------------------
         # If nothing specified at all, use sensible defaults
         # -----------------------------------------------------------------------
@@ -1006,9 +1012,9 @@ class CommandLineVariables(object):
             # Use command-line value, if fails - use default
             # -------------------------------------------------------------------
             try:
-                self.Cranckset = []
-                self.CrancksetStart = 0  # The initial value of index
-                self.CrancksetMax = 0  # Corresponds to full WH of the drawing area
+                self.Crankset = []
+                self.CranksetStart = 0  # The initial value of index
+                self.CranksetMax = 0  # Corresponds to full WH of the drawing area
 
                 self.Cassette = []
                 self.CassetteStart = 0  # The initial value of index
@@ -1027,11 +1033,11 @@ class CommandLineVariables(object):
                 for i in range(0, len(s2)):
                     chainring = s2[i]
                     if chainring.find("*") != -1:
-                        self.CrancksetStart = i
+                        self.CranksetStart = i
                         chainring = chainring.replace("*", "")
-                    self.Cranckset.append(int(chainring))
-                    if int(chainring) > self.CrancksetMax:
-                        self.CrancksetMax = int(chainring)
+                    self.Crankset.append(int(chainring))
+                    if int(chainring) > self.CranksetMax:
+                        self.CranksetMax = int(chainring)
                     if i == 2:
                         break
                 # ---------------------------------------------------------------
@@ -1060,8 +1066,8 @@ class CommandLineVariables(object):
         # -----------------------------------------------------------------------
         # If no start defined, take middle position
         # -----------------------------------------------------------------------
-        if self.CrancksetStart == 0:
-            self.CrancksetStart = int(round(len(self.Cranckset) / 2 - 0.5))
+        if self.CranksetStart == 0:
+            self.CranksetStart = int(round(len(self.Crankset) / 2 - 0.5))
         if self.CassetteStart == 0:
             self.CassetteStart = int(round(len(self.Cassette) / 2 - 0.5))
 
@@ -1078,6 +1084,8 @@ class CommandLineVariables(object):
                 "Pedal stroke analysis is not possible in console mode or this Tacx type"
             )
             self.PedalStrokeAnalysis = False
+
+        self.SettingsOnly = self.args.SettingsOnly
 
     def print(self):
         try:
@@ -1175,9 +1183,9 @@ class CommandLineVariables(object):
                 logfile.Console(
                     "-T %s x %s (start=%sx%s)"
                     % (
-                        self.Cranckset,
+                        self.Crankset,
                         self.Cassette,
-                        self.Cranckset[self.CrancksetStart],
+                        self.Crankset[self.CranksetStart],
                         self.Cassette[self.CassetteStart],
                     )
                 )

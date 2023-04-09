@@ -1,0 +1,6 @@
+fortius\_ant.settings.RightOf
+=============================
+
+.. currentmodule:: fortius_ant.settings
+
+.. autofunction:: RightOf

@@ -1,0 +1,6 @@
+fortius\_ant.bleBless.clsFTMS\_bless.CurrentSpeed
+=================================================
+
+.. currentmodule:: fortius_ant.bleBless
+
+.. autoattribute:: clsFTMS_bless.CurrentSpeed

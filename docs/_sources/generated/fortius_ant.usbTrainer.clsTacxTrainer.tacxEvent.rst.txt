@@ -1,0 +1,6 @@
+fortius\_ant.usbTrainer.clsTacxTrainer.tacxEvent
+================================================
+
+.. currentmodule:: fortius_ant.usbTrainer
+
+.. autoattribute:: clsTacxTrainer.tacxEvent

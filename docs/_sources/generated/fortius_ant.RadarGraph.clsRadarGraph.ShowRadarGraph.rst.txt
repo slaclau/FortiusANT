@@ -1,0 +1,6 @@
+fortius\_ant.RadarGraph.clsRadarGraph.ShowRadarGraph
+====================================================
+
+.. currentmodule:: fortius_ant.RadarGraph
+
+.. automethod:: clsRadarGraph.ShowRadarGraph
