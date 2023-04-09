@@ -33,6 +33,9 @@ jobs:
           sudo add-apt-repository ppa:deadsnakes/ppa
           sudo apt update
           sudo apt install python3.9 python3.9-dev python3.9-distutils python3.9-venv
+      - name: Install needed libraries
+        run: |
+          sudo apt install libgstreamer-plugins-base1.0-0 libnotify4 libsdl2-2.0-0 libwebkitgtk-1.0-0 libjavascriptcoregtk-4.0-dev libegl-dev
       - name: Build package
         run: |
           dpkg-buildpackage -us -uc -b
