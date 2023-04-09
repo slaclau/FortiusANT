@@ -40,13 +40,14 @@ jobs:
           sudo apt install libgstreamer-plugins-base1.0-0 libnotify4 libsdl2-2.0-0 libwebkit2gtk-4.0-dev libjavascriptcoregtk-4.0-dev libegl-dev
       - name: Build package
         run: |
+          pwd
           dpkg-buildpackage -us -uc -b
       - name: Install and test package
         run: |
-          sudo dpkg -i /home/runner/work/FortiusANT/fortius_ant*.deb
+          sudo dpkg -i /home/runner/work/fortius_ant*.deb
           timeout 10 fortius-ant >> log.txt
       - name: Upload debian package
         uses: actions/upload-artifact@v3
         with:
           name: matrix.os
-          path: /home/runner/work/FortiusANT/fortius_ant*.deb
+          path: /home/runner/work/fortius_ant*.deb
