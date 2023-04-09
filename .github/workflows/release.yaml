@@ -10,16 +10,17 @@ jobs:
   release:
     runs-on: "ubuntu-latest"
     
-    strategy:
-      matrix:
-        os: [ubuntu-22.04, ubuntu-20.04]
-    
     needs: build
         
     steps:
-      - name: Get packages
+      - name: Get focal package
         uses: actions/download-artifact@v3
         with:
-          name: ${{ matrix.os }}
-          path: test
-      - run: ls
+          name: ubuntu-20.04
+          path: packages
+      - name: Get kinetic package
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu-22.04
+          path: packages
+      - run: ls packages
