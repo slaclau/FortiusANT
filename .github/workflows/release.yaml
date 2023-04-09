@@ -2,6 +2,8 @@ name: "Release debian packages"
 
 on:
   push:
+    tags:
+      - "Test"
       
 jobs:
   build:
@@ -26,7 +28,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: 6.7-0ubuntu1
+          tag_name: test
           files: |
-            focal
-            kinetic
+            focal/*
+            kinetic/*
