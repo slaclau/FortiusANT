@@ -44,7 +44,7 @@ jobs:
           mv ../fortius-ant*.deb .
       - name: Install and test package
         run: |
-          sudo dpkg -i fortius-ant*.deb
+          sudo apt install ./fortius-ant*.deb
           timeout 10 fortius-ant >> log.txt
       - name: Upload debian package
         uses: actions/upload-artifact@v3
