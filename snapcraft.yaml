@@ -15,6 +15,6 @@ apps:
 parts:
   fortius-ant:
     plugin: python
-    requirements: [requirements.txt]
+    requirements: [snap-requirements.txt]
     source: https://github.com/slaclau/FortiusANT.git
 
