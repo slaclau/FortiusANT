@@ -42,12 +42,15 @@ jobs:
         run: |
           pwd
           dpkg-buildpackage -us -uc -b
+          mv ../fortius-ant*.deb .
+          pwd
+          ls
       - name: Install and test package
         run: |
-          sudo dpkg -i /home/runner/work/fortius_ant*.deb
+          sudo dpkg -i fortius_ant*.deb
           timeout 10 fortius-ant >> log.txt
       - name: Upload debian package
         uses: actions/upload-artifact@v3
         with:
           name: matrix.os
-          path: /home/runner/work/fortius_ant*.deb
+          path: fortius_ant*.deb
