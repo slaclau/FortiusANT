@@ -1,7 +1,13 @@
 # ---------------------------------------------------------------------------
 # Version info
 # ---------------------------------------------------------------------------
-__version__ = "2021-12-03"
+__version__ = "2023-03-15"
+# 2023-03-15    Even when there is no ANT-dongle, the message queue must be
+#               created, so that MessageQueueSize() returns zero.
+# 2022-08-22    Data from the ANT dongle is stored in a queue.
+#               This class only adds messages to the queue, the user removes
+#               the messages. Messages are never skipped anymore.
+# 2022-08-10    Steering merged from marcoveeneman and switchable's code
 # 2021-12-03    When pairing, TransmissionType must be zero (TransmissionType_Pairing)
 #               this became apparent when using another make of HRM, returning
 #               a TransmissionType=207, not being found using TransmissionType_IC.
@@ -103,18 +109,24 @@ __version__ = "2021-12-03"
 # 2019-12-30    strings[] replaced by messages[]
 # ---------------------------------------------------------------------------
 import binascii
+import glob
 import os
 import platform
+from pyexpat.errors import messages
+import re
 
 if platform.system() == "False":
-    import serial  # pylint: disable rt-error
+    import serial  # pylint: disable=import-error
+import queue
 import struct
-import usb.core
+import threading
 import time
+import usb.core
 
 import fortius_ant.structConstants as sc
 import fortius_ant.debug as debug
 import fortius_ant.logfile as logfile
+import fortius_ant.FortiusAntCommand as cmd
 
 # ---------------------------------------------------------------------------
 # Our own choice what channels are used
@@ -145,6 +157,9 @@ channel_GNS_s = channel_VHU_s  # ANT+ Channel for Tacx Genius
 channel_BHU_s = channel_VHU_s  # ANT+ Channel for Tacx Bushido Headunit
 
 channel_CTRL = 6  # ANT+ Channel for Remote Control
+
+channel_BLTR_s = 7  # ANT Channel for Tacx BlackTrack
+
 # ---------------------------------------------------------------------------
 # Vortex Headunit modes
 # ---------------------------------------------------------------------------
@@ -361,6 +376,7 @@ DeviceTypeID_BHU = 82  # Tacx Bushido head unit
 # 0x3d  according TotalReverse
 DeviceTypeID_VHU = 0x3E  # Thanks again to TotalReverse
 # https://github.com/WouterJD/FortiusANT/issues/46#issuecomment-616838329
+DeviceTypeID_BLTR = 84  # Tacx BlackTrack steering unit
 
 TransmissionType_Pairing = 0  # See ANT+ HRM  Device Profile D00000693 5.1
 # See ANT+ FE-C Device Profile D00001231 7.1
@@ -394,6 +410,15 @@ class clsAntDongle:
     Cycplus = False
     DongleReconnected = False  # So can be used even when OK=False
 
+    # Messages are store in a queue since 22-8-2022
+    _MessageQueue = None
+    _MessageLock = None
+
+    # Read messages in a separate thread
+    UseThread = True  # "Compile time" flag to use threading
+    ThreadActive = False  # "Run time" flag that threading active
+    MessageThread = None  # The thread handle
+
     # -----------------------------------------------------------------------
     # _ _ i n i t _ _
     # -----------------------------------------------------------------------
@@ -401,6 +426,8 @@ class clsAntDongle:
     # -----------------------------------------------------------------------
     def __init__(self, DeviceID=None):
         self.DeviceID = DeviceID
+        self._MessageQueue = queue.Queue()  # Here messages are stored
+        self._MessageLock = threading.Lock()  # This lock protects the queue
         self.OK = True  # Otherwise we're disabled!!
         if self.DeviceID == -1:
             self.OK = False  # No ANT dongle wanted
@@ -424,6 +451,8 @@ class clsAntDongle:
         self.Message = ""
         self.Cycplus = False
         self.DongleReconnected = False
+
+        self.StopReadThread()  # Stop reading in a thread
 
         if self.DeviceID == None:
             dongles = {(4104, "Suunto"), (4105, "Garmin"), (4100, "Older")}
@@ -514,12 +543,13 @@ class clsAntDongle:
 
                             if debug.on(debug.Function):
                                 logfile.Write("GetDongle - Read answer")
-                            reply = self.Read(False)
+                            self.Read(False)
 
                             if debug.on(debug.Function):
                                 logfile.Write("GetDongle - Check for an ANT+ reply")
                             self.Message = "No expected reply from dongle"
-                            for s in reply:
+                            while self.MessageQueueSize() > 0:
+                                s = self.MessageQueueGet()
                                 (
                                     synch,
                                     length,
@@ -580,6 +610,47 @@ class clsAntDongle:
         return found_available_ant_stick
 
     # -----------------------------------------------------------------------
+    # M e s s a g e Q u e u e   P u t   /   G e t   /   S i z e
+    # -----------------------------------------------------------------------
+    # input     self._MessageLock
+    #           self._MessageQueue
+    #
+    # function  Put: add message to   queue, protected by lock
+    #           Get: get message from queue, protected by lock
+    #
+    #           The lock is used, so that Put/Get can be called from
+    #           different threads.
+    #
+    # output    self._MessageQueue
+    #
+    # returns   Put: None
+    #           Get: the next message from the queue (or None)
+    # -----------------------------------------------------------------------
+    def MessageQueuePut(self, message):
+        if debug.on(debug.Function):
+            logfile.Write("MessageQueuePut(%s)" % logfile.HexSpace(message))
+        self._MessageLock.acquire()
+        self._MessageQueue.put(message)
+        self._MessageLock.release()
+
+    def MessageQueueGet(self):
+        self._MessageLock.acquire()
+        if self.MessageQueueSize():
+            message = self._MessageQueue.get(
+                block=False, timeout=1
+            )  # No timeout in the lock!!
+            self._MessageQueue.task_done()
+        else:
+            message = None
+        self._MessageLock.release()
+        if debug.on(debug.Function):
+            logfile.Write("MessageQueueGet() returns %s" % logfile.HexSpace(message))
+        return message
+
+    def MessageQueueSize(self):
+        return self._MessageQueue.qsize()
+
+    # -----------------------------------------------------------------------
     # W r i t e
     # -----------------------------------------------------------------------
     # input     messages    an array of data-buffers
@@ -599,10 +670,9 @@ class clsAntDongle:
     # function  write all strings to antDongle
     #           read responses from antDongle
     #
-    # returns   rtn         the string-array as received from antDongle
+    # returns   None; data is in the Queue. QueueSize() returns nr messages.
     # -----------------------------------------------------------------------
     def Write(self, messages, receive=True, drop=True, flush=True):
-        rtn = []
         if self.OK:  # If no dongle ==> no action at all
             # ---------------------------------------------------------------
             # Read all available messages first, it seems required to be
@@ -610,7 +680,7 @@ class clsAntDongle:
             # message lost)
             # ---------------------------------------------------------------
             if receive and flush:
-                rtn = self.Read(drop)  # Flush -> default timeout = proven!
+                self.Read(drop)  # Flush -> default timeout = proven!
 
             for message in messages:
                 # -----------------------------------------------------------
@@ -642,30 +712,26 @@ class clsAntDongle:
                 # Read all responses (after each write only when flushing!)
                 # -----------------------------------------------------------
                 if receive and flush:
-                    data = self.Read(drop)  # Flush -> default timeout = proven!
-                    for d in data:
-                        rtn.append(d)
+                    self.Read(drop)  # Flush -> default timeout = proven!
 
             # ---------------------------------------------------------------
             # Read all responses after having sent all messages.
             # Not required when flushing, to avoid double timeout.
             # ---------------------------------------------------------------
             if receive and not flush:
-                data = self.Read(drop, 1)  # Shortest possible timeout
-                for d in data:
-                    rtn.append(d)
-
-        return rtn
+                self.Read(drop, 1)  # Shortest possible timeout
 
     # ---------------------------------------------------------------------------
     # R e a d
     # ---------------------------------------------------------------------------
-    # input     drop           the caller does not process the returned data
-    #                          this flag impacts the logfile only!
+    # input     drop    the caller does not process the returned data, this flag
+    #                           impacts the logfile only!
+    #                   2022-08-22 since messages are stored in a queue, they
+    #                           are no longer dropped
     #
     # function  read response from antDongle
     #
-    # returns   return array of data-buffers
+    # returns   None; data is in the Queue. QueueSize() returns nr messages.
     # ---------------------------------------------------------------------------
     # Dongle disconnect recovery
     # summary           This is introduced for the CYCPLUS dongles that appear
@@ -746,7 +812,7 @@ class clsAntDongle:
             logfile.Write("... done")
         return trv
 
-    def Read(self, drop, timeout=20):
+    def _Read(self, _drop, timeout=20):
         # -------------------------------------------------------------------
         # Read from antDongle untill no more data (timeout), or error
         # Usually, dongle gives one buffer at the time, starting with 0xa4
@@ -754,17 +820,17 @@ class clsAntDongle:
         #
         # https://www.thisisant.com/forum/view/viewthread/812
         # -------------------------------------------------------------------
-        data = []
         while self.OK:  # If no dongle ==> no action at all
             trv = self.__ReadAndRetry(timeout)
             if len(trv) == 0:
                 break
             # --------------------------------------------------------------------------
-            # Handle content returned by .read()
+            # Handle content returned by .__ReadAndRetry()
             # --------------------------------------------------------------------------
             if debug.on(debug.Data1):
                 logfile.Write(
-                    "devAntDongle.read() returns %s " % (logfile.HexSpaceL(trv))
+                    "devAntDongle.__ReadAndRetry() returns %s "
+                    % (logfile.HexSpaceL(trv))
                 )
 
             if len(trv) > 900:
@@ -810,11 +876,10 @@ class clsAntDongle:
                                 )
                             )
                         else:
-                            data.append(d)  # add data to array
-                            if drop == True:
-                                DongleDebugMessage("Dongle    drop   :", d)
-                            else:
-                                DongleDebugMessage("Dongle    receive:", d)
+                            self.MessageQueuePut(d)  # 2022-08-22
+                            # Messages are always stored in the queue and hence never
+                            # dropped because a caller does not handle them.
+                            DongleDebugMessage("Dongle    receive:", d)
                     else:
                         error = "error: message exceeds buffer length"
                         break
@@ -827,8 +892,55 @@ class clsAntDongle:
                 # -------------------------------------------------------
                 start += length
         if self.OK and debug.on(debug.Function):
-            logfile.Write("AntDongle.Read() returns: " + logfile.HexSpaceL(data))
-        return data
+            logfile.Write(
+                "AntDongle.Read: Queue contains %s messages" % self.MessageQueueSize()
+            )
+
+    # --------------------------------------------------------------------------
+    # R e a d   /   R e a d T h r e a d
+    # --------------------------------------------------------------------------
+    # Read the ANT dongle directly
+    #   - as is done in GetDongle()
+    #   - or when no thread is created.
+    # ... or just using the queue as is filled in the thread
+    # --------------------------------------------------------------------------
+    def StartReadThread(self):
+        if self.UseThread and self.OK:
+            if debug.on(debug.Function):
+                logfile.Write(
+                    "StartReadThread(): Create thread to read messages from ANT dongle"
+                )
+            self.MessageThread = threading.Thread(
+                target=self.ReadThread, daemon=True
+            )  # No args=(),
+            self.ThreadActive = True
+            self.MessageThread.start()
+            if debug.on(debug.Function):
+                logfile.Write("StartReadThread(): Thread started")
+
+    def Read(self, drop, timeout=20):
+        if self.UseThread and self.ThreadActive:
+            # Reading is done by ReadThread()
+            pass
+        else:
+            self._Read(drop, timeout)
+
+    def ReadThread(self):
+        while self.ThreadActive:
+            # print('*** Thread read message')
+            self._Read(False)
+
+    def StopReadThread(self):
+        if self.MessageThread:
+            if debug.on(debug.Function):
+                logfile.Write(
+                    "StopReadThread(): Stop thread reading messages from ANT dongle"
+                )
+            self.ThreadActive = False  # Signal thread to stop
+            self.MessageThread.join()  # Wait that thread is stopped
+            self.MessageThread = None
+            if debug.on(debug.Function):
+                logfile.Write("StopReadThread(): Thread stopped")
 
     # -----------------------------------------------------------------------
     # Standard dongle commands
@@ -853,8 +965,11 @@ class clsAntDongle:
             # network for Tacx i-Vortex
         ]
         self.Write(messages)
+        self.StartReadThread()  # Start reading in a thread from now on
 
     def ResetDongle(self):
+        self.StopReadThread()  # Stop reading in a thread
+
         if self.Cycplus:
             # For CYCPLUS dongles this command may be given on initialization only
             # If done lateron, the dongle hangs
@@ -900,7 +1015,7 @@ class clsAntDongle:
         if self.OK:
             if self.ConfigMsg:
                 logfile.Console(
-                    "FortiusANT broadcasts data as an ANT+ Controlled Fitness Equipment device (FE-C), id=%s"
+                    "FortiusANT broadcasts data as an ANT+ Controlled Fitness Equipent device (FE-C), id=%s"
                     % DeviceNumber_FE
                 )
             if debug.on(debug.Data1):
@@ -1241,6 +1356,36 @@ class clsAntDongle:
             msg60_ChannelTransmitPower(channel_VHU_s, TransmitPower_0dBm),
             msg4B_OpenChannel(channel_VHU_s),
             msg4D_RequestMessage(channel_VHU_s, msgID_ChannelID),
+        ]
+        self.Write(messages)
+
+    def SlaveBLTR_ChannelConfig(
+        self, DeviceNumber
+    ):  # Listen to a Tacx Blacktrack steering unit
+        if DeviceNumber > 0:
+            s = ", id=%s only" % DeviceNumber
+        else:
+            s = ", any device"
+        if self.OK:
+            if self.ConfigMsg:
+                logfile.Console(
+                    "FortiusANT receives data from an ANT Tacx BlackTrack steering unit (BLTR)"
+                    + s
+                )
+            if debug.on(debug.Data1):
+                logfile.Write("SlaveBLTR_ChannelConfig()")
+        messages = [
+            msg42_AssignChannel(
+                channel_BLTR_s, ChannelType_BidirectionalReceive, NetworkNumber=0x01
+            ),
+            msg51_ChannelID(
+                channel_BLTR_s, DeviceNumber, DeviceTypeID_BLTR, TransmissionType_IC
+            ),
+            msg45_ChannelRfFrequency(channel_BLTR_s, RfFrequency_2460Mhz),
+            msg43_ChannelPeriod(channel_BLTR_s, ChannelPeriod=0x2000),
+            msg60_ChannelTransmitPower(channel_BLTR_s, TransmitPower_0dBm),
+            msg4B_OpenChannel(channel_BLTR_s),
+            msg4D_RequestMessage(channel_BLTR_s, msgID_ChannelID),
         ]
         self.Write(messages)
 
@@ -3655,5 +3800,47 @@ def msgPage2_CTRL(
         Reserved5,
         DeviceCapabilities,
     )
+
+    return info
+
+
+# ------------------------------------------------------------------------------
+# T a c x  B l a c k T r a c k  p a g e s
+# ------------------------------------------------------------------------------
+# Refer:    https://gist.github.com/switchabl/75b2619e2e3381f49425479d59523ead
+# ------------------------------------------------------------------------------
+
+
+# -------------------------------------------------------------------------------------
+# P a g e 0 0  T a c x B l a c k T r a c k A n g l e
+# -------------------------------------------------------------------------------------
+def msgUnpage00_TacxBlackTrackAngle(info):
+    fChannel = sc.unsigned_char  # First byte of the ANT+ message content
+    fDataPageNumber = sc.unsigned_char  # First byte of the ANT+ datapage (payload)
+
+    fAngle = sc.short  # raw angle
+    nAngle = 2
+    fReserved = sc.unsigned_char  # always 0xff (?)
+    nReserved = 3
+    fPadding = 4 * sc.pad
+
+    format = sc.big_endian + fChannel + fDataPageNumber + fAngle + fReserved + fPadding
+    tuple = struct.unpack(format, info)
+
+    return tuple[nAngle], tuple[nReserved]
+
+
+# ------------------------------------------------------------------------------
+# P a g e 0 1  T a c x B l a c k T r a c k K e e p A l i v e
+# ------------------------------------------------------------------------------
+def msgPage01_TacxBlackTrackKeepAlive(Channel):
+    DataPageNumber = 0x01
+
+    fChannel = sc.unsigned_char  # First byte of the ANT+ message content
+    fDataPageNumber = sc.unsigned_char  # First byte of the ANT+ datapage (payload)
+    fPadding = sc.pad * 7
+
+    format = sc.big_endian + fChannel + fDataPageNumber + fPadding
+    info = struct.pack(format, Channel, DataPageNumber)
 
     return info

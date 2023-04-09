@@ -54,7 +54,9 @@ if UseGui:
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-__version__ = "2022-03-08"
+__version__ = "2023-03-17"
+# 2023-03-17    #422 importlib not found; ignore that issue
+# 2022-11-19    importlib_metadata_version used to print bless.version
 # 2022-03-08    bleBless, bleBlessClass added
 # 2021-04-29    If no hrm used (-H-1) thgen do not show on console.
 #               Leds shown on console
@@ -79,7 +81,6 @@ __version__ = "2022-03-08"
 #               This module contains program startup, GUI-binding and
 #               multi-processing functionality only
 # -------------------------------------------------------------------------------
-
 # -------------------------------------------------------------------------------
 # Directives for this module
 # -------------------------------------------------------------------------------
@@ -1042,7 +1043,18 @@ def mainProgram():
         logfile.Write(s % ("TCXexport", TCXexport.__version__))
         logfile.Write(s % ("usbTrainer", usbTrainer.__version__))
 
+        # See https://github.com/kevincar/bless/issues/98
+        # importlib_metadata_version("modulename")
+        #       does not work for argparse, binascii, math or os
+        #       but works for bless and numpy
+        #   I did not try them all.
         logfile.Write(s % ("argparse", argparse.__version__))
+        try:
+            logfile.Write(s % ("bless", importlib_metadata_version("bless")))
+        except:
+            pass
+        #   logfile.Write(s % ('binascii',             binascii.__version__ ))
+        #   logfile.Write(s % ('math',                     math.__version__ ))
         logfile.Write(s % ("numpy", numpy.__version__))
         logfile.Write(s % ("os", os.name))
         if os.name == "nt":

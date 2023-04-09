@@ -51,7 +51,8 @@
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-__version__ = "2022-03-21"
+__version__ = "2022-12-28"
+# 2022-12-28    bleak does no longer support __version__
 # 2022-03-21    Made available to kevincar/bless as example; small modifications
 # 2022-03-16    bleBleak.py works on Windows 10
 #               - sometimes the BLE dongle must be reset (remove/insert)
@@ -79,13 +80,14 @@ __version__ = "2022-03-21"
 # -------------------------------------------------------------------------------
 import asyncio
 import logging
+import os
 from socket import timeout
 
 from bleak import BleakClient
 from bleak import discover
 
-# from bleak import __version__ as bleakVersion
-bleakVersion = 1
+# from bleak import __version__ as bleakVersion      # No longer supported; #408
+# print("bleak = %s" % bleakVersion)
 
 import struct
 
@@ -123,7 +125,6 @@ else:
 # 2. Windows 10 (for version see above)
 # --> bleBleak.py works; sample output added to end-of-this-file.
 # -------------------------------------------------------------------------------
-print("bleak = %s" % bleakVersion)
 
 # -------------------------------------------------------------------------------
 # ADDRESSES: Returned by findBLEdevices()

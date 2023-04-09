@@ -684,7 +684,7 @@ class frmFortiusAntGui(wx.Frame):
 
         # ----------------------------------------------------------------------
         # self.Power values; (On top of self.Power)
-        # ----------------------------------------------------------------------
+        # -------~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX),---------------------------------------------------------------
         self.txtPower = wx.TextCtrl(
             self.Power,
             value="999 Watt",

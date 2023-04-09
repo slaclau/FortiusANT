@@ -1,7 +1,9 @@
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-__version__ = "2022-05-12"
+__version__ = "2022-08-22"
+# 2022-08-22    AntDongle stores received messages in a queue.
+# 2022-08-10    Steering merged from marcoveeneman and switchable's code
 # 2022-05-12    Message added on failing calibration
 # 2022-04-07    BLE disabled on error to avoid repeated error-messages
 # 2022-03-01    #366 Implement BLE using bless
@@ -246,6 +248,7 @@ import fortius_ant.constants as constants
 import fortius_ant.debug as debug
 import fortius_ant.logfile as logfile
 import fortius_ant.raspberry as raspberry
+import fortius_ant.steering as steering
 import fortius_ant.TCXexport as TCXexport
 import fortius_ant.usbTrainer as usbTrainer
 
@@ -381,7 +384,7 @@ def IdleFunction(FortiusAntGui):
 # input:        pRestartApplication, pclv
 #
 # Description:  data provided by the GUI/Settings interface
-#               NOTE: only dynamic parameters of clv may be changed, otherwise
+#               NOimport steeringTE: only dynamic parameters of clv may be changed, otherwise
 #                     the application must be restarted.
 #                     If important parameters are changed (without restart)
 #                     this may cause unchecked inconsistencies!
@@ -907,6 +910,19 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
         # Create ANT+ master channel for ANT Control
         # -------------------------------------------------------------------
         AntDongle.CTRL_ChannelConfig(ant.DeviceNumber_CTRL)
+
+    BlackTrack = None
+    if clv.Steering == "Blacktrack":
+        # -------------------------------------------------------------------
+        # Create ANT slave channel for BLTR (Tacx BlackTrack)
+        # -------------------------------------------------------------------
+        AntDongle.SlaveBLTR_ChannelConfig(0)
+        BlackTrack = steering.clsBlackTrack(AntDongle)
+        Steering = BlackTrack.Steering
+    elif clv.Steering == "wired":
+        Steering = TacxTrainer.SteeringFrame
+    else:
+        Steering = None
 
     AntDongle.ConfigMsg = False  # Displayed only once
 
@@ -1586,6 +1602,10 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
                         TacxTrainer.Cadence,
                         TacxTrainer.CurrentPower,
                     )
+
+                    if Steering is not None:
+                        bleCTP.SetSteeringAngle(Steering.Angle)
+
                     if bleCTP.Refresh():
                         bleEvent = True
                         CTPcommandTime = time.time()
@@ -1623,7 +1643,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
             # Broadcast and receive ANT+ responses
             # -------------------------------------------------------------------
             if len(messages) > 0:
-                data = AntDongle.Write(messages, True, False, flush)
+                AntDongle.Write(messages, True, False, flush)
                 flush = False
                 # antEvent is not set here; only for data on FE-C channel
 
@@ -1639,7 +1659,9 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
             # practical impact; grouping by Channel would enable to handle all
             # ANT in a channel (device) module. No advantage today.
             # -------------------------------------------------------------------
-            for d in data:
+            while AntDongle.MessageQueueSize() > 0:
+                d = AntDongle.MessageQueueGet()
+
                 (
                     synch,
                     length,
@@ -1655,6 +1677,10 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
                 if clv.Tacx_Vortex or clv.Tacx_Genius or clv.Tacx_Bushido:
                     if TacxTrainer.HandleANTmessage(d):
                         continue  # Message is handled or ignored
+
+                if BlackTrack is not None:
+                    if BlackTrack.HandleAntMessage(d):
+                        continue
 
                 # ---------------------------------------------------------------
                 # AcknowledgedData = Slave -> Master
@@ -2107,6 +2133,10 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
                         FortiusAntGui.SetMessages(
                             HRM="Heart Rate Monitor paired: %s" % DeviceNumber
                         )
+
+                    elif Channel == ant.channel_CTRL:
+                        pass  # Ignore since 2022-08-22; to be investigated
+                        # Obviously message was dropped before
 
                     else:
                         logfile.Console(

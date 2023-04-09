@@ -1,8 +1,12 @@
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-__version__ = "2023-02-05"
-# 2023-02-05    move settings to .fortius-ant/ on posix compliant systems
+__version__ = "2022-08-10"
+# 2022-12-28    PowerFactor limit changed to 0.2 ... 1.5 (20 ... 150)
+#               to correspond with FortiusAntCommand.py
+#               See also 2021-01-19
+# 2022-12-28    Default values changed; see also 2022-04-11.
+# 2022-08-10    Steering merged from marcoveeneman and switchable's code
 # 2022-04-15    The new flags for debugging (performance, logging) are not
 #               translated to the user-interface.
 #               - maximum value for debug=127
@@ -55,6 +59,7 @@ json_gui = "gui"
 json_leds = "leds"
 json_homeTrainer = "home trainer"  # User function, although technically like simulation
 json_hrm = "hrm"
+json_steering = "steering"
 json_imperial = "imperial"
 # json_scs               = 'scs'
 json_exportTCX = "export TCX-file"
@@ -220,6 +225,8 @@ def ReadJsonFile(args):
                             args.homeTrainer = w[q]
                         elif q == json_hrm:
                             args.hrm = w[q]
+                        elif q == json_steering:
+                            args.Steering = w[q]
                         elif q == json_imperial:
                             args.imperial = w[q]
                         elif q == json_leds:
@@ -296,6 +303,9 @@ def ReadJsonFile(args):
 
             # ------------------------------------------------------------------
             # Correct values, to be compatibel with command-line
+            # Issue#404; when default value specified wrong behaviour
+            # 2022-12-28: Now the same values (None, False) used as the default=
+            #             values in FortiusAntCommand.py
             # ------------------------------------------------------------------
             if args.debug == "":
                 args.debug = False
@@ -305,6 +315,8 @@ def ReadJsonFile(args):
                 args.factor = False
             if args.TacxType == "":
                 args.TacxType = False
+            if args.Steering == "":
+                args.Steering = False
 
             # ------------------------------------------------------------------
             # Warn for (possibly) incompatible json-file
@@ -451,6 +463,7 @@ if constants.UseGui:
             json_gui: DialogWindow.cb_g.GetValue(),
             json_homeTrainer: DialogWindow.cb_e.GetValue(),
             json_hrm: DialogWindow.txt_H.GetValue(),
+            json_steering: DialogWindow.combo_S.GetValue(),
             json_imperial: DialogWindow.cb_i.GetValue(),
             #'scs':                     DialogWindow.txt_S  .GetValue(),
             json_exportTCX: DialogWindow.cb_x.GetValue(),
@@ -807,12 +820,42 @@ if constants.UseGui:
                 name=wx.StaticTextNameStr,
             )
 
+            v = ""
+            s = (-1, -1)
+            p = Under(self.combo_t)
+            c = ["wired", "Blacktrack"]
+            self.combo_S = wx.ComboBox(
+                panel,
+                id=wx.ID_ANY,
+                value=v,
+                pos=p,
+                size=s,
+                choices=c,
+                style=0,
+                validator=wx.DefaultValidator,
+                name=wx.ComboBoxNameStr,
+            )
+            self.combo_S.Bind(wx.EVT_COMBOBOX, self.EVT_COMBOBOX_combo_S)
+
+            l = constants.help_S + " (-S *)"
+            s = (-1, -1)
+            p = RightOf(self.combo_S)
+            self.lbl_S = wx.StaticText(
+                panel,
+                id=wx.ID_ANY,
+                label=l,
+                pos=p,
+                size=s,
+                style=0,
+                name=wx.StaticTextNameStr,
+            )
+
             # ----------------------------------------------------------------------
             # POWER CURVE
             # ----------------------------------------------------------------------
             l = "Power curve adjustment:"
             s = (500, -1)
-            p = Under(self.combo_t, 15)
+            p = Under(self.combo_S, 15)
             self.lblPower = wx.StaticText(
                 panel,
                 id=wx.ID_ANY,
@@ -1393,6 +1436,8 @@ if constants.UseGui:
                     self.txt_c.SetValue(str(float(clv.CalibrateRR)))
                 if clv.TacxType:
                     self.combo_t.SetValue(str(clv.TacxType))
+                if clv.Steering is not None:
+                    self.combo_S.SetValue(str(clv.Steering))
 
                 if not clv.args.debug:
                     self.txt_d.SetValue(
@@ -1569,6 +1614,12 @@ if constants.UseGui:
             self.cb_restart.SetValue(True)
 
         # --------------------------------------------------------------------------
+        # Combobox -S
+        # --------------------------------------------------------------------------
+        def EVT_COMBOBOX_combo_S(self, event):
+            self.cb_restart.SetValue(True)
+
+        # --------------------------------------------------------------------------
         # Checkbox -restart
         # --------------------------------------------------------------------------
         def EVT_CHECKBOX_cb_restart(self, event):
@@ -1652,6 +1703,11 @@ if constants.UseGui:
                     clv.TacxType = False
                 else:
                     clv.TacxType = self.combo_t.GetValue()
+
+                if self.combo_S.GetValue() == "":
+                    clv.Steering = None
+                else:
+                    clv.Steering = self.combo_S.GetValue()
 
             # ----------------------------------------------------------------------
             # Store values in json file

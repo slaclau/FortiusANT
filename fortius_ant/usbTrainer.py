@@ -1,7 +1,10 @@
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-__version__ = "2022-03-01"
+__version__ = "2023-04-06"
+# 2023-04-06    If UserAndBikeWeight is set below the minimum, a sensible value is set.
+# 2022-08-22    Steering only active when -S wired specified.
+# 2022-08-10    Steering merged from marcoveeneman and switchable's code
 # 2022-03-01    #361 clsSimulatedTrainer.Refresh() must correct data type of
 #               variables otherwise CurrentPower = iPower is not integer.
 # 2021-11-15    "Steering axis = " commented code added for investigation
@@ -353,6 +356,8 @@ class clsTacxTrainer:
         self.Message = Message
         self.OK = False
 
+        self.SteeringFrame = None  # a clsSteeringUnit instance, if available
+
     # ---------------------------------------------------------------------------
     # G e t T r a i n e r
     # ---------------------------------------------------------------------------
@@ -365,8 +370,6 @@ class clsTacxTrainer:
     # ---------------------------------------------------------------------------
     @staticmethod  # pretent to be c++ factory function
     def GetTrainer(clv, AntDevice=None):
-        import time
-
         if debug.on(debug.Function):
             logfile.Write("clsTacxTrainer.GetTrainer()")
 
@@ -579,6 +582,12 @@ class clsTacxTrainer:
         self.GearRatio = GearRatio
         self.UserWeight = UserWeight
         self.UserAndBikeWeight = UserWeight + BicycleWeight
+        if self.UserAndBikeWeight < 70:
+            logfile.Console(
+                "UserAndBikeWeight is set to %d, which is below the expected minimum of 70kg; corrected to 85kg."
+                % self.UserAndBikeWeight
+            )
+            self.UserAndBikeWeight = 75 + 10
 
     # ---------------------------------------------------------------------------
     # SendToTrainer() and ReceivedFromTrainer() to be defined by sub-class
@@ -611,8 +620,6 @@ class clsTacxTrainer:
     # Output        Class variables match with Target***
     # ---------------------------------------------------------------------------
     def Refresh(self, QuarterSecond, TacxMode):
-        import time
-
         if debug.on(debug.Function):
             logfile.Write("clsTacxTrainer.Refresh(%s, %s)" % (QuarterSecond, TacxMode))
         # -----------------------------------------------------------------------
@@ -1056,6 +1063,15 @@ class clsSimulatedTrainer(clsTacxTrainer):
         self.clv.PowerFactor = 1  # Not applicable for simulation
         self.Operational = True  # Always true
 
+        # ----------------------------------------------------------------------
+        # Steering
+        # ----------------------------------------------------------------------
+        if self.clv.Steering == "wired":
+            self.Steering1st = True
+            self.SteeringFrame = steering.clsSteering(
+                InitialCalLeft=-100, InitialCalRight=100, DeadZone=7.0
+            )
+
     # --------------------------------------------------------------------------
     # R e f r e s h
     # --------------------------------------------------------------------------
@@ -1076,8 +1092,6 @@ class clsSimulatedTrainer(clsTacxTrainer):
     # Output:       self.* variables, see next 10 lines
     # --------------------------------------------------------------------------
     def Refresh(self, _QuarterSecond=None, _TacxMode=None):
-        import time
-
         if debug.on(debug.Function):
             logfile.Write("clsSimulatedTrainer.Refresh()")
         # ----------------------------------------------------------------------
@@ -1094,7 +1108,7 @@ class clsSimulatedTrainer(clsTacxTrainer):
         # ----------------------------------------------------------------------
         # Randomize figures
         # ----------------------------------------------------------------------
-        self.Axis = 0
+        self.Axis = 75  # I have no sensible random axis
         self.Buttons = 0
         self.TargetResistance = 2345
 
@@ -1158,6 +1172,24 @@ class clsSimulatedTrainer(clsTacxTrainer):
         self.SpeedKmh = round(self.SpeedKmh, 1)
         self.VirtualSpeedKmh = round(self.VirtualSpeedKmh, 1)
 
+        # ----------------------------------------------------------------------
+        # Steering
+        # ----------------------------------------------------------------------
+        if self.clv.Steering == "wired":
+            if self.Steering1st:
+                # First time, send the stable center position. For us zero is fine.
+                for _i in range(10):
+                    self.SteeringFrame.Update(0)  # Calibrate center
+                for _i in range(10):
+                    self.SteeringFrame.Update(110)  # Calibrate right
+                for _i in range(10):
+                    self.SteeringFrame.Update(-110)  # Calibrate left
+                self.Steering1st = False
+
+            # Invert axis value so lower value -> left (not right)
+            for _i in range(10):
+                self.SteeringFrame.Update(-self.Axis)
+
 
 # -------------------------------------------------------------------------------
 # c l s T a c x A n t V o r t e x T r a i n e r
@@ -1178,8 +1210,6 @@ class clsTacxAntVortexTrainer(clsTacxTrainer):
         self.__ResetTrainer()
 
     def __ResetTrainer(self):
-        import time
-
         self.__AntVTXpaired = False
         self.__AntVHUpaired = False
         self.__DeviceNumberVTX = 0  # provided by CHANNEL_ID msg
@@ -1270,8 +1300,6 @@ class clsTacxAntVortexTrainer(clsTacxTrainer):
     # SendToTrainer()
     # ---------------------------------------------------------------------------
     def SendToTrainer(self, QuarterSecond, TacxMode):
-        import time
-
         if TacxMode == modeStop:
             self.__ResetTrainer()  # Must be paired again!
 
@@ -1951,8 +1979,6 @@ class clsTacxAntGeniusTrainer(clsTacxAntTrainer):
         super().__init__(clv, msg, AntDevice, ant.channel_GNS_s)
 
     def _ResetTrainer(self):
-        import time
-
         super()._ResetTrainer()
         self.__Calibrated = False
         self.__WatchdogTime = time.time()
@@ -1969,13 +1995,9 @@ class clsTacxAntGeniusTrainer(clsTacxAntTrainer):
             self.Operational = True  # FortiusAnt can send/receive to brake
 
     def __ResetTimeout(self):
-        import time
-
         self.__WatchdogTime = time.time()
 
     def __CheckCalibrationTimeout(self):
-        import time
-
         # cancel calibration if no progress in last 60s
         timeout = 60
         if time.time() > self.__WatchdogTime + timeout:
@@ -2359,8 +2381,6 @@ class clsTacxAntBushidoTrainer(clsTacxAntTrainer):
         super().__init__(clv, msg, AntDevice, ant.channel_BHU_s)
 
     def _ResetTrainer(self):
-        import time
-
         super()._ResetTrainer()
         self.__State = BushidoState.Pairing
         self.__ModeRequested = ant.VHU_PCmode
@@ -2449,8 +2469,6 @@ class clsTacxAntBushidoTrainer(clsTacxAntTrainer):
     # SendToTrainer()
     # ---------------------------------------------------------------------------
     def SendToTrainer(self, QuarterSecond, TacxMode):
-        import time
-
         messages = []
 
         # -------------------------------------------------------------------
@@ -2837,8 +2855,6 @@ class clsTacxUsbTrainer(clsTacxTrainer):
     #           At least 40 bytes must be returned, retry 4 times
     # ---------------------------------------------------------------------------
     def USB_Read_retry4x40(self, expectedHeader=USB_ControlResponse):
-        import time
-
         retry = 4
 
         while True:
@@ -3019,6 +3035,14 @@ class clsTacxLegacyUsbTrainer(clsTacxUsbTrainer):
             11.9  # GoldenCheetah: curSpeed = curSpeedInternal / (1.19f * 10.0f);
         )
         # PowerResistanceFactor = (1 / 0.0036)     # GoldenCheetah ~= 277.778
+
+        # ----------------------------------------------------------------------
+        # Steering
+        # ----------------------------------------------------------------------
+        if self.clv.Steering == "wired":
+            self.SteeringFrame = steering.clsSteering(
+                InitialCalLeft=-25, InitialCalRight=25, DeadZone=7.0
+            )
 
     # ---------------------------------------------------------------------------
     # Basic physics: Power = Resistance * Speed  <==> Resistance = Power / Speed
@@ -3215,6 +3239,16 @@ class clsTacxLegacyUsbTrainer(clsTacxUsbTrainer):
         self.Wheel2Speed()
         self.CurrentResistance2Power()
 
+        # ----------------------------------------------------------------------
+        # Steering
+        # ----------------------------------------------------------------------
+        if self.clv.Steering == "wired":
+            axisNotConnected = 0
+            if self.Axis != axisNotConnected:
+                self.SteeringFrame.Update(self.Axis)
+            else:
+                self.SteeringFrame.Update(None)
+
         if debug.on(debug.Function):
             logfile.Write(
                 "ReceiveFromTrainer() = hr=%s Buttons=%s, Cadence=%s Speed=%s TargetRes=%s CurrentRes=%s CurrentPower=%s, pe=%s %s"
@@ -3243,8 +3277,6 @@ class clsTacxLegacyUsbTrainer(clsTacxUsbTrainer):
 # -------------------------------------------------------------------------------
 class clsTacxNewUsbTrainer(clsTacxUsbTrainer):
     def __init__(self, clv, Message, Headunit, UsbDevice):
-        import time
-
         super().__init__(clv, Message)
         if debug.on(debug.Function):
             logfile.Write("clsTacxNewUsbTrainer.__init__()")
@@ -3268,6 +3300,14 @@ class clsTacxNewUsbTrainer(clsTacxUsbTrainer):
         self.MotorBrakeUnitType = 0  # 41 = T1941 (Fortius motorbrake)
         # 01 = T1901 (Magnetic brake)
         self.Version2 = 0
+
+        # ----------------------------------------------------------------------
+        # Steering
+        # ----------------------------------------------------------------------
+        if self.clv.Steering == "wired":
+            self.SteeringFrame = steering.clsSteering(
+                InitialCalLeft=-100, InitialCalRight=100, DeadZone=7.0
+            )
 
         # ---------------------------------------------------------------------------
         # Resistance values for MagneticBrake
@@ -3805,7 +3845,16 @@ class clsTacxNewUsbTrainer(clsTacxUsbTrainer):
             self.Wheel2Speed()
             self.CurrentResistance2Power()
 
-            # print('Steering axis = ', self.Axis) # To investigate steering behaviour
+            # ----------------------------------------------------------------------
+            # Steering
+            # ----------------------------------------------------------------------
+            if self.clv.Steering == "wired":
+                axisNotConnected = 0x0A0D
+                if self.Axis != axisNotConnected:
+                    # Invert axis value so lower value -> left (not right)
+                    self.SteeringFrame.Update(-self.Axis)
+                else:
+                    self.SteeringFrame.Update(None)
 
             if debug.on(debug.Function):
                 logfile.Write(
