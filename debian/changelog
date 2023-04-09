@@ -1,3 +1,9 @@
+fortius-ant (6.7.1-0ubuntu1) replaceme; urgency=medium
+
+  * Fix to upstream
+
+ -- Sebastien Laclau <seb.laclau@gmail.com>  Sun, 09 Apr 2023 19:54:44 +0100
+
 fortius-ant (6.7-0ubuntu2) replaceme; urgency=medium
 
   * Update to desktop file
