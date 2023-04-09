@@ -47,4 +47,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: matrix.os
-          path: ../fortius_ant*.deb
+          path: /home/runner/work/FortiusANT/fortius_ant*.deb
