@@ -1,5 +1,6 @@
 [![Build debian packages](https://github.com/slaclau/FortiusANT/actions/workflows/build.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/build.yaml)
 [![Build snap](https://github.com/slaclau/FortiusANT/actions/workflows/build-snap.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/build-snap.yaml)
+![Upstream version](https://img.shields.io/github/v/tag/slaclau/FortiusANT?label=Upstream%20version)
 ![Ubuntu package version](https://img.shields.io/github/v/release/slaclau/FortiusANT?label=Ubuntu%20Package)
 
 # FortiusANT
