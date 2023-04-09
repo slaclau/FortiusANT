@@ -2,8 +2,6 @@ name: "Release debian packages"
 
 on:
   push:
-    tags:
-      - "*-*ubuntu*"
       
 jobs:
   build:
