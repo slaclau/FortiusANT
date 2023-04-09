@@ -29,3 +29,6 @@ jobs:
           files: |
             focal/*
             kinetic/*
+
+permissions:
+  contents: write
