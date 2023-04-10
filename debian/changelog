@@ -1,3 +1,9 @@
+fortius-ant (6.7.2-0ubuntu3) replaceme; urgency=medium
+
+  * Change to build system
+
+ -- Sebastien Laclau <seb.laclau@gmail.com>  Mon, 10 Apr 2023 15:47:33 +0100
+
 fortius-ant (6.7.2-0ubuntu2) replaceme; urgency=medium
 
   * Change to build system
