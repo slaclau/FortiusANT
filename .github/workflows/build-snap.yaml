@@ -16,7 +16,7 @@ jobs:
           sudo snap install --dangerous steps.build.outputs.snap }}
       - name: Test snap
         run: |
-          fortius-ant -a -s
+          timeout 10 fortius-ant -a -s
       - name: Upload snap
         uses: actions/upload-artifact@v3
         with:
