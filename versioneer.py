@@ -1254,7 +1254,7 @@ def git_pieces_from_vcs(tag_prefix, root, verbose, runner=run_command):
     # if there isn't one, this yields HEX[-dirty] (no NUM)
     describe_out, rc = runner(GITS, [
         "describe", "--tags", "--dirty", "--always", "--long",
-        "--match", f"{tag_prefix}[[:digit:]]*"
+        "--match", f"{tag_prefix}[[:digit:]]*", "--exclude", "*ubuntu*"
     ], cwd=root)
     # --long was added in git-1.5.5
     if describe_out is None:
@@ -1334,7 +1334,6 @@ def git_pieces_from_vcs(tag_prefix, root, verbose, runner=run_command):
                                % (full_tag, tag_prefix))
             return pieces
         pieces["closest-tag"] = full_tag[len(tag_prefix):]
-
         # distance: number of commits since tag
         pieces["distance"] = int(mo.group(2))
 
@@ -2200,6 +2199,7 @@ def setup_command():
 
 
 if __name__ == "__main__":
-    cmd = sys.argv[1]
-    if cmd == "setup":
-        setup_command()
+    print(get_versions());
+    #cmd = sys.argv[1]
+    #if cmd == "setup":
+    #    setup_command()
