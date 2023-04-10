@@ -2,8 +2,8 @@ name: "Release debian packages"
 
 on:
   push:
-    tags:
-      - "*.*-*ubuntu*"
+#    tags:
+#      - "*.*-*ubuntu*"
 
 jobs:
   release:
@@ -79,7 +79,6 @@ jobs:
           mv ../*tar.gz ../debuild/
           tar xf ../debuild/*tar.gz
       - name: Publish focal package
-      - name: Publish jammy package
         run: |
           dput ppa:slaclau/ppa fortius_ant*source.changes
         if: matrix.os == 'ubuntu-20.04'
