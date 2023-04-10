@@ -84,6 +84,7 @@ jobs:
         if: matrix.os == 'ubuntu-20.04'
       - name: Publish jammy package
         run: |
+          sudo apt install dput
           dput ppa:slaclau/ppa fortius_ant*source.changes
         if: matrix.os == 'ubuntu-22.04'
 permissions:
