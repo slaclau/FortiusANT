@@ -6,30 +6,14 @@ on:
       - "*.*-*ubuntu*"
 
 jobs:
-  build:
-    uses: ./.github/workflows/build-debian.yaml
-
   release:
     runs-on: ${{ matrix.os }}
     
     strategy:
       matrix:
         os: [ubuntu-22.04, ubuntu-20.04]
-    needs: build
 
     steps:
-      - name: Get package
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ matrix.os }}
-          path: ${{ matrix.os }}
-      - name: tar package
-        run: |
-          tar cf ${{ matrix.os }}.tar ${{ matrix.os }}
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: ${{ matrix.os }}.tar
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -59,6 +43,35 @@ jobs:
       - name: Install needed libraries
         run: |
           sudo apt install libgstreamer-plugins-base1.0-0 libnotify4 libsdl2-2.0-0 libwebkit2gtk-4.0-dev libjavascriptcoregtk-4.0-dev libegl-dev
+      - name: Build package
+        run: |
+          dpkg-buildpackage -us -uc
+          mv ../fortius-ant*.deb .
+          mv ../fortius-ant*.dsc .
+          mv ../fortius-ant*.changes .
+      - name: Install package
+        run: |
+          sudo apt install ./fortius-ant*.deb
+      - name: Upload debian package
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}
+          path: |
+            fortius-ant*.deb
+            fortius-ant*.dsc
+            fortius-ant*.changes
+      - name: Get package
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ matrix.os }}
+          path: ${{ matrix.os }}
+      - name: tar package
+        run: |
+          tar cf ${{ matrix.os }}.tar ${{ matrix.os }}
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ matrix.os }}.tar
       - name: Build source package
         run: |
           ./buildSource.sh
@@ -79,6 +92,7 @@ jobs:
         with:
           repository: 'ppa:slaclau/ppa'
           gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
+          gpg_passphrase: ""
           pkgdir: '../debuild/fortius-ant_*/'
           series: 'jammy'
         if: matrix.os == 'ubuntu-22.04'
