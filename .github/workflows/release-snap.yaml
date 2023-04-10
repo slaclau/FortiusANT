@@ -31,7 +31,7 @@ jobs:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
         with:
           snap: snap/*
-          release: edge
+          release: stable
 
 permissions:
   contents: write
