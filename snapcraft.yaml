@@ -6,7 +6,7 @@ confinement: devmode
 base: core20
 architectures:
   - build-on: [amd64]
-
+adopt-info: fortius-ant
 build-packages:
   - libffi-dev
   - libgstreamer-plugins-base1.0-0
