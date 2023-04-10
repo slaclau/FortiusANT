@@ -1,7 +1,6 @@
 name: fortius-ant
 summary: FortiusANT by WouterJD
 description: FortiusANT BY WouterJD
-version: git
 grade: devel
 confinement: devmode
 base: core20
