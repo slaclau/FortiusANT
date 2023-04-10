@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    uses: ./.github/workflows/build.yaml
+    uses: ./.github/workflows/build-debian.yaml
 
   release:
     runs-on: "ubuntu-latest"
@@ -34,6 +34,5 @@ jobs:
           files: |
             focal.tar
             jammy.tar
-
 permissions:
   contents: write
