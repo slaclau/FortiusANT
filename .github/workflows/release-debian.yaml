@@ -69,7 +69,8 @@ jobs:
         run: |
           tar cf ${{ matrix.os }}.tar ${{ matrix.os }}
       - name: Release
-        uses: softprops/action-gh-release@       with:
+        uses: softprops/action-gh-release@
+        with:
           files: ${{ matrix.os }}.tar
       - name: Build and sign source
         run: |
