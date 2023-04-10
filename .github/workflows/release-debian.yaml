@@ -32,7 +32,7 @@ jobs:
           files: ${{ matrix.os }}.tar
       - name: Build source package
         run: |
-          buildSource.sh
+          ./buildSource.sh
           mkdir ../debuild
           mv ../*tar.gz ../debuild/
           tar xf ..debuild/*tar.gz
