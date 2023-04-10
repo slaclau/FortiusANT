@@ -64,7 +64,7 @@ jobs:
           ./buildSource.sh
           mkdir ../debuild
           mv ../*tar.gz ../debuild/
-          tar xf ..debuild/*tar.gz
+          tar xf ../debuild/*tar.gz
       - name: Publish focal package
         uses: yuezk/publish-ppa-package@main
         with:
