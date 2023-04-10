@@ -26,6 +26,9 @@ parts:
     plugin: python
     requirements: [snap-requirements.txt]
     source: https://github.com/slaclau/FortiusANT.git
+    override-pull: |
+      snapcraftctl pull
+      snapcraftctl set-version $(python3 setup.py version)
     stage-packages:
       - libasound2
       - libasyncns0
