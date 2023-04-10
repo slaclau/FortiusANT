@@ -2199,7 +2199,7 @@ def setup_command():
 
 
 if __name__ == "__main__":
-    print(get_versions());
-    #cmd = sys.argv[1]
-    #if cmd == "setup":
-    #    setup_command()
+    #print(get_versions());
+    cmd = sys.argv[1]
+    if cmd == "setup":
+        setup_command()
