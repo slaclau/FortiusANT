@@ -28,8 +28,9 @@ parts:
     source: https://github.com/slaclau/FortiusANT.git
     override-pull: |
       snapcraftctl pull
-      snapcraftctl set-version $(pip3 install setuptools; python3 setup.py version)
+      snapcraftctl set-version $(python3 setup.py version)
     stage-packages:
+      - python3-setuptools
       - libasound2
       - libasyncns0
       - libatk-bridge2.0-0
