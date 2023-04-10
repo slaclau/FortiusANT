@@ -1,7 +1,9 @@
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-WindowTitle = "Fortius Antifier v6.7"  # Double quotes, see below!
+import fortius_ant
+WindowTitle = "Fortius Antifier " + fortius_ant.__version__  # Double quotes, see below!
+# 2023-03-10    Version 6.7.2   Update versioning system to use python-versioneer
 # 2022-12-28    Version 6.7     #404 BLE does not work when debug=0
 #                               #404 PowerFactor setting always reset to 20
 # 2022-08-24    Version 6.7     #341 Refactoring of ANT reading loop
