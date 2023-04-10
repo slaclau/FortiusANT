@@ -1,8 +1,10 @@
 from setuptools import setup, find_packages
+import versioneer
 
 setup(
     name='fortius-ant',
-    version='6.5.1',
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     description='FortiusANT',
     author='Sebastien Laclau',
     author_email='seb.laclau@gmail.com',
