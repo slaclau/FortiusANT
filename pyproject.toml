@@ -20,9 +20,3 @@ require-plugins = [
 extend-select = [
     "D417",
 ]
-[tool.versioneer]
-VCS = "git"
-style = "pep440"
-versionfile_source = "fortius_ant/_version.py"
-versionfile_build = "fortius_ant/_version.py"
-tag_prefix = ""
