@@ -74,8 +74,12 @@ jobs:
 #          files: ${{ matrix.os }}.tar
       - name: Build source package
         run: |
-          ./buildSource.sh
-          ls ..
+          python3 updateChangelog.py
+          GPG_KEY_ID=$(echo "${{ secrets.PPA_GPG_PRIVATE_KEY }}" | gpg --import-options show-only --import | sed -n '2s/^\s*//p')
+          echo $GPG_KEY_ID
+          echo "${{ secrets.PPA_GPG_PRIVATE_KEY }}" | gpg --batch --import
+          dpkg-buildpackage -S -sa
+          
       - name: Publish focal package
         run: |
           sudo apt install dput
