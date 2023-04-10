@@ -2,8 +2,8 @@ name: "Build debian packages"
 
 on: 
   push:
-    branch:
-      - upstream/*
+    tags-ignore:
+      - *
   workflow_call:
 
 jobs:
