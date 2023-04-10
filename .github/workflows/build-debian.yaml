@@ -48,6 +48,7 @@ jobs:
           mv ../fortius-ant*.deb .
           mv ../fortius-ant*.dsc .
           mv ../fortius-ant*.changes .
+          mv ../fortius-ant*.tar.gz .
       - name: Install package
         run: |
           sudo apt install ./fortius-ant*.deb
@@ -59,3 +60,4 @@ jobs:
             fortius-ant*.deb
             fortius-ant*.dsc
             fortius-ant*.changes
+            fortius-ant*.tar.gz .
