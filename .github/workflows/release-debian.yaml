@@ -76,10 +76,10 @@ jobs:
         run: |
           sed -i "s/replaceme/focal/g" debian/changelog
         if: matrix.os == 'ubuntu-20.04'
-      - name: Update changelog for focal
+      - name: Update changelog for jammy
         run: |
-          sed -i "s/replaceme/focal/g" debian/changelog
-        if: matrix.os == 'ubuntu-20.04'
+          sed -i "s/replaceme/jammy/g" debian/changelog
+        if: matrix.os == 'ubuntu-22.04'
       - name: Build and sign source
         run: |
           GPG_KEY_ID=$(echo "${{ secrets.PPA_GPG_PRIVATE_KEY }}" | gpg --import-options show-only --import | sed -n '2s/^\s*//p')
