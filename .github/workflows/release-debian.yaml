@@ -10,47 +10,47 @@ jobs:
     uses: ./.github/workflows/build-debian.yaml
 
   release:
-    runs-on: "ubuntu-latest"
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-20.04]
     needs: build
 
     steps:
-      - name: Get focal package
+      - name: Get package
         uses: actions/download-artifact@v3
         with:
-          name: ubuntu-20.04
-          path: focal
-      - name: Get jammy package
-        uses: actions/download-artifact@v3
-        with:
-          name: ubuntu-22.04
-          path: jammy
-      - name: tar packages
+          name: ${{ matrix.os }}
+          path: ${{ matrix.os }}
+      - name: tar package
         run: |
-          tar cf focal.tar focal
-          tar cf jammy.tar jammy
+          tar cf ${{ matrix.os }}.tar ${{ matrix.os }}
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            focal.tar
-            jammy.tar
-      - name: untar source packages
+          files: ${{ matrix.os }}.tar
+      - name: Build source package
         run: |
-          tar -xf focal/*.tar.gz
-          tar -xf jammy/*.tar.gz
-      - name: Publish focal package
+          buildSource.sh
+          mkdir ../debuild
+          mv ../*tar.gz ../debuild/
+          tar xf ..debuild/*tar.gz
+      - name: Publish package
         uses: yuezk/publish-ppa-package@main
         with:
           repository: 'ppa:slaclau/ppa'
           gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
-          pkgdir: 'focal/fortius-ant_*/'
+          pkgdir: '../debuild/fortius-ant_*/'
           series: 'focal'
+        if: matrix.os == 'ubuntu-20.04'
       - name: Publish jammy package
         uses: yuezk/publish-ppa-package@main
         with:
           repository: 'ppa:slaclau/ppa'
           gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
-          pkgdir: 'jammy/fortius-ant_*/'
+          pkgdir: '../debuild/fortius-ant_*/'
           series: 'jammy'
+        if: matrix.os == 'ubuntu-22.04'
 permissions:
   contents: write
