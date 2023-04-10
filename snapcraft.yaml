@@ -20,6 +20,8 @@ build-packages:
 apps:
   fortius-ant:
     command: bin/fortius-ant
+    plugs:
+      - raw-usb
 
 parts:
   fortius-ant:
