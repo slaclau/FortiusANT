@@ -77,7 +77,7 @@ jobs:
           GPG_KEY_ID=$(echo "${{ secrets.PPA_GPG_PRIVATE_KEY }}" | gpg --import-options show-only --import | sed -n '2s/^\s*//p')
           echo $GPG_KEY_ID
           echo "${{ secrets.PPA_GPG_PRIVATE_KEY }}" | gpg --batch --import
-          buildSource.sh
+          ./buildSource.sh
       - name: Publish focal package
         run: |
           sudo apt install dput
