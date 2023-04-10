@@ -2,7 +2,7 @@
 [![Build snap](https://github.com/slaclau/FortiusANT/actions/workflows/build-snap.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/build-snap.yaml)
 ![Upstream version](https://img.shields.io/github/v/tag/slaclau/FortiusANT?label=Upstream%20version)
 ![Ubuntu package version](https://img.shields.io/github/v/release/slaclau/FortiusANT?label=Ubuntu%20Package)
-![Snap version](https://badgen.net//snapcraft/v/joplin-desktop/snapcraft/v/fortius-ant)
+![Snap version](https://badgen.net/snapcraft/v/joplin-desktop/snapcraft/v/fortius-ant)
 
 # FortiusANT
 FortiusANT enables a pre-smart Tacx trainer (usb- or ANT-connected) to communicate with TrainerRoad, Rouvy or Zwift through ANT.
