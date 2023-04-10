@@ -1,0 +1,11 @@
+-f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-20.04/
+bless
+lib_programname
+numpy != 1.19.4
+pyinstaller
+pyusb
+requests
+service_identity
+wheel
+dbus_next
+wxPython
