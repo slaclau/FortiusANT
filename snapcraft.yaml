@@ -16,7 +16,7 @@ build-packages:
   - libwebkit2gtk-4.0-dev
   - libjavascriptcoregtk-4.0-dev
   - libegl-dev
-
+  - python3-setuptools
 apps:
   fortius-ant:
     command: bin/fortius-ant
@@ -30,7 +30,6 @@ parts:
       snapcraftctl pull
       snapcraftctl set-version $(python3 setup.py version)
     stage-packages:
-      - python3-setuptools
       - libasound2
       - libasyncns0
       - libatk-bridge2.0-0
