@@ -79,22 +79,13 @@ jobs:
           mv ../*tar.gz ../debuild/
           tar xf ../debuild/*tar.gz
       - name: Publish focal package
-        uses: yuezk/publish-ppa-package@main
-        with:
-          repository: 'ppa:slaclau/ppa'
-          gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
-          gpg_passphrase: ""
-          pkgdir: '../debuild/fortius-ant_*/'
-          series: 'focal'
+      - name: Publish jammy package
+        run: |
+          dput ppa:slaclau/ppa fortius_ant*source.changes
         if: matrix.os == 'ubuntu-20.04'
       - name: Publish jammy package
-        uses: yuezk/publish-ppa-package@main
-        with:
-          repository: 'ppa:slaclau/ppa'
-          gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
-          gpg_passphrase: ""
-          pkgdir: '../debuild/fortius-ant_*/'
-          series: 'jammy'
+        run: |
+          dput ppa:slaclau/ppa fortius_ant*source.changes
         if: matrix.os == 'ubuntu-22.04'
 permissions:
   contents: write
