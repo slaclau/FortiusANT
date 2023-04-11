@@ -13,4 +13,6 @@ ubuntu_tag = subprocess.check_output(["git", "describe", "--tags", "--always", "
 
 for line in fileinput.input("debian/changelog", inplace = True):
     print(line.replace(") replaceme", "~" + codename + ") " + codename), end = "")
+
+for line in fileinput.input("debian/changelog", inplace = True):
     print(line.replace(") ubuntutag", ubuntu_version), end = "")
