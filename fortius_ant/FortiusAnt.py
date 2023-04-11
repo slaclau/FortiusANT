@@ -1089,7 +1089,8 @@ def mainProgram():
         settings.OpenDialog(None, None, clv)
     elif clv.VersionOnly:
         import fortius_ant
-        print(fortius_ant.__version__)
+        print(f"This is FortiusAnt version {fortius_ant.__shortversion__}")
+        print(f"The full version is {fortius_ant.__version__}")
     elif not clv.gui:
         # --------------------------------------------------------------------------
         # Console only, no multiprocessing required to separate GUI
