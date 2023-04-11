@@ -1087,6 +1087,9 @@ def mainProgram():
         app = wx.App(0)
 
         settings.OpenDialog(None, None, clv)
+    elif clv.VersionOnly:
+        import fortius_ant
+        print(fortius_ant.__version__)
     elif not clv.gui:
         # --------------------------------------------------------------------------
         # Console only, no multiprocessing required to separate GUI
