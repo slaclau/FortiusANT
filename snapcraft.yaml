@@ -30,7 +30,7 @@ parts:
     override-pull: |
       snapcraftctl pull
       snapcraftctl set-version "$(git describe --tags --always --long --match [[:digit:]]* --exclude *ubuntu*)"
-      echo "__version__ = $(git describe --tags --always --long --match [[:digit:]]* --exclude *ubuntu*)" >> fortius_ant/_snapversion.py
+      echo "__version__ = "$(git describe --tags --always --long --match [[:digit:]]* --exclude *ubuntu*)"" >> fortius_ant/_snapversion.py
       ls fortius_ant
       cat fortius_ant/_snapversion.py
     stage-packages:
