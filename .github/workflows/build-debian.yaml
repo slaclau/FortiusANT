@@ -48,10 +48,8 @@ jobs:
           sudo apt install libgstreamer-plugins-base1.0-0 libnotify4 libsdl2-2.0-0 libwebkit2gtk-4.0-dev libjavascriptcoregtk-4.0-dev libegl-dev
       - name: Build package
         run: |
-          dpkg-buildpackage -us -uc
+          dpkg-buildpackage -us -uc -b
           mv ../fortius-ant*.deb .
-          mv ../fortius-ant*.dsc .
-          mv ../fortius-ant*.changes .
       - name: Install package
         run: |
           sudo apt install ./fortius-ant*.deb
@@ -61,5 +59,3 @@ jobs:
           name: ${{ matrix.os }}
           path: |
             fortius-ant*.deb
-            fortius-ant*.dsc
-            fortius-ant*.changes
