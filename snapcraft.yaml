@@ -6,7 +6,7 @@ confinement: devmode
 base: core20
 architectures:
   - build-on: [amd64]
-adopt-info: local
+adopt-info: fortius-ant
 build-packages:
   - libffi-dev
   - libgstreamer-plugins-base1.0-0
@@ -23,19 +23,14 @@ apps:
       - raw-usb
 
 parts:
-  local:
-    plugin: nil
-    source: .
-    override-pull: |
-      snapcraftctl pull
-      git fetch --all --tags
-      snapcraftctl set-version "$(git describe --tags --always --long --match f"[[:digit:]]*" --exclude *ubuntu*)"
-      echo "__version = $(git describe --tags --always --long --match f"[[:digit:]]*" --exclude *ubuntu*)" >> fortius_ant/snapversion.py
-
   fortius-ant:
     plugin: python
     requirements: [snap-requirements.txt]
     source: https://github.com/slaclau/FortiusANT.git
+    override-pull: |
+      snapcraftctl pull
+      snapcraftctl set-version "$(git describe --tags --always --long --match f"[[:digit:]]*" --exclude *ubuntu*)"
+      echo "__version = $(git describe --tags --always --long --match f"[[:digit:]]*" --exclude *ubuntu*)" >> fortius_ant/snapversion.py
     stage-packages:
       - libusb-1.0-0
       - libasound2
