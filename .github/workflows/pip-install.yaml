@@ -1,0 +1,50 @@
+name: "Test pip install"
+
+on: 
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "*"
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-20.04]
+        
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Add dh-virtualenv repository if needed
+        if: matrix.os == 'ubuntu-20.04'
+        run: |
+          sudo add-apt-repository ppa:jyrki-pulliainen/dh-virtualenv
+          sudo apt update
+      - name: Install build dependencies
+        run: |
+          sudo apt install debhelper dh-virtualenv
+      - name: Check system python version
+        run: |
+          echo "useSystemPython=$(python3 useSystemPython.py)" >> $GITHUB_ENV
+          echo "${{env.useSystemPython}}"
+      - name: Install system python packages
+        if: ${{ env.useSystemPython == 'yes' }}
+        run: |
+          sudo apt install python3 python3-dev python3-distutils python3-venv
+      - name: Install python3.9 packages
+        if: ${{ env.useSystemPython != 'yes' }}
+        run: |
+          sudo add-apt-repository ppa:deadsnakes/ppa
+          sudo apt update
+          sudo apt install python3.9 python3.9-dev python3.9-distutils python3.9-venv
+      - name: Install needed libraries
+        run: |
+          sudo apt install libgstreamer-plugins-base1.0-0 libnotify4 libsdl2-2.0-0 libwebkit2gtk-4.0-dev libjavascriptcoregtk-4.0-dev libegl-dev
+      - name: Pip install
+        run: pip3 install .
