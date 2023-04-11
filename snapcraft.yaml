@@ -26,9 +26,9 @@ parts:
   local:
     plugin: nil
     source: .
+%      snapcraftctl set-version "$(git describe --tags --always --long --match f"[[:digit:]]* --exclude *ubuntu*)"
     override-pull: |
       snapcraftctl pull
-%      snapcraftctl set-version "$(git describe --tags --always --long --match f"[[:digit:]]* --exclude *ubuntu*)"
       sh ./set-snapversion.sh
   fortius-ant:
     plugin: python
