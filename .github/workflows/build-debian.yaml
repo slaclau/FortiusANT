@@ -2,7 +2,7 @@ name: "Build debian packages"
 
 on: 
   push:
-    branch:
+    branches:
       - "**"
     tags-ignore:
       - "*"
