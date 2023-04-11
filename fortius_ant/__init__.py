@@ -31,4 +31,4 @@ __all__ = [
 
 from . import _version
 __version__ = _version.get_versions()['version']
-__shortversion__ = _version.get_versions()['version'].strip("+")[0]
+__shortversion__ = _version.get_versions()['version'].split("+")[0]
