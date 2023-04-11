@@ -49,6 +49,7 @@ jobs:
       - name: Build package
         run: |
           python3 updateChangelog.py
+          cat fortius_ant/_debversion.py
           dpkg-buildpackage -us -uc -b
           mv ../fortius-ant*.deb .
       - name: Install package
