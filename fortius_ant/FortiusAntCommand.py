@@ -1,7 +1,8 @@
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-__version__ = "2023-03-15"
+__version__ = "2023-04-11"
+# 2023-04-11    --version added
 # 2023-03-15    Typo in message corrected
 # 2022-08-10    Steering merged from marcoveeneman and switchable's code
 # 2022-03-03    #366 -bb added
@@ -183,7 +184,7 @@ class CommandLineVariables(object):
     # Launch in settings editor mode
     # ---------------------------------------------------------------------------
     SettingsOnly = False  # introduced 2023-02-05; allow program to be launched as settings editor only
-
+    VersionOnly = False  # introduced 2023-04-11; print version and exit
     # ---------------------------------------------------------------------------
     # Define and process command line
     # ---------------------------------------------------------------------------
@@ -500,6 +501,9 @@ class CommandLineVariables(object):
         )
         parser.add_argument(
             "--settings", dest="SettingsOnly", required=False, action="store_true"
+        )
+        parser.add_argument(
+            "--version", dest="VersionOnly", required=False, action="store_true"
         )
         # -----------------------------------------------------------------------
         # Parse command line
@@ -1086,6 +1090,7 @@ class CommandLineVariables(object):
             self.PedalStrokeAnalysis = False
 
         self.SettingsOnly = self.args.SettingsOnly
+        self.VersionOnly = self.args.VersionOnly
 
     def print(self):
         try:
