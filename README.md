@@ -1,6 +1,6 @@
 | Target | Version |
 | ------ | ------- |
-| Source code | ![Upstream version](https://img.shields.io/github/v/tag/slaclau/FortiusANT?label=Upstream%20version)
+| [![Test pip install](https://github.com/slaclau/FortiusANT/actions/workflows/pip-install.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/pip-install.yaml) | ![Upstream version](https://img.shields.io/github/v/tag/slaclau/FortiusANT?label=Upstream%20version)
 | [![Build debian packages](https://github.com/slaclau/FortiusANT/actions/workflows/build-debian.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/build-debian.yaml)
 | [![Build snap for edge](https://github.com/slaclau/FortiusANT/actions/workflows/build-snap.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/build-snap.yaml) | ![Snap version](https://badgen.net/snapcraft/v/fortius-ant) |
 | [![Build snap for stable](https://github.com/slaclau/FortiusANT/actions/workflows/release-snap.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/release-snap.yaml) | ![Snap version](https://badgen.net/snapcraft/v/fortius-ant/amd64/stable) |
