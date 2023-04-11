@@ -31,7 +31,7 @@ parts:
       snapcraftctl pull
       snapcraftctl set-version "$(python3 setup.py --version)"
     stage-packages:
-      - libusb
+      - libusb-1.0-0
       - libasound2
       - libasyncns0
       - libatk-bridge2.0-0
