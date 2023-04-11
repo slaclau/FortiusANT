@@ -2,7 +2,10 @@ name: Build snap
 
 on:
   push:
-    tags-ignore: "*"
+    branch:
+      - "**"
+    tags-ignore:
+      - "*"
   workflow_call:
 
 jobs:
