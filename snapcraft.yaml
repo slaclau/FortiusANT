@@ -30,7 +30,8 @@ parts:
     override-pull: |
       snapcraftctl pull
       snapcraftctl set-version "$(git describe --tags --always --long --match f"[[:digit:]]*" --exclude *ubuntu*)"
-      echo "__version = $(git describe --tags --always --long --match f"[[:digit:]]*" --exclude *ubuntu*)" >> fortius_ant/snapversion.py
+      git describe
+      echo "__version__ = $(git describe --tags --always --long --match f"[[:digit:]]*" --exclude *ubuntu*)" >> fortius_ant/snapversion.py
     stage-packages:
       - libusb-1.0-0
       - libasound2
