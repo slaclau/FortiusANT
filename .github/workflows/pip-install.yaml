@@ -40,3 +40,5 @@ jobs:
           sudo apt install libgstreamer-plugins-base1.0-0 libnotify4 libsdl2-2.0-0 libwebkit2gtk-4.0-dev libjavascriptcoregtk-4.0-dev libegl-dev
       - name: Pip install
         run: pip3 install .
+      - name: Get version
+        run: fortius-ant --version
