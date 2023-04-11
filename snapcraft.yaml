@@ -31,7 +31,8 @@ parts:
       snapcraftctl pull
       snapcraftctl set-version "$(git describe --tags --always --long --match [[:digit:]]* --exclude *ubuntu*)"
       echo "__version__ = $(git describe --tags --always --long --match [[:digit:]]* --exclude *ubuntu*)" >> fortius_ant/_snapversion.py
-      ls
+      ls fortius_ant
+      cat fortius_ant/_snapversion.py
     stage-packages:
       - libusb-1.0-0
       - libasound2
