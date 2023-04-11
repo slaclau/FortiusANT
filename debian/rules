@@ -4,7 +4,6 @@
 	dh $@ --with python-virtualenv
 
 override_dh_gencontrol:
-	python3 updateChangelog.py
 	dh_gencontrol	
 
 SYSPY := $(shell python3 useSystemPython.py)
