@@ -25,3 +25,5 @@ debian/files
 wxPython-source.txt
 sphinx/source/generated/
 flake8heavened
+fortius_ant/_debversion.py
+fortius_ant/_snapversion.py
