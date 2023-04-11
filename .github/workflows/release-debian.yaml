@@ -1,20 +1,23 @@
-name: "Build debian packages"
+name: "Release debian packages"
 
-on: 
+on:
   push:
-  workflow_call:
+    tags:
+      - "*.*-*ubuntu*"
 
 jobs:
-  build:
+  release:
     runs-on: ${{ matrix.os }}
     
     strategy:
       matrix:
         os: [ubuntu-22.04, ubuntu-20.04]
-        
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Add dh-virtualenv repository if needed
         if: matrix.os == 'ubuntu-20.04'
         run: |
@@ -40,12 +43,14 @@ jobs:
       - name: Install needed libraries
         run: |
           sudo apt install libgstreamer-plugins-base1.0-0 libnotify4 libsdl2-2.0-0 libwebkit2gtk-4.0-dev libjavascriptcoregtk-4.0-dev libegl-dev
-      - name: Build package
+      - name: Build and sign source and binary
         run: |
-          dpkg-buildpackage -us -uc
+          GPG_KEY_ID=$(echo "${{ secrets.PPA_GPG_PRIVATE_KEY }}" | gpg --import-options show-only --import | sed -n '2s/^\s*//p')
+          echo $GPG_KEY_ID
+          echo "${{ secrets.PPA_GPG_PRIVATE_KEY }}" | gpg --batch --import
+          ./buildSource.sh
+          dpkg-buildpackage -b
           mv ../fortius-ant*.deb .
-          mv ../fortius-ant*.dsc .
-          mv ../fortius-ant*.changes .
       - name: Install package
         run: |
           sudo apt install ./fortius-ant*.deb
@@ -55,5 +60,27 @@ jobs:
           name: ${{ matrix.os }}
           path: |
             fortius-ant*.deb
-            fortius-ant*.dsc
-            fortius-ant*.changes
+      - name: Get package
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ matrix.os }}
+          path: ${{ matrix.os }}
+      - name: tar package
+        run: |
+          tar cf ${{ matrix.os }}.tar ${{ matrix.os }}
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ matrix.os }}.tar
+      - name: Publish focal package
+        run: |
+          sudo apt install dput
+          dput ppa:slaclau/ppa ../fortius-ant*source.changes
+        if: matrix.os == 'ubuntu-20.04'
+      - name: Publish jammy package
+        run: |
+          sudo apt install dput
+          dput ppa:slaclau/ppa ../fortius-ant*source.changes
+        if: matrix.os == 'ubuntu-22.04'
+permissions:
+  contents: write

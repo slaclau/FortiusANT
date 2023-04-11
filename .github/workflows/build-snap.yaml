@@ -1,0 +1,39 @@
+name: Build snap
+
+on:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "*"
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Build snap
+        uses: snapcore/action-build@v1
+        id: build
+      - name: Install snap
+        run: |
+          sudo snap install --devmode ${{ steps.build.outputs.snap }}
+      - name: Test snap
+        run: |
+          timeout 10 fortius-ant -a -s
+      - name: Upload snap
+        uses: actions/upload-artifact@v3
+        with:
+          name: snap
+          path: ${{ steps.build.outputs.snap }}
+      - name: Publish snap
+        uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+        with:
+          snap: ${{ steps.build.outputs.snap }}
+          release: edge
