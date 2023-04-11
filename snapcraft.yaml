@@ -26,7 +26,6 @@ parts:
   local:
     plugin: nil
     source: .
-%      snapcraftctl set-version "$(git describe --tags --always --long --match f"[[:digit:]]* --exclude *ubuntu*)"
     override-pull: |
       snapcraftctl pull
       sh ./set-snapversion.sh
