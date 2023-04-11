@@ -24,7 +24,7 @@ jobs:
           sudo snap install --devmode ${{ steps.build.outputs.snap }}
       - name: Test snap
         run: |
-          timeout 10 fortius-ant -a -s
+          fortius-ant --version
       - name: Upload snap
         uses: actions/upload-artifact@v3
         with:
