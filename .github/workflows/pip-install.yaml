@@ -65,7 +65,7 @@ jobs:
           cat deptry.md >> $GITHUB_STEP_SUMMARY
       - name: Upload report
         if: always()
-                uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3
         with:
           name: json
           path: |
