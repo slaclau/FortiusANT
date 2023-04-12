@@ -32,7 +32,8 @@ parts:
       echo "__version__ = \"$(git describe --tags --always --long --match [[:digit:]]* --exclude *ubuntu*)\"" >> fortius_ant/_snapversion.py
       ls fortius_ant
       cat fortius_ant/_snapversion.py
-
+    stage: 
+      - fortius_ant/_snapversion.py
   fortius-ant:
     plugin: python
     requirements: [snap-requirements.txt]
