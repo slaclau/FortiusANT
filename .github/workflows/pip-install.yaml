@@ -47,7 +47,9 @@ jobs:
         run: |
           sudo apt install libgstreamer-plugins-base1.0-0 libnotify4 libsdl2-2.0-0 libwebkit2gtk-4.0-dev libjavascriptcoregtk-4.0-dev libegl-dev
       - name: Get version
-        run: fortius-ant --version
+        run: |
+          fortius-ant --version
+          explorant --version
       - name: Check dependencies
         run: |
           source venv/bin/activate
