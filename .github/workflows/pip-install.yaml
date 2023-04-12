@@ -57,6 +57,12 @@ jobs:
           pip install .
           fortius-ant --version
           deptry fortius_ant --json-output deptry.json
+      - name: Convert report
+        if: always()
+        run: |
+          pip install jsonschema2md
+          jsonschema2md deptry.json deptry.md
+          cat deptry.md >> $GITHUB_STEP_SUMMARY
       - name: Upload report
         if: always()
                 uses: actions/upload-artifact@v3
