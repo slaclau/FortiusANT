@@ -56,4 +56,11 @@ jobs:
           pip install -r requirements.txt
           pip install .
           fortius-ant --version
-          deptry fortius_ant
+          deptry fortius_ant --json-output deptry.json
+      - name: Upload report
+        if: always()
+                uses: actions/upload-artifact@v3
+        with:
+          name: json
+          path: |
+            deptry.json
