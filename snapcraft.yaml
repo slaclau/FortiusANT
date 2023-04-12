@@ -24,7 +24,7 @@ apps:
 
 parts:
   local:
-    plugin: nil
+    plugin: dump
     source: .
     override-pull: |
       snapcraftctl pull
