@@ -32,6 +32,7 @@ jobs:
           python3 wxPython-source.py
           python3 -m pip install -r requirements.txt
           python3 -m pip install .
+          python3 -m venv venv
       - name: Install python3.9 packages
         if: ${{ env.useSystemPython != 'yes' }}
         run: |
@@ -41,10 +42,16 @@ jobs:
           python3.9 wxPython-source.py
           python3.9 -m pip install -r requirements.txt
           python3.9 -m pip install .
+          python3.9 -m venv venv
       - name: Install needed libraries
         run: |
           sudo apt install libgstreamer-plugins-base1.0-0 libnotify4 libsdl2-2.0-0 libwebkit2gtk-4.0-dev libjavascriptcoregtk-4.0-dev libegl-dev
       - name: Get version
         run: fortius-ant --version
       - name: Check dependencies
-        run: deptry .
+        run: |
+          source venv/bin/activate
+          pip install -r requirements.txt
+          pip install .
+          fortius-ant --version
+          deptry .
