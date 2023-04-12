@@ -105,6 +105,7 @@ class CommandLineVariables(object):
         # -----------------------------------------------------------------------
         self.autostart = args.autostart
         self.SimulateTrainer = args.simulate
+        self.version = args.version
 
         # -----------------------------------------------------------------------
         # Get debug-flags, used in debug module
