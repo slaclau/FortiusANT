@@ -88,6 +88,14 @@ class CommandLineVariables(object):
             required=False,
             default=False,
         )
+        parser.add_argument(
+            "-v",
+            "--version",
+            help="Get version",
+            required=False,
+            default=False,
+            action="store_true",
+        )
         args = parser.parse_args()
         self.args = args
 
