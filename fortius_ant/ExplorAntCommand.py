@@ -1,7 +1,8 @@
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-__version__ = "2020-05-01"
+__version__ = "2023-04-12"
+# 2023-04-12    Added version argument
 # 2020-05-01    Added: vhu, no command line variable defined
 # 2020-04-23    Create() and Get() removed because it is weard
 # 2020-04-20    Added: -S -V
@@ -88,6 +89,14 @@ class CommandLineVariables(object):
             required=False,
             default=False,
         )
+        parser.add_argument(
+            "-v",
+            "--version",
+            help="Get version",
+            required=False,
+            default=False,
+            action="store_true",
+        )
         args = parser.parse_args()
         self.args = args
 
@@ -96,6 +105,7 @@ class CommandLineVariables(object):
         # -----------------------------------------------------------------------
         self.autostart = args.autostart
         self.SimulateTrainer = args.simulate
+        self.version = args.version
 
         # -----------------------------------------------------------------------
         # Get debug-flags, used in debug module

@@ -1091,7 +1091,8 @@ def mainProgram():
         import fortius_ant
         print(f"This is FortiusAnt version {fortius_ant.__shortversion__}")
         print(f"The full version is {fortius_ant.__version__}")
-        print(f"This copy was distributed as a {fortius_ant.__packagetype__}, the package version is {fortius_ant.__packageversion__}")
+        if fortius_ant.__packagetype__ != "":
+            print(f"This copy was distributed as a {fortius_ant.__packagetype__}, the package version is {fortius_ant.__packageversion__}")
     elif not clv.gui:
         # --------------------------------------------------------------------------
         # Console only, no multiprocessing required to separate GUI
