@@ -79,7 +79,8 @@ def main():
     debug.activate(clv.debug)
 
     if clv.version:
-        print(f"This is the ExplorAnt version packaged with FortiusAnt version {fortius_ant.__shortversion__}")
+        import fortius_ant
+        print(f"This is ExplorAnt version __version__ packaged with FortiusAnt version {fortius_ant.__shortversion__}")
         print(f"The full version is {fortius_ant.__version__}")
         print(f"This copy was distributed as a {fortius_ant.__packagetype__}, the package version is {fortius_ant.__packageversion__}")
 
