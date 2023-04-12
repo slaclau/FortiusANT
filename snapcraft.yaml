@@ -35,7 +35,8 @@ parts:
     stage: 
       - fortius_ant/_snapversion.py
   fortius-ant:
-    after: local
+    after:
+      - local
     plugin: python
     requirements: [snap-requirements.txt]
     source: https://github.com/slaclau/FortiusANT.git
