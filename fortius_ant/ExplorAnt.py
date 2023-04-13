@@ -1,7 +1,8 @@
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-__version__ = "2022-08-22"
+__version__ = "2023-04-12"
+# 2023-04-12    Added version argument
 # 2022-08-22    AntDongle stores received messages in a queue.
 # 2020-05-07    clsAntDongle encapsulates all functions
 #               and implements dongle recovery
@@ -76,6 +77,14 @@ def main():
     debug.deactivate()
     clv = cmd.CommandLineVariables()
     debug.activate(clv.debug)
+
+    if clv.version:
+        import fortius_ant
+        print(f"This is ExplorAnt version {__version__} packaged with FortiusAnt version {fortius_ant.__shortversion__}")
+        print(f"The full version is {fortius_ant.__version__}")
+        if fortius_ant.__packagetype__ != "":
+            print(f"This copy was distributed as a {fortius_ant.__packagetype__}, the package version is {fortius_ant.__packageversion__}")
+
     
     if True or debug.on(debug.Any):
         logfile.Open("ExplorANT")

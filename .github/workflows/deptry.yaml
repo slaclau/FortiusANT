@@ -1,4 +1,4 @@
-name: "Test pip install"
+name: "deptry"
 
 on: 
   push:
@@ -10,11 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    
-    strategy:
-      matrix:
-        os: [ubuntu-22.04, ubuntu-20.04]
+    runs-on: ubuntu-latest
         
     steps:
       - name: Checkout
@@ -32,6 +28,7 @@ jobs:
           python3 wxPython-source.py
           python3 -m pip install -r requirements.txt
           python3 -m pip install .
+          python3 -m venv venv
       - name: Install python3.9 packages
         if: ${{ env.useSystemPython != 'yes' }}
         run: |
@@ -39,12 +36,26 @@ jobs:
           sudo apt update
           sudo apt install python3.9 python3.9-dev python3.9-distutils python3.9-venv
           python3.9 wxPython-source.py
-          python3.9 -m pip install -r requirements.txt
-          python3.9 -m pip install .
-      - name: Install needed libraries
+          python3.9 -m venv venv
+      - name: Check pip install
         run: |
-          sudo apt install libgstreamer-plugins-base1.0-0 libnotify4 libsdl2-2.0-0 libwebkit2gtk-4.0-dev libjavascriptcoregtk-4.0-dev libegl-dev
-      - name: Get version
+          source venv/bin/activate
+          pip install -r requirements.txt
+          pip install .
+      - name: Check dependencies
         run: |
-          fortius-ant --version
-          explorant --version
+          pip install deptry
+          deptry fortius_ant --json-output deptry.json
+      - name: Convert report
+        if: always()
+        run: |
+          python scripts/deptry2md.py deptry.json "deptry report" >> deptry.md
+          cat deptry.md >> $GITHUB_STEP_SUMMARY
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: deptry
+          path: |
+            deptry.json
+            deptry.md
