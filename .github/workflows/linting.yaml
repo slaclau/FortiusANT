@@ -28,7 +28,9 @@ jobs:
         run: |
           echo "# black report" >> black.md
           echo "These files have not been formatted" >> black.md
+          echo "```" >> black.md
           black --check fortius_ant &>> black.md
+          echo "```" >> black.md
       - name: Convert reports
         if: always()
         run: |
