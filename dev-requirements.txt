@@ -5,6 +5,7 @@ black
 darglint
 mypy
 flake8-pylint
+flake8-pyproject
 docformatter
 sphinx
 sphinx_rtd_theme
