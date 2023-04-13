@@ -16,7 +16,10 @@ with open(sys.argv[1]) as f:
             count = 0
             for line in data[i]:
                 count += 1
-                print(f'{line["code"]} :{line["line_number"]}:{line["column_number"]}: {line["text"]} [```{line["physical_line"].strip()}```]')
+                print(f'{line["code"]} :{line["line_number"]}:{line["column_number"]}: {line["text"]}")
+                print("python```")
+                print(line["physical_line"].strip())
+                print("```")
                 if count > 100:
                     print(f"Truncated at {count} errors")
                     break
