@@ -12,6 +12,6 @@ with open(sys.argv[1]) as f:
             count = 0
             for line in data[i]:
                 count += 1
-                print(f"{line["code"]}")
+                print(line["code"])
                 if count > 100:
                     break
