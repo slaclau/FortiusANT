@@ -21,24 +21,25 @@ __version__ = "2023-04-12"
 # -------------------------------------------------------------------------------
 import argparse
 import binascii
+import glob
 import math
-import numpy
 import os
 import pickle
-import platform, glob
+import platform
 import random
-import sys
 import struct
+import sys
 import threading
 import time
+from datetime import datetime
+
+import numpy
 import usb.core
 import wx
 
-from datetime import datetime
-
 import fortius_ant.antDongle as ant
-import fortius_ant.antHRM as hrm
 import fortius_ant.antFE as fe
+import fortius_ant.antHRM as hrm
 import fortius_ant.debug as debug
 import fortius_ant.ExplorAntCommand as cmd
 import fortius_ant.logfile as logfile

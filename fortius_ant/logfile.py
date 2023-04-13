@@ -29,11 +29,11 @@ import json
 import os
 import sys
 import time
-from datetime import datetime
 import traceback
+from datetime import datetime
 
-from fortius_ant.constants import UsePythonLogging
 import fortius_ant.debug as debug
+from fortius_ant.constants import UsePythonLogging
 
 global LogfileCreated
 LogfileCreated = False

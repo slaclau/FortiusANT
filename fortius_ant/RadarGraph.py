@@ -14,7 +14,9 @@ __version__ = "2021-02-21"
 import math
 import random
 import time
+
 import wx
+
 import fortius_ant.logfile as logfile
 
 

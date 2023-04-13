@@ -7,12 +7,13 @@ __version__ = "2022-08-22"
 # 2021-11-14    Initial version, switchable
 # -------------------------------------------------------------------------------
 
+import statistics
+import time
 from abc import ABC
+
 import fortius_ant.antDongle as ant
 import fortius_ant.debug as debug
 import fortius_ant.logfile as logfile
-import statistics
-import time
 
 
 # -------------------------------------------------------------------------------

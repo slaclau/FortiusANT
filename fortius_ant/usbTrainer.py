@@ -149,23 +149,24 @@ __version__ = "2023-04-06"
 # 2019-12-25    Target grade implemented; modes defined
 # -------------------------------------------------------------------------------
 import array
-import lib_programname
-from enum import Enum
-import usb.core
 import os
 import random
 import struct
 import sys
 import time
+from enum import Enum
+
+import lib_programname
+import usb.core
 
 import fortius_ant.antDongle as ant
-from fortius_ant.constants import mode_Power, mode_Grade
 import fortius_ant.constants as constants
 import fortius_ant.debug as debug
-import fortius_ant.logfile as logfile
-import fortius_ant.structConstants as sc
 import fortius_ant.FortiusAntCommand as cmd
 import fortius_ant.fxload as fxload
+import fortius_ant.logfile as logfile
+import fortius_ant.structConstants as sc
+from fortius_ant.constants import mode_Grade, mode_Power
 
 # -------------------------------------------------------------------------------
 # Constants

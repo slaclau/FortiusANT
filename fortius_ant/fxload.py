@@ -2,10 +2,11 @@
 
 # pip3 install pyusb
 
+import optparse
+import time
+
 import usb.core
 import usb.util
-import time
-import optparse
 
 # Some words about the variants of TACX head units and brakes:
 #

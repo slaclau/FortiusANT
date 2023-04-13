@@ -7,6 +7,7 @@ __version__ = "2020-12-27"
 # 2020-06-09    First version, based upon antHRM.py
 # -------------------------------------------------------------------------------
 import time
+
 import fortius_ant.antDongle as ant
 import fortius_ant.logfile as logfile
 

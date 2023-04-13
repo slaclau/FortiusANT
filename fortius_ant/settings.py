@@ -27,15 +27,18 @@ __version__ = "2022-08-10"
 # 2021-01-06    First version
 # -------------------------------------------------------------------------------
 import json
-import lib_programname
 import os
 import sys
+
+import lib_programname
+
 import fortius_ant.constants as constants
 import fortius_ant.debug as debug
 import fortius_ant.logfile as logfile
 
 if constants.UseGui:
     import webbrowser
+
     import wx
 
 # -------------------------------------------------------------------------------

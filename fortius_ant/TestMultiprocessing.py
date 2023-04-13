@@ -1,6 +1,6 @@
-from multiprocessing import Process, Queue, Pipe
 import os
 import time
+from multiprocessing import Pipe, Process, Queue
 
 import fortius_ant.debug as debug
 import fortius_ant.logfile as logfile

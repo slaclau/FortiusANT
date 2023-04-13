@@ -2,6 +2,15 @@
 # Version info
 # ---------------------------------------------------------------------------
 __version__ = "2022-12-28"
+import os
+import sys
+import time
+
+import lib_programname
+
+import fortius_ant.debug as debug
+import fortius_ant.logfile as logfile
+
 # 2022-12-28    Issue#404, incorrect usages of() corrected. See 2022-03-24.
 # 2022-08-10    Steering merged from marcoveeneman and switchable's code
 # 2022-03-24    logfile.fLogfile must be checked before usage
@@ -14,19 +23,13 @@ __version__ = "2022-12-28"
 #               https://github.com/WouterJD/FortiusANT/issues/103#issuecomment-753359525
 # 2020-12-18    First version, obtained from @MarcoVeeneman
 # ---------------------------------------------------------------------------
-from fortius_ant.constants import mode_Power, mode_Grade, UseBluetooth
-
-import fortius_ant.debug as debug
-import lib_programname
-import fortius_ant.logfile as logfile
-import os
-import sys
-import time
+from fortius_ant.constants import UseBluetooth, mode_Grade, mode_Power
 
 if UseBluetooth:
     import json
     import requests
     import subprocess
+
 import atexit
 
 import fortius_ant.FortiusAntCommand as cmd
