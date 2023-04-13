@@ -23,6 +23,7 @@ jobs:
           pip install flake8 flake8-json
           flake8 fortius_ant --format=json >> flake8.json
       - name: black
+        if: always()
         run: |
           pip install black
           black --check fortius_ant
