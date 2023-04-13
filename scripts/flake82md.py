@@ -7,6 +7,6 @@ with open(sys.argv[1]) as f:
         print(f"## {sys.argv[2]}")
     for i in data:
         if len(data[i]) > 0:
-            print(f"## {i.capitalize():")
+            print(f"## {i.capitalize()}:")
             for j in data[i]:
                 print(j)
