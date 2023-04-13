@@ -9,3 +9,7 @@ with open(sys.argv[1]) as f:
     print(f"{len(data)} files checked")
     for i in data:
         print(i)
+        print("| Occurrences | Message |")
+        print("| - | - |"
+        for line in i:
+        print(f"| {i[line]} | {i} |")
