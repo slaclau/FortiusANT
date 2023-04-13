@@ -1,12 +1,13 @@
 flake8
 flake8-json
 flake8-pydocstyle
+flake8-pylint
+flake8-pyproject
 isort
 black
 darglint
 mypy
-flake8-pylint
-flake8-pyproject
+mypy-json-reporter
 docformatter
 sphinx
 sphinx_rtd_theme
