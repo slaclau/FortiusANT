@@ -1,4 +1,5 @@
 flake8
+flake8-json
 flake8-pydocstyle
 isort
 black
