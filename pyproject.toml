@@ -14,7 +14,7 @@ max-doc-length = 88
 count = true
 docstring-convention = "numpy"
 require-plugins = [
-    "flake8-docstyle",
+    "flake8-pydocstyle",
     "flake8-pylint",
 ]
 extend-select = [
