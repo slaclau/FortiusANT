@@ -10,7 +10,7 @@ with open(sys.argv[1]) as f:
             ii = "misplaced development"
         else:
             ii = i
-        print(f"## {i.capitalize()} dependencies:")
+        print(f"## {ii.capitalize()} dependencies:")
         for j in data[i]:
             print(j)
     
