@@ -3,22 +3,33 @@
 %:
 	dh $@ --with python-virtualenv
 
-override_dh_gencontrol:
-	dh_gencontrol	
-
 SYSPY := $(shell python3 useSystemPython.py)
 ifdef SYSPY
+override_dh_build:
+	dh_build
+	python3 -m pip download \
+	--destination-directory pip_local \
+	-r requirements.txt
 override_dh_virtualenv:
 	python3 wxPython-source.py
 	dh_virtualenv \
 	--python python3 \
-	--builtin-venv
+	--builtin-venv \
+	--extra-pip-arg --no-index \
+	--extra-pip-arg --find-links=pip_local
 else
+override_dh_build:
+	dh_build
+	python3 -m pip download \
+	--destination-directory pip_local \
+	-r requirements.txt
 override_dh_virtualenv:
 	python3 wxPython-source.py
 	dh_virtualenv \
 	--python python3.9 \
-	--builtin-venv
+	--builtin-venv \
+	--extra-pip-arg --no-index \
+	--extra-pip-arg --find-links=pip_local
 endif
 
 override_dh_strip:
