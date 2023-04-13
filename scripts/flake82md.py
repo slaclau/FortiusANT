@@ -20,15 +20,17 @@ with open(sys.argv[1]) as f:
             codeCount = {}
             codeText = {}
             for line in data[i]:
-                codeCount[line['code']] = codeCount.get(line['code'], 0) + 1
-                codeText[line['code']] = line['text']
+                codeCount[line["code"]] = codeCount.get(line["code"], 0) + 1
+                codeText[line["code"]] = line["text"]
             for code in codes:
                 print(f"| {codeCount[code]} | {code} | {codeText[code]} |")
             print()
             count = 0
             for line in data[i]:
                 count += 1
-                print(f'{line["code"]} :{line["line_number"]}:{line["column_number"]}: {line["text"]}')
+                print(
+                    f'{line["code"]} :{line["line_number"]}:{line["column_number"]}: {line["text"]}'
+                )
                 print("```python")
                 print(line["physical_line"].strip())
                 print("```")

@@ -185,6 +185,7 @@ class CommandLineVariables(object):
     # ---------------------------------------------------------------------------
     SettingsOnly = False  # introduced 2023-02-05; allow program to be launched as settings editor only
     VersionOnly = False  # introduced 2023-04-11; print version and exit
+
     # ---------------------------------------------------------------------------
     # Define and process command line
     # ---------------------------------------------------------------------------

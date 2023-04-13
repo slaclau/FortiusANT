@@ -60,6 +60,7 @@ class clsDeviceID(object):
 # Main program; Command line parameters
 # ==============================================================================
 
+
 # -------------------------------------------------------------------------------
 # And go!
 # ------------------------------------------------------------------------------
@@ -80,28 +81,32 @@ def main():
 
     if clv.version:
         import fortius_ant
-        print(f"This is ExplorAnt version {__version__} packaged with FortiusAnt version {fortius_ant.__shortversion__}")
+
+        print(
+            f"This is ExplorAnt version {__version__} packaged with FortiusAnt version {fortius_ant.__shortversion__}"
+        )
         print(f"The full version is {fortius_ant.__version__}")
         if fortius_ant.__packagetype__ != "":
-            print(f"This copy was distributed as a {fortius_ant.__packagetype__}, the package version is {fortius_ant.__packageversion__}")
+            print(
+                f"This copy was distributed as a {fortius_ant.__packagetype__}, the package version is {fortius_ant.__packageversion__}"
+            )
 
-    
     if True or debug.on(debug.Any):
         logfile.Open("ExplorANT")
         logfile.Console("ExplorANT started")
-    
+
         s = " %17s = %s"
         logfile.Console(s % ("ExplorANT", __version__))
         logfile.Console(s % ("antDongle", ant.__version__))
-    
+
         clv.print()
         logfile.Console("--------------------")
-    
+
     # ------------------------------------------------------------------------------
     # First enumerate all dongles
     # ------------------------------------------------------------------------------
     ant.EnumerateAll()
-    
+
     # ------------------------------------------------------------------------------
     # Open dongle; either the defined one or default
     #
@@ -113,10 +118,10 @@ def main():
         p = clv.dongle  # Specified on command line
     else:
         p = None  # Take the default
-    
+
     AntDongle = ant.clsAntDongle(p)
     logfile.Console(AntDongle.Message)
-    
+
     if AntDongle.OK and not clv.SimulateTrainer:
         # ---------------------------------------------------------------------------
         # We are going to look what MASTER devices there are
@@ -129,7 +134,7 @@ def main():
         # Initialize dongle
         # ---------------------------------------------------------------------------
         AntDongle.Calibrate()  # calibrate ANT+ dongle
-    
+
         # ---------------------------------------------------------------------------
         # Create ANT+ slave channels for pairing to a master device (HRM, FE, ...)
         #
@@ -167,9 +172,9 @@ def main():
                     i, DeviceNumber, DeviceTypeID, TransmissionType
                 )
         print("")
-    
+
         deviceIDs = []
-    
+
         # --------------------------------------------------------------------------
         # Do pairing loop
         # --------------------------------------------------------------------------
@@ -185,7 +190,7 @@ def main():
             for i in range(0, NrDevicesToPair):
                 messages.append(ant.msg4D_RequestMessage(i, ant.msgID_ChannelID))
             AntDongle.Write(messages, False, False)
-    
+
             print("Wait for responses from channel what device is paired: ", end="")
             while RunningSwitch == True and pairingCounter > 0:
                 StartTime = time.time()
@@ -193,7 +198,7 @@ def main():
                 # Receive response from channels
                 # -------------------------------------------------------------------
                 AntDongle.Read(False)
-    
+
                 # -------------------------------------------------------------------
                 # Only handle ChannelID messages and ignore everyting else
                 #
@@ -213,19 +218,19 @@ def main():
                         Channel,
                         DataPageNumber,
                     ) = ant.DecomposeMessage(d)
-    
+
                     # ---------------------------------------------------------------
                     # ChannelResponse: acknowledge message
                     # ---------------------------------------------------------------
                     if id == ant.msgID_ChannelResponse:
                         Unknown = False
-    
+
                     # ---------------------------------------------------------------
                     # Message BroadcastData, provides a datapage from master
                     # ---------------------------------------------------------------
                     elif id == ant.msgID_BroadcastData:
                         Unknown = False
-    
+
                     # ---------------------------------------------------------------
                     # ChannelID - the info from a Master device on the network
                     # ---------------------------------------------------------------
@@ -237,7 +242,7 @@ def main():
                             DeviceTypeID,
                             TransmissionType,
                         ) = ant.unmsg51_ChannelID(info)
-    
+
                         # -----------------------------------------------------------
                         # Check what DeviceType is discovered
                         # -----------------------------------------------------------
@@ -245,30 +250,30 @@ def main():
                             DeviceType = "HRM"
                             if clv.hrm <= 0:
                                 clv.hrm = DeviceNumber
-    
+
                         elif DeviceTypeID == ant.DeviceTypeID_FE:
                             DeviceType = "FE"
                             if clv.fe <= 0:
                                 clv.fe = DeviceNumber
-    
+
                         elif DeviceTypeID == ant.DeviceTypeID_SCS:
                             if clv.scs <= 0:
                                 clv.scs = DeviceNumber
                             DeviceType = "SCS"
-    
+
                         elif DeviceTypeID == ant.DeviceTypeID_VTX:
                             if clv.vtx <= 0:
                                 clv.vtx = DeviceNumber
                             DeviceType = "VTX"
-    
+
                         elif DeviceTypeID == ant.DeviceTypeID_VHU:
                             if clv.vhu <= 0:
                                 clv.vhu = DeviceNumber
                             DeviceType = "VHU"
-    
+
                         else:
                             DeviceType = "?"
-    
+
                         # -----------------------------------------------------------
                         # Store in device table, so we print at the end of loop
                         # -----------------------------------------------------------
@@ -306,9 +311,9 @@ def main():
                             if not deviceID in deviceIDs:
                                 print("%s=%s" % (d.Channel, DeviceType), end=" ")
                                 logfile.Write("ExplorANT: added to list")
-    
+
                                 deviceIDs.append(deviceID)
-    
+
                                 # ---------------------------------------------------
                                 # Ask the found device for more info; page 70
                                 # ---------------------------------------------------
@@ -320,7 +325,7 @@ def main():
                             else:
                                 print("*", end=" ")
                                 logfile.Write("ExplorANT: already in list")
-    
+
                         deviceID = None
                     else:
                         logfile.Console(
@@ -328,29 +333,29 @@ def main():
                             % (hex(id), Channel, DataPageNumber)
                         )
                         pass
-    
+
                 # -------------------------------------------------------------------
                 # Show some movement on screen during pairing
                 # -------------------------------------------------------------------
                 print(".", end=" ")
                 sys.stdout.flush()
-    
+
                 # -------------------------------------------------------------------
                 # WAIT        So we do not cycle faster than 4 x per second
                 # -------------------------------------------------------------------
                 SleepTime = 0.25 - (time.time() - StartTime)
                 if SleepTime > 0:
                     time.sleep(SleepTime)
-    
+
                 pairingCounter -= 0.25  # Subtract quarter second
-    
+
         except KeyboardInterrupt:
             pass
         except Exception as e:
             logfile.Console("Pairing loop stopped due to exception: " + str(e))
         print("")
         logfile.Console("Pairing stopped")
-    
+
         # ---------------------------------------------------------------------------
         # Show what devices discovered
         # ---------------------------------------------------------------------------
@@ -366,7 +371,7 @@ def main():
                 )
             )
         logfile.Console("--------------------")
-    
+
         # ---------------------------------------------------------------------------
         # Free pairing channels
         # ---------------------------------------------------------------------------
@@ -376,7 +381,7 @@ def main():
             pass
         AntDongle.Write(messages)
         AntDongle.ResetDongle()  # This one does the job
-    
+
     while AntDongle.OK:
         # ---------------------------------------------------------------------------
         # If any channel specified and/or found: Open the device channels & listen.
@@ -397,7 +402,7 @@ def main():
             # Calibrate ANT+ dongle (because reset was done!)
             # ----------------------------------------------------------------------
             AntDongle.Calibrate()
-    
+
             # ----------------------------------------------------------------------
             # Open channels
             # ----------------------------------------------------------------------
@@ -406,7 +411,7 @@ def main():
                 # We are going to simulate MASTER devices
                 # -----------------------------------------------------------------------
                 logfile.Console("ExplorANT: We're simulating master ANT+ devices")
-    
+
                 if clv.hrm >= 0:
                     hrm.Initialize()
                     AntDongle.HRM_ChannelConfig()
@@ -414,7 +419,7 @@ def main():
                         "HRM master channel %s opened; device %s (act as an HRM)"
                         % (ant.channel_HRM, ant.DeviceNumber_HRM)
                     )
-    
+
                 if clv.fe >= 0:
                     fe.Initialize()
                     AntDongle.Trainer_ChannelConfig()
@@ -422,14 +427,14 @@ def main():
                         "FE  master channel %s opened; device %s (act as a Tacx Trainer)"
                         % (ant.channel_FE, ant.DeviceNumber_FE)
                     )
-    
+
                 if clv.vtx >= 0:
                     AntDongle.VTX_ChannelConfig()
                     logfile.Console(
                         "VTX master channel %s opened; device %s (act as a Tacx -Vortex)"
                         % (ant.channel_VTX, ant.DeviceNumber_VTX)
                     )
-    
+
             else:
                 if clv.hrm > 0:
                     AntDongle.SlaveHRM_ChannelConfig(clv.hrm)
@@ -437,35 +442,35 @@ def main():
                         "HRM slave channel %s opened; listening to master device %s"
                         % (ant.channel_HRM_s, clv.hrm)
                     )
-    
+
                 if clv.fe > 0:
                     AntDongle.SlaveTrainer_ChannelConfig(clv.fe)
                     logfile.Console(
                         "FE  slave channel %s opened; listening to master device %s"
                         % (ant.channel_FE_s, clv.fe)
                     )
-    
+
                 if clv.scs > 0:
                     AntDongle.SlaveSCS_ChannelConfig(clv.scs)
                     logfile.Console(
                         "SCS slave channel %s opened; listening to master device %s"
                         % (ant.channel_SCS_s, clv.scs)
                     )
-    
+
                 if clv.vtx > 0:
                     AntDongle.SlaveVTX_ChannelConfig(clv.vtx)
                     logfile.Console(
                         "VTX slave channel %s opened; listening to master device %s"
                         % (ant.channel_VTX_s, 0)
                     )
-    
+
                 if clv.vhu > 0:
                     AntDongle.SlaveVHU_ChannelConfig(clv.vhu)
                     logfile.Console(
                         "VHU slave channel %s opened; listening to master device %s"
                         % (ant.channel_VHU_s, 0)
                     )
-    
+
             # ----------------------------------------------------------------------
             # Get info from the devices
             # ----------------------------------------------------------------------
@@ -473,12 +478,12 @@ def main():
             try:
                 # if True:
                 RunningSwitch = True
-    
+
                 HRM_s_count = 0
                 HRM_HeartRate = -1
                 HRM_page2_done = False
                 HRM_page3_done = False
-    
+
                 FE_s_count = 0
                 FE_Power = -1
                 FE_Cadence = -1
@@ -486,9 +491,9 @@ def main():
                 FE_HeartRate = -1
                 FE_page80_done = False
                 FE_page81_done = False
-    
+
                 SCS_s_count = 0
-    
+
                 (
                     VTX_UsingVirtualSpeed,
                     VTX_Power,
@@ -506,27 +511,27 @@ def main():
                     True  # Can be used to test the Tacx Vortex setPower function
                 )
                 Power = -1
-    
+
                 listenCount = 0
-    
+
                 dpBasicResistance = 0  # Requests received from Trainer Road or Zwift
                 dpTargetPower = 0
                 dpTrackResistance = 0
                 dpUserConfiguration = 0
                 dpRequestDatapage = 0
-    
+
                 TargetPower = 100  # For SimulateTrainer
                 CurrentPower = 100
-    
+
                 EventCounter = 0
-    
+
                 while RunningSwitch == True and not AntDongle.DongleReconnected:
                     StartTime = time.time()
                     # ---------------------------------------------------------------
                     # Simulate HRM, FE-S, VTX (master device, broadcasting data)
                     # ---------------------------------------------------------------
                     messages = []
-    
+
                     if clv.SimulateTrainer:
                         if False:
                             raise NotImplementedError
@@ -539,22 +544,22 @@ def main():
                                 35.6,
                                 123,
                             )  # Always the same, ennoying but predictable
-    
+
                         if clv.hrm >= 0:
                             messages.append(hrm.BroadcastHeartrateMessage(HeartRate))
-    
+
                         if clv.fe >= 0:
                             messages.append(
                                 fe.BroadcastTrainerDataMessage(
                                     Cadence, CurrentPower, SpeedKmh, HeartRate
                                 )
                             )
-    
+
                         if clv.vtx >= 0:
                             EventCounter += 1
                             if EventCounter == 64:
                                 EventCounter = 0
-    
+
                             if (
                                 EventCounter % 64 < 4
                             ):  # Transmit 4 times (0, 1, 2, 3) Page 3
@@ -578,7 +583,7 @@ def main():
                                         ),
                                     )
                                 )
-    
+
                     # ---------------------------------------------------------------
                     # Receive data
                     # ---------------------------------------------------------------
@@ -586,7 +591,7 @@ def main():
                         AntDongle.Write(messages, True, False)
                     else:
                         AntDongle.Read(False)
-    
+
                     # ---------------------------------------------------------------
                     # Simulate vortex data, just to test the loop
                     # ---------------------------------------------------------------
@@ -602,7 +607,7 @@ def main():
                         for m in messages:
                             d = binascii.unhexlify(m.replace(" ", ""))
                             AntDongle.MessageQueuePut(d)
-    
+
                     # ---------------------------------------------------------------
                     # Here all response from the ANT dongle are processed
                     #
@@ -623,14 +628,14 @@ def main():
                             Channel,
                             DataPageNumber,
                         ) = ant.DecomposeMessage(d)
-    
+
                         # -----------------------------------------------------------
                         # Message ChannelResponse, acknowledges a message
                         # -----------------------------------------------------------
                         if id == ant.msgID_ChannelResponse:
                             # Ignore
                             Unknown = False
-    
+
                         # -----------------------------------------------------------
                         # Message BroadcastData, provides a datapage from master
                         # -----------------------------------------------------------
@@ -681,7 +686,7 @@ def main():
                                                     HRM_SerialNumber,
                                                 )
                                             )
-    
+
                                     if DataPageNumber & 0x7F == 3:
                                         if HRM_page3_done == False:
                                             HRM_page3_done = True
@@ -697,13 +702,13 @@ def main():
                                                     HRM_Model,
                                                 )
                                             )
-    
+
                                 # ---------------------------------------------------
                                 # Data page 89   ??????????????????????????????
                                 # ---------------------------------------------------
                                 elif DataPageNumber == 89:
                                     Unknown = True
-    
+
                             # -------------------------------------------------------
                             # FE_s = Cycle Training Program (e.g. Zwift, Trainer Road)
                             # We are slave, listening to a master Tacx Trainer
@@ -727,9 +732,9 @@ def main():
                                         FE_HeartRate,
                                         Capabilities,
                                     ) = ant.msgUnpage16_GeneralFEdata(info)
-    
+
                                     FE_Speed = round(FE_Speed / (1000 * 1000 / 3600), 1)
-    
+
                                 # ---------------------------------------------------
                                 # Data page 25 (0x19) Trainer info
                                 # ---------------------------------------------------
@@ -744,7 +749,7 @@ def main():
                                         FE_Power,
                                         xx_Flags,
                                     ) = ant.msgUnpage25_TrainerData(info)
-    
+
                                 # ---------------------------------------------------
                                 # Data page 80 (0x50) Manufacturers info
                                 # ---------------------------------------------------
@@ -770,7 +775,7 @@ def main():
                                                 FE_ModelNumber,
                                             )
                                         )
-    
+
                                 # ---------------------------------------------------
                                 # Data page 81 (0x51) Product Information
                                 # ---------------------------------------------------
@@ -795,7 +800,7 @@ def main():
                                                 FE_SerialNumber,
                                             )
                                         )
-    
+
                             # -------------------------------------------------------
                             # SCS_s = Heart rate Monitor Display
                             # We are slave, listening to a master (Speed Cadence Sensor)
@@ -804,7 +809,7 @@ def main():
                                 SCS_s_count += 1
                                 if SCS_s_count > 99:
                                     SCS_s_count = 0
-    
+
                                 # ---------------------------------------------------
                                 # Only one Data page for SCS! msgUnpage_SCS
                                 # ---------------------------------------------------
@@ -815,7 +820,7 @@ def main():
                                     _EventTime,
                                     SpeedRevolutionCount,
                                 ) = ant.msgUnpage_SCS(info)
-    
+
                                 try:
                                     _ = pEventTime
                                 except:
@@ -832,7 +837,7 @@ def main():
                                             / (EventTime - pEventTime)
                                         )
                                         cadence = int(cadence)
-    
+
                                         speed = (
                                             (
                                                 SpeedRevolutionCount
@@ -859,7 +864,7 @@ def main():
                                 pCadenceRevolutionCount = CadenceRevolutionCount
                                 pSpeedRevolutionCount = SpeedRevolutionCount
                                 pEventTime = EventTime
-    
+
                             # -------------------------------------------------------
                             # VTX_s = Tacx i-Vortex trainer
                             # We are slave, listening to a master (the real trainer)
@@ -882,7 +887,7 @@ def main():
                                     )
                                     # logfile.Console ('i-Vortex Page=%s UsingVirtualSpeed=%s Power=%s Speed=%s State=%s Cadence=%s' % \
                                     #   (DataPageNumber, VTX_UsingVirtualSpeed, VTX_Power, VTX_Speed, VTX_CalibrationState, VTX_Cadence) )
-    
+
                                 # ---------------------------------------------------
                                 # Data page 01 msgUnpage01_TacxVortexDataSerial
                                 # ---------------------------------------------------
@@ -904,7 +909,7 @@ def main():
                                             VTX_Alarm,
                                         )
                                     )
-    
+
                                 # ---------------------------------------------------
                                 # Data page 02 msgUnpage02_TacxVortexDataVersion
                                 # ---------------------------------------------------
@@ -917,9 +922,14 @@ def main():
                                     ) = ant.msgUnpage02_TacxVortexDataVersion(info)
                                     logfile.Console(
                                         "i-Vortex Page=%s Major=%s Minor=%s Build=%s"
-                                        % (DataPageNumber, VTX_Major, VTX_Minor, VTX_Build)
+                                        % (
+                                            DataPageNumber,
+                                            VTX_Major,
+                                            VTX_Minor,
+                                            VTX_Build,
+                                        )
                                     )
-    
+
                                 # ---------------------------------------------------
                                 # Data page 03 msgUnpage03_TacxVortexDataCalibration
                                 # ---------------------------------------------------
@@ -931,7 +941,7 @@ def main():
                                     ) = ant.msgUnpage03_TacxVortexDataCalibration(info)
                                     # logfile.Console ('i-Vortex Page=%s Calibration=%s VortexID=%s' % \
                                     #    (DataPageNumber, VTX_Calibration, VTX_VortexID))
-    
+
                             # -------------------------------------------------------
                             # VTX = Cycle Training Program (e.g. Zwift, Trainer Road)
                             # We are slave, listening to a master Fortius ANT or TTS
@@ -948,7 +958,7 @@ def main():
                                     VTX_Power,
                                 ) = ant.msgUnpage16_TacxVortexSetPower(info)
                                 Unknown = False
-    
+
                         elif id == ant.msgID_AcknowledgedData:
                             # -----------------------------------------------------------
                             # Fitness Equipment Channel inputs (Trainer Road, Zwift)
@@ -959,25 +969,25 @@ def main():
                                 # -------------------------------------------------------
                                 if DataPageNumber == 48:
                                     dpBasicResistance += 1
-    
+
                                 # -------------------------------------------------------
                                 # Data page 49 (0x31) Target Power
                                 # -------------------------------------------------------
                                 elif DataPageNumber == 49:
                                     dpTargetPower += 1
-    
+
                                 # -------------------------------------------------------
                                 # Data page 51 (0x33) Track resistance
                                 # -------------------------------------------------------
                                 elif DataPageNumber == 51:
                                     dpTrackResistance += 1
-    
+
                                 # -------------------------------------------------------
                                 # Data page 55 User configuration
                                 # -------------------------------------------------------
                                 elif DataPageNumber == 55:
                                     dpUserConfiguration += 1
-    
+
                                 # -------------------------------------------------------
                                 # Data page 70 Request data page
                                 # -------------------------------------------------------
@@ -992,7 +1002,7 @@ def main():
                                         RequestedPageNumber,
                                         CommandType,
                                     ) = ant.msgUnpage70_RequestDataPage(info)
-    
+
                                     info = False
                                     if RequestedPageNumber == 80:
                                         info = ant.msgPage80_ManufacturerInfo(
@@ -1014,7 +1024,9 @@ def main():
                                         )
                                         comment = "(Product info)"
                                     elif RequestedPageNumber == 82:
-                                        info = ant.msgPage82_BatteryStatus(ant.channel_FE)
+                                        info = ant.msgPage82_BatteryStatus(
+                                            ant.channel_FE
+                                        )
                                         comment = "(Battery status)"
                                     else:
                                         error = "Requested page not suported"
@@ -1027,7 +1039,7 @@ def main():
                                             data.append(d)
                                             NrTimes -= 1
                                         AntDongle.Write(data, False)
-    
+
                                 # -------------------------------------------------------
                                 # Other data pages
                                 # -------------------------------------------------------
@@ -1036,16 +1048,21 @@ def main():
                         if Unknown:
                             logfile.Console(
                                 "IGNORED!! msg=%s ch=%s p=%s info=%s"
-                                % (hex(id), Channel, DataPageNumber, logfile.HexSpace(info))
+                                % (
+                                    hex(id),
+                                    Channel,
+                                    DataPageNumber,
+                                    logfile.HexSpace(info),
+                                )
                             )
-    
+
                     # -------------------------------------------------------
                     # WAIT So we do not cycle faster than 4 x per second
                     # -------------------------------------------------------
                     SleepTime = 0.25 - (time.time() - StartTime)
                     if SleepTime > 0:
                         time.sleep(SleepTime)
-    
+
                     # -------------------------------------------------------
                     # Inform once per second
                     # -------------------------------------------------------
@@ -1071,7 +1088,7 @@ def main():
                                     VTX_Power,
                                 )
                             )
-    
+
                         else:
                             logfile.Console(
                                 "HRM#=%2s hr=%3s FE-C#=%2s Speed=%4s Cadence=%3s Power=%3s hr=%3s SCS#=%2s VTX ID=%s Speed=%4s Cadence=%3s Target=%s"
@@ -1090,7 +1107,7 @@ def main():
                                     Power,
                                 )
                             )
-    
+
                     # -------------------------------------------------------
                     # Set Tacx Vortex power, once per second
                     # -------------------------------------------------------
@@ -1107,7 +1124,7 @@ def main():
                         )
                         msg = ant.ComposeMessage(ant.msgID_BroadcastData, info)
                         AntDongle.Write([msg], False)
-    
+
             except KeyboardInterrupt:
                 logfile.Console("Listening stopped")
             except Exception as e:
@@ -1134,6 +1151,7 @@ def main():
             break
     logfile.Console("We're done")
     logfile.Console("--------------------")
+
 
 if __name__ == "__main__":
     main()

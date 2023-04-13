@@ -10,6 +10,7 @@ import time
 import fortius_ant.antDongle as ant
 import fortius_ant.logfile as logfile
 
+
 def Initialize():
     global PedalEchoPreviousCount, CadenceEventTime, CadenceEventCount, SpeedEventTime, SpeedEventCount
     PedalEchoPreviousCount = 0  # There is no previous

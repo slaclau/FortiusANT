@@ -2,7 +2,10 @@
 # Version info
 # -------------------------------------------------------------------------------
 import fortius_ant
-WindowTitle = "Fortius Antifier " + fortius_ant.__shortversion__  # Double quotes, see below!
+
+WindowTitle = (
+    "Fortius Antifier " + fortius_ant.__shortversion__
+)  # Double quotes, see below!
 # 2023-03-11    Version 6.7.3   Improve git versioning
 # 2023-03-10    Version 6.7.2   Update versioning system to use python-versioneer
 # 2022-12-28    Version 6.7     #404 BLE does not work when debug=0
