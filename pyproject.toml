@@ -16,3 +16,7 @@ docstring-convention = "numpy"
 extend-select = [
     "D417",
 ]
+require-plugins = [     
+    "flake8-pydocstyle",
+    "flake8-pylint",
+]
