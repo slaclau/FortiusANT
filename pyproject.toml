@@ -19,4 +19,5 @@ extend-select = [
 require-plugins = [     
     "flake8-pydocstyle",
     "flake8-pylint",
+    "flake8-json",
 ]
