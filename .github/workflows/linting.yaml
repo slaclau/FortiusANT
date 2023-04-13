@@ -26,17 +26,20 @@ jobs:
         if: always()
         run: |
           pip install black
-          black --check fortius_ant
-      - name: Convert report
+          echo "black report" >> black.md
+          black --check fortius_ant >> black.md
+      - name: Convert reports
         if: always()
         run: |
+          cat black.md >> $GITHUB_STEP_SUMMARY
           python scripts/flake82md.py flake8.json "flake8 report" >> flake8.md
           cat flake8.md >> $GITHUB_STEP_SUMMARY
       - name: Upload report
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: flake8
+          name: reports
           path: |
-            flake8.json
-            flake8.md
+            *.json
+            *.md
+
