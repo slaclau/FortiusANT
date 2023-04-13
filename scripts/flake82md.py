@@ -17,7 +17,7 @@ with open(sys.argv[1]) as f:
             for line in data[i]:
                 count += 1
                 print(f'{line["code"]} :{line["line_number"]}:{line["column_number"]}: {line["text"]}')
-                print("python```")
+                print("```python")
                 print(line["physical_line"].strip())
                 print("```")
                 if count > 100:
