@@ -26,8 +26,8 @@ jobs:
         if: always()
         run: |
           pip install black
-          echo "black report" >> black.md
-          black --check fortius_ant >> black.md
+          echo "# black report" >> black.md
+          black --check fortius_ant &>> black.md
       - name: Convert reports
         if: always()
         run: |
