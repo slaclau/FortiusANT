@@ -16,7 +16,7 @@ with open(sys.argv[1]) as f:
             print("The following code(s) occurred in this file")
             print("| Occurences | Code | Meaning |")
             print("| - | - | - |")
-            codes = set(d["code"] for d in data[i])
+            codes = set(d["code"] for d in data[i]).sort()
             codeCount = {}
             codeText = {}
             for line in data[i]:
