@@ -23,6 +23,10 @@ jobs:
         if: always()
         run: |
           flake8 fortius_ant --format=json >> flake8.json
+      - name: mypy
+        if: always()
+        run: |
+          mypy --strict fortius_ant | mypy-json-report parse --output-file mypy.json
       - name: black
         if: always()
         run: |
@@ -37,6 +41,8 @@ jobs:
           cat black.md >> $GITHUB_STEP_SUMMARY
           python scripts/flake82md.py flake8.json "flake8 report" >> flake8.md
           cat flake8.md >> $GITHUB_STEP_SUMMARY
+          python scripts/flake82md.py mypy.json "mypy report" >> mypy.md
+          cat mypy.md >> $GITHUB_STEP_SUMMARY
       - name: Upload report
         if: always()
         uses: actions/upload-artifact@v3
@@ -46,4 +52,5 @@ jobs:
             flake8.json
             flake8.md
             black.md
-
+            mypy.json
+            mypy.md
