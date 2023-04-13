@@ -1,6 +1,5 @@
 flake8
-flake8-docstrings
-flake8-docstyle
+flake8-pydocstyle
 isort
 black
 darglint
