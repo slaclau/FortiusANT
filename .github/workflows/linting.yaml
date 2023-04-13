@@ -26,11 +26,12 @@ jobs:
         if: always()
         run: |
           pip install black
-          echo "`# black report`" >> black.md
+          echo "# black report" >> black.md
           black --check fortius_ant &>> black.md
       - name: Convert reports
         if: always()
         run: |
+          sed -i "s/would reformat //g" black.md
           cat black.md >> $GITHUB_STEP_SUMMARY
           python scripts/flake82md.py flake8.json "flake8 report" >> flake8.md
           cat flake8.md >> $GITHUB_STEP_SUMMARY
