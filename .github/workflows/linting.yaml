@@ -32,8 +32,8 @@ jobs:
       - name: Convert reports
         if: always()
         run: |
-          sed -i "s/would reformat //g" black.md
-          sed -i "s/__/\_\_/g" black.md
+          sed -i "s/would reformat \/home\/runner\/work\/FortiusANT\/FortiusANT\///g" black.md
+          sed -i "s/__/\\_\\_/g" black.md
           cat black.md >> $GITHUB_STEP_SUMMARY
           python scripts/flake82md.py flake8.json "flake8 report" >> flake8.md
           cat flake8.md >> $GITHUB_STEP_SUMMARY
