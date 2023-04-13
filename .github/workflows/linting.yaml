@@ -39,10 +39,10 @@ jobs:
           sed -i "s/would reformat \/home\/runner\/work\/FortiusANT\/FortiusANT\///g" black.md
           sed -i "s/__/\\_\\_/g" black.md
           cat black.md >> $GITHUB_STEP_SUMMARY
-          python scripts/flake82md.py flake8.json "flake8 report" >> flake8.md
-          cat flake8.md >> $GITHUB_STEP_SUMMARY
           python scripts/mypy2md.py mypy.json "mypy report" >> mypy.md
           cat mypy.md >> $GITHUB_STEP_SUMMARY
+          python scripts/flake82md.py flake8.json "flake8 report" >> flake8.md
+          cat flake8.md >> $GITHUB_STEP_SUMMARY
       - name: Upload report
         if: always()
         uses: actions/upload-artifact@v3
