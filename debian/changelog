@@ -1,3 +1,10 @@
+fortius-ant (6.7.3-0ubuntu2) replaceme; urgency=medium
+
+  * Packaging update due to build failure
+
+ -- Sebastien Laclau <seb.laclau@gmail.com>  Thu, 13 Apr 2023 09:36:21 +0100
+
+
 fortius-ant (6.7.3-0ubuntu1) replaceme; urgency=medium
 
   * Initial packaging of upstream 6.7.3
