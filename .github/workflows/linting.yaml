@@ -21,7 +21,7 @@ jobs:
         if: always()
         run: |
           pip install flake8 flake8-json
-          flake8 fortius_ant --output=json
+          flake8 fortius_ant --format=json
           ls
       - name: Convert report
         if: always()
