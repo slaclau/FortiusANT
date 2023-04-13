@@ -61,8 +61,7 @@ jobs:
       - name: Convert report
         if: always()
         run: |
-          pip install jsonschema2md
-          jsonschema2md deptry.json deptry.md
+          python scripts/deptry2md.py deptry.json >> deptry.md
           cat deptry.md >> $GITHUB_STEP_SUMMARY
       - name: Upload report
         if: always()
