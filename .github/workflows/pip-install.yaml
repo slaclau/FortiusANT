@@ -51,6 +51,7 @@ jobs:
           fortius-ant --version
           explorant --version
       - name: Check dependencies
+        if: always()
         run: |
           source venv/bin/activate
           pip install -r requirements.txt
