@@ -38,7 +38,7 @@ jobs:
           echo "# black report" >> black.md
           echo "These files have not been formatted" >> black.md
           black --check fortius_ant &>> black.md
-      - name: black
+      - name: isort
         if: always()
         run: |
           echo "# isort report" >> isort.md
