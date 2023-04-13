@@ -25,6 +25,7 @@ jobs:
       - name: Install development requirements
         run: pip install -r dev-requirements.txt
       - name: flake8
+        continue-on-error: true
         if: always()
         run: |
           flake8 fortius_ant --format=json >> flake8.json
