@@ -1,3 +1,9 @@
+fortius-ant (6.7.3-0ubuntu3) replaceme; urgency=medium
+
+  * Packaging update due to continued build failure - add build-depend on python3-distro
+
+ -- Sebastien Laclau <seb.laclau@gmail.com>  Thu, 13 Apr 2023 21:26:42 +0100
+
 fortius-ant (6.7.3-0ubuntu2) replaceme; urgency=medium
 
   * Packaging update due to build failure
