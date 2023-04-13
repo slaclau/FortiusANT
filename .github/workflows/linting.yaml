@@ -19,9 +19,9 @@ jobs:
           python-version: '3.9'
       - name: Install requirements
         run: |
+          pip install distro
           python wxPython-source.py
           pip install -r requirements.txt
-          pip install -r dev-requirements.txt
       - name: Install development requirements
         run: pip install -r dev-requirements.txt
       - name: flake8
