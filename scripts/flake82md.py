@@ -24,6 +24,7 @@ with open(sys.argv[1]) as f:
                 codeText[line['code']] = line['text']
             for code in codes:
                 print(f"| {codeCount[code]} | {code} | {codeText[code]} |")
+            print()
             count = 0
             for line in data[i]:
                 count += 1
