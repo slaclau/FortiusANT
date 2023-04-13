@@ -6,8 +6,6 @@ with open(sys.argv[1]) as f:
     if len(sys.argv) > 1:
         print(f"# {sys.argv[2]}")
     n = 0
-    for i in data:
-        n += len(data[i])
-    print(f"{len(data)} files checked, {n} issues found")
+    print(f"{len(data)} files checked")
     for i in data:
         print(i)
