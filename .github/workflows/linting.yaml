@@ -17,15 +17,15 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.9' 
+      - name: Install development requirements
+        run: pip install -r dev-requirements.txt
       - name: flake8
         if: always()
         run: |
-          pip install flake8 flake8-json
           flake8 fortius_ant --format=json >> flake8.json
       - name: black
         if: always()
         run: |
-          pip install black
           echo "# black report" >> black.md
           echo "These files have not been formatted" >> black.md
           black --check fortius_ant &>> black.md
