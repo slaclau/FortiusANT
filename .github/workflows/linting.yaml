@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: '3.9' 
       - name: Install development requirements
-        run: pip install -r dev-requirements.txt
+        run: pip install flake8 flake8-json black flake8-docstrings flake8-pylint
       - name: flake8
         if: always()
         run: |
