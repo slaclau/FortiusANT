@@ -50,6 +50,7 @@ jobs:
           sed -i "s/would reformat \/home\/runner\/work\/FortiusANT\/FortiusANT\///g" black.md
           sed -i "s/__/\\_\\_/g" black.md
           cat black.md >> $GITHUB_STEP_SUMMARY
+          sed -i "s/\/home\/runner\/work\/FortiusANT\/FortiusANT\///g" isort.md
           cat isort.md >> $GITHUB_STEP_SUMMARY
           python scripts/mypy2md.py mypy.json "mypy report" >> mypy.md
           cat mypy.md >> $GITHUB_STEP_SUMMARY
