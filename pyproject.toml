@@ -20,3 +20,5 @@ require-plugins = [
 extend-select = [
     "D417",
 ]
+[project.dependencies]
+
