@@ -12,4 +12,4 @@ with open(sys.argv[1]) as f:
         print("| Occurrences | Message |")
         print("| - | - |")
         for line in data[i]:
-            print(f"| {i[line]} | {line} |")
+            print(f"| {line} | {line} |")
