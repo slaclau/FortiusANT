@@ -13,6 +13,8 @@ with open(sys.argv[1]) as f:
         if len(data[i]) > 0:
             print(f"## {i.capitalize()}:")
             print(f"{len(data[i])} issues found")
+            print(f"{The following code(s) occurred in this file")
+            print( set(d["code"] for d in data[i]) )
             count = 0
             for line in data[i]:
                 count += 1
