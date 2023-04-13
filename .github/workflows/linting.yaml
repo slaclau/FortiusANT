@@ -39,7 +39,7 @@ jobs:
           pip install -r requirements.txt
           pip install .
       - name: flake8
-        if: always
+        if: always()
         run: |
           pip install flake8 flake8-json
           deptry fortius_ant --output=json --output-file=flake8.json
