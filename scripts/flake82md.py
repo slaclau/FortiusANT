@@ -14,6 +14,8 @@ with open(sys.argv[1]) as f:
             print(f"## {i.capitalize()}:")
             print(f"{len(data[i])} issues found")
             print("The following code(s) occurred in this file")
+            print("| Occurences | Code | Meaning |")
+            print("| = | = | = |")
             codes = set(d["code"] for d in data[i])
             codeCount = {}
             codeText = {}
