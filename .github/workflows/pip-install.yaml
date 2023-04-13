@@ -50,13 +50,17 @@ jobs:
         run: |
           fortius-ant --version
           explorant --version
-      - name: Check dependencies
+      - name: Check pip install
         if: always()
         run: |
           source venv/bin/activate
           pip install -r requirements.txt
           pip install .
           fortius-ant --version
+      - name: Check dependencies
+        if: always()
+        run: |
+          pip install deptry
           deptry fortius_ant --json-output deptry.json
       - name: Convert report
         if: always()
