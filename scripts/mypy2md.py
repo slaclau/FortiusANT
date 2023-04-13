@@ -8,8 +8,9 @@ with open(sys.argv[1]) as f:
     n = 0
     print(f"{len(data)} files checked")
     for i in data:
-        print(i)
+        print(f"## i")
         print("| Occurrences | Message |")
         print("| - | - |")
         for line in data[i]:
-            print(f"| {line} | {line} |")
+            print(f"| {data[i][line]} | {line} |")
+        print()
