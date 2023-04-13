@@ -7,7 +7,7 @@ isort
 black
 darglint
 mypy
-mypy-json-reporter
+mypy-json-report
 docformatter
 sphinx
 sphinx_rtd_theme
