@@ -16,10 +16,12 @@ with open(sys.argv[1]) as f:
             print("The following code(s) occurred in this file")
             codes = set(d["code"] for d in data[i])
             codeCount = {}
+            codeText = {}
             for line in data[i]:
                 codeCount[line['code']] = codeCount.get(line['code'], 0) + 1
+                codeText[line['code']] = line['text']
             for code in codes:
-                print(f"{code}: {codeCount[code]} times")
+                print(f"| {codeCount[code]} | {code} | {codeText[code]} |")
             count = 0
             for line in data[i]:
                 count += 1
