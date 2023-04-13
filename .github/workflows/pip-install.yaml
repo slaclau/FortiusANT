@@ -65,7 +65,7 @@ jobs:
       - name: Convert report
         if: always()
         run: |
-          python scripts/deptry2md.py deptry.json >> deptry.md
+          python scripts/deptry2md.py deptry.json "deptry: ${{ matrix.os }}" >> deptry.md
           cat deptry.md >> $GITHUB_STEP_SUMMARY
       - name: Upload report
         if: always()
