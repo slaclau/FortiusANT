@@ -10,7 +10,4 @@ with open(sys.argv[1]) as f:
         count += 1
         if len(data[i]) > 0:
             print(f"## {i.capitalize()}:")
-            for j in data[i]:
-                print(j)
-        if count > 100:
-            break
+ 
