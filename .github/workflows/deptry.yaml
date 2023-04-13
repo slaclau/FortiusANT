@@ -1,4 +1,4 @@
-name: "Test pip install"
+name: "deptry"
 
 on: 
   push:
