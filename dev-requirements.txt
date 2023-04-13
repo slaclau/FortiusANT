@@ -1,5 +1,6 @@
 flake8
 flake8-docstrings
+flake8-docstyle
 isort
 black
 darglint
