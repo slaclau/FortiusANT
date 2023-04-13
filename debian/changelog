@@ -1,3 +1,9 @@
+fortius-ant (6.7.3-0ubuntu4) replaceme; urgency=medium
+
+  * Packaging update due to continued build failure - download python packages in source package
+
+ -- Sebastien Laclau <seb.laclau@gmail.com>  Fri, 14 Apr 2023 00:48:42 +0100
+
 fortius-ant (6.7.3-0ubuntu3) replaceme; urgency=medium
 
   * Packaging update due to continued build failure - add build-depend on python3-distro
