@@ -22,13 +22,13 @@ jobs:
       - name: flake8
         if: always()
         run: |
-          flake8 fortius_ant --format=json >> flake8.json
+          flake8 fortius_ant --format=json | tee >> flake8.json
       - name: black
         if: always()
         run: |
           echo "# black report" >> black.md
           echo "These files have not been formatted" >> black.md
-          black --check fortius_ant &>> black.md
+          black --check fortius_ant | tee &>> black.md
       - name: Convert reports
         if: always()
         run: |
