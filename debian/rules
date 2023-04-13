@@ -6,7 +6,7 @@
 SYSPY := $(shell python3 useSystemPython.py)
 ifdef SYSPY
 override_dh_auto_configure:
- 	python3 wxPython-source.py
+	python3 wxPython-source.py
 	dh_auto_configure
 	python3 -m pip download \
 	--destination-directory pip_local \
