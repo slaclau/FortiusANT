@@ -6,9 +6,12 @@ with open(sys.argv[1]) as f:
     if len(sys.argv) > 1:
         print(f"# {sys.argv[2]}")
     n = 0
-    print(f"{len(data)} files checked")
     for i in data:
-        print(f"## i")
+        for line in i:
+            n += data[i][line]
+    print(f"{len(data)} files checked, {n} issues found")
+    for i in data:
+        print(f"## {i}")
         print("| Occurrences | Message |")
         print("| - | - |")
         for line in data[i]:
