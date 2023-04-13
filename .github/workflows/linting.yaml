@@ -38,12 +38,19 @@ jobs:
           echo "# black report" >> black.md
           echo "These files have not been formatted" >> black.md
           black --check fortius_ant &>> black.md
+      - name: black
+        if: always()
+        run: |
+          echo "# isort report" >> isort.md
+          echo "These files have not been formatted" >> black.md
+          isort -c fortius_ant &>> isort.md
       - name: Convert reports
         if: always()
         run: |
           sed -i "s/would reformat \/home\/runner\/work\/FortiusANT\/FortiusANT\///g" black.md
           sed -i "s/__/\\_\\_/g" black.md
           cat black.md >> $GITHUB_STEP_SUMMARY
+          cat isort.md >> $GITHUB_STEP_SUMMARY
           python scripts/mypy2md.py mypy.json "mypy report" >> mypy.md
           cat mypy.md >> $GITHUB_STEP_SUMMARY
           python scripts/flake82md.py flake8.json "flake8 report" >> flake8.md
