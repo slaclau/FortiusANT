@@ -1,4 +1,4 @@
-name: "Test pip install"
+name: "Build python package"
 
 on: 
   push:
