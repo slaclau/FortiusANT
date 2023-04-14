@@ -95,5 +95,5 @@ jobs:
       - name: Publish jammy package
         run: |
           sudo apt install dput
-          dput ppa:slaclau/ppa-pre ../fortius-ant*source.changes
+          dput ppa:slaclau/ppa-pre fortius-ant*source.changes
         if: matrix.os == 'ubuntu-22.04'
