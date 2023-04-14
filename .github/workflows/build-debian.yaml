@@ -67,10 +67,7 @@ jobs:
           sed -i '1d' requirements.txt
           dpkg-buildpackage -S -sa
           dpkg-buildpackage -b
-          mv ../fortius-ant*.deb .
-          mv ../fortius-ant*.tar.gz .
-          mv ../fortius-ant*.changes .
-          mv ../fortius-ant*.dsc .
+          mv ../fortius-ant_*.* .
       - name: Install package
         run: |
           sudo apt install ./fortius-ant*.deb
