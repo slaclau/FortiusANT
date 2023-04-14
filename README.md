@@ -55,6 +55,8 @@ sudo apt update
 sudo apt install fortius-ant
 ```
 
+Formal releases are also available from [GitHub](https://github.com/slaclau/FortiusANT/releases/latest).
+
 ## snap installation
 
 Snap installation is currently work in progress, full releases are available in the snapcraft beta channel:
