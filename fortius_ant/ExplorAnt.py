@@ -32,7 +32,6 @@ import struct
 import threading
 import time
 import usb.core
-import wx
 
 from datetime import datetime
 
