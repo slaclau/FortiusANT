@@ -68,6 +68,9 @@ jobs:
           dpkg-buildpackage -S -sa
           dpkg-buildpackage -b
           mv ../fortius-ant*.deb .
+          mv ../fortius-ant*.tar.gz .
+          mv ../fortius-ant*.changes .
+          mv ../fortius-ant*.dsc .
       - name: Install package
         run: |
           sudo apt install ./fortius-ant*.deb
@@ -81,6 +84,9 @@ jobs:
           name: ${{ matrix.os }}
           path: |
             fortius-ant*.deb
+            fortius-ant*.dsc
+            fortius-ant*.tar.gz
+            fortius-ant*.changes
       - name: Publish focal package
         run: |
           sudo apt install dput
