@@ -1,5 +1,7 @@
 #!/usr/bin/make -f
 
+SHELL := /bin/bash
+
 %:
 	dh $@ --with python-virtualenv
 
@@ -10,14 +12,18 @@ override_dh_virtualenv:
 	--python python3 \
 	--builtin-venv \
 	--extra-pip-arg --no-index \
-	--extra-pip-arg --find-links=pip_local
+	--extra-pip-arg --find-links=pip_local \
+	--skip-install
+	debian/fortius-ant/opt/venvs/fortius-ant/bin/python -m pip install --force-reinstall pip_local/fortius_ant*.whl
 else
 override_dh_virtualenv:
 	dh_virtualenv \
 	--python python3.9 \
 	--builtin-venv \
 	--extra-pip-arg --no-index \
-	--extra-pip-arg --find-links=pip_local
+	--extra-pip-arg --find-links=pip_local \
+	--skip-install
+	debian/fortius-ant/opt/venvs/fortius-ant/bin/python -m pip install --force-reinstall pip_local/fortius_ant*.whl
 endif
 
 override_dh_strip:
