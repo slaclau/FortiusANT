@@ -25,6 +25,7 @@ jobs:
       - name: Test snap
         run: |
           fortius-ant --version
+          explorant --version
       - name: Upload snap
         uses: actions/upload-artifact@v3
         with:
