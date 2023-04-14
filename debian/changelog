@@ -1,3 +1,9 @@
+fortius-ant (6.7.3-0ubuntu6) replaceme; urgency=medium
+
+  * Packaging update due to continued build failure - download packages before building source
+
+ -- Sebastien Laclau <seb.laclau@gmail.com>  Fri, 14 Apr 2023 01:42:42 +0100
+
 fortius-ant (6.7.3-0ubuntu5) replaceme; urgency=medium
 
   * Packaging update due to continued build failure - move pip download earlier
