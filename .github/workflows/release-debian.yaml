@@ -30,11 +30,13 @@ jobs:
         run: |
           echo "useSystemPython=$(python3 useSystemPython.py)" >> $GITHUB_ENV
           echo "${{env.useSystemPython}}"
+
       - name: Install system python packages
         if: ${{ env.useSystemPython == 'yes' }}
         run: |
           sudo apt install python3 python3-dev python3-distutils python3-venv
           python3 wxPython-source.py
+          python3 updateChangelog.py
           python3 setup.py bdist_wheel --dist-dir=pip_local
           python3 -m pip download \
           --destination-directory pip_local \
@@ -46,6 +48,7 @@ jobs:
           sudo apt update
           sudo apt install python3.9 python3.9-dev python3.9-distutils python3.9-venv
           python3.9 wxPython-source.py
+          python3.9 updateChangelog.py
           python3.9 setup.py bdist_wheel --dist-dir=pip_local
           python3.9 -m pip download \
           --destination-directory pip_local \
@@ -59,9 +62,9 @@ jobs:
           echo $GPG_KEY_ID
           echo "${{ secrets.PPA_GPG_PRIVATE_KEY }}" | gpg --batch --import
           sed -i '1d' requirements.txt
-          ./buildSource.sh
+          dpkg-buildpackage -S -sa --compression=xz --compression-level=1
           dpkg-buildpackage -b
-          mv ../fortius-ant*.deb .
+          mv ../fortius-ant_*.* .
       - name: Install package
         run: |
           sudo apt install ./fortius-ant*.deb
@@ -75,6 +78,9 @@ jobs:
           name: ${{ matrix.os }}
           path: |
             fortius-ant*.deb
+            fortius-ant*.dsc
+            fortius-ant*.tar.xz
+            fortius-ant*.changes
       - name: Get package
         uses: actions/download-artifact@v3
         with:
@@ -90,12 +96,12 @@ jobs:
       - name: Publish focal package
         run: |
           sudo apt install dput
-          dput ppa:slaclau/ppa ../fortius-ant*source.changes
+          dput ppa:slaclau/ppa fortius-ant*source.changes
         if: matrix.os == 'ubuntu-20.04'
       - name: Publish jammy package
         run: |
           sudo apt install dput
-          dput ppa:slaclau/ppa ../fortius-ant*source.changes
+          dput ppa:slaclau/ppa fortius-ant*source.changes
         if: matrix.os == 'ubuntu-22.04'
 permissions:
   contents: write
