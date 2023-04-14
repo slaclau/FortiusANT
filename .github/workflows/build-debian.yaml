@@ -82,7 +82,7 @@ jobs:
           path: |
             fortius-ant*.deb
             fortius-ant*.dsc
-            fortius-ant*.tar.gz
+            fortius-ant*.tar.xz
             fortius-ant*.changes
       - name: Publish focal package
         run: |
