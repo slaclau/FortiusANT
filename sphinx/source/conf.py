@@ -1,6 +1,7 @@
 import sys
 import os
 import pylint
+
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
@@ -9,31 +10,31 @@ import pylint
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'FortiusANT'
-copyright = '2023, WouterJD, Sebastien Laclau'
-author = 'WouterJD, Sebastien Laclau'
+project = "FortiusANT"
+copyright = "2023, WouterJD, Sebastien Laclau"
+author = "WouterJD, Sebastien Laclau"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.inheritance_diagram',
-    'sphinx.ext.graphviz',
-    'sphinx_pyreverse',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.inheritance_diagram",
+    "sphinx.ext.graphviz",
+    "sphinx_pyreverse",
 ]
 
 autosummary_generate = True
 
 
 autodoc_default_options = {
-    'undoc-members': True,
+    "undoc-members": True,
 }
 autoclass_content = "class"
-#autodoc_class_signature = "separated"
+# autodoc_class_signature = "separated"
 autodoc_member_order = "bysource"
 autodoc_docstring_signature = True
 autodoc_mock_imports = [
@@ -42,31 +43,31 @@ autodoc_mock_imports = [
 ]
 autodoc_typehints = "description"
 
-templates_path = ['_templates']
+templates_path = ["_templates"]
 exclude_patterns = []
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3', None),
-    'wxpython': ('https://wxpython.org/Phoenix/docs/html/', None),
+    "python": ("https://docs.python.org/3", None),
+    "wxpython": ("https://wxpython.org/Phoenix/docs/html/", None),
 }
 
 inheritance_graph_attrs = dict(rankdir="TB", size='""')
 
-graphviz_output_format = 'svg'
+graphviz_output_format = "svg"
 
-sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath("../"))
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-#html_theme = 'default'
-html_theme = 'pydata_sphinx_theme'
-#html_theme = 'sphinx_rtd_theme'
-html_static_path = ['_static']
+# html_theme = 'default'
+html_theme = "pydata_sphinx_theme"
+# html_theme = 'sphinx_rtd_theme'
+html_static_path = ["_static"]
 
 html_theme_options = {
-   "logo": {
-      "image_light": "logo-light.png",
-      "image_dark": "logo-dark.png",
-   }
+    "logo": {
+        "image_light": "logo-light.png",
+        "image_dark": "logo-dark.png",
+    }
 }

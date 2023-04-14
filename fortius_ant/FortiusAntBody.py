@@ -1497,8 +1497,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
             if ReductionChanged:
                 if 0 <= CranksetIndex < len(clv.Crankset):
                     ReductionCrankset = (
-                        clv.Crankset[CranksetIndex]
-                        / clv.Crankset[clv.CranksetStart]
+                        clv.Crankset[CranksetIndex] / clv.Crankset[clv.CranksetStart]
                     )
 
                 if 0 <= CassetteIndex < len(clv.Cassette):

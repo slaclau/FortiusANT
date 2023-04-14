@@ -1,5 +1,6 @@
 import distro
 
+
 def main():
     version = int(distro.major_version())
     if version >= 22:
@@ -12,10 +13,15 @@ def main():
         print("wxPython needs to be built from source")
         lts = None
     if lts != None:
-        wheels_url = "https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-" + lts + "/"
+        wheels_url = (
+            "https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-"
+            + lts
+            + "/"
+        )
         print("wxPython will be installed from " + wheels_url)
-        f = open("wxPython-source.txt","w+")
+        f = open("wxPython-source.txt", "w+")
         f.write("-f " + wheels_url)
+
 
 if __name__ == "__main__":
     main()
