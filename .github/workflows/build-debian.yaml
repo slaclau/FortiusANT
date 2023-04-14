@@ -65,7 +65,7 @@ jobs:
           echo $GPG_KEY_ID
           echo "${{ secrets.PPA_GPG_PRIVATE_KEY }}" | gpg --batch --import
           sed -i '1d' requirements.txt
-          dpkg-buildpackage -S -sa --compression=xz --format="3.0"
+          dpkg-buildpackage -S -sa --compression=xz
           dpkg-buildpackage -b
           mv ../fortius-ant_*.* .
       - name: Install package
