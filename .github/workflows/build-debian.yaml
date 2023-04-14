@@ -66,7 +66,7 @@ jobs:
       - name: Test package
         run: |
           fortius-ant --version
-          explorant--version
+          explorant --version
       - name: Upload debian package
         uses: actions/upload-artifact@v3
         with:
