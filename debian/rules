@@ -1,5 +1,7 @@
 #!/usr/bin/make -f
 
+SHELL := /bin/bash
+
 %:
 	dh $@ --with python-virtualenv
 
