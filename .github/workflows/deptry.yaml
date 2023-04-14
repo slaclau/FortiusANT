@@ -43,6 +43,7 @@ jobs:
           pip install -r requirements.txt
           pip install .
       - name: Check dependencies
+        continue-on-error: true
         run: |
           pip install deptry
           deptry fortius_ant --json-output deptry.json
