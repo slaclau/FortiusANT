@@ -112,21 +112,24 @@ import binascii
 import glob
 import os
 import platform
-from pyexpat.errors import messages
 import re
+
+from pyexpat.errors import messages
 
 if platform.system() == "False":
     import serial  # pylint: disable=import-error
+
 import queue
 import struct
 import threading
 import time
+
 import usb.core
 
-import fortius_ant.structConstants as sc
 import fortius_ant.debug as debug
-import fortius_ant.logfile as logfile
 import fortius_ant.FortiusAntCommand as cmd
+import fortius_ant.logfile as logfile
+import fortius_ant.structConstants as sc
 
 # ---------------------------------------------------------------------------
 # Our own choice what channels are used

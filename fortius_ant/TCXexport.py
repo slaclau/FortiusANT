@@ -13,7 +13,7 @@ import time
 from datetime import datetime
 
 import fortius_ant.logfile as logfile
-from fortius_ant.constants import mode_Power, mode_Grade
+from fortius_ant.constants import mode_Grade, mode_Power
 
 # -------------------------------------------------------------------------------
 # TCX template

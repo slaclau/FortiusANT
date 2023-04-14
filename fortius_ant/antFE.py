@@ -10,6 +10,7 @@ __version__ = "2020-12-28"
 # 2020-02-18    First version, split-off from FortiusAnt.py
 # -------------------------------------------------------------------------------
 import time
+
 import fortius_ant.antDongle as ant
 
 

@@ -94,23 +94,24 @@ __version__ = "2022-01-05"
 # -------------------------------------------------------------------------------
 import array
 import math
-import numpy
 import os
 import random
 import sys
 import threading
 import time
 import webbrowser
+
+import numpy
 import wx
 import wx.lib.agw.speedmeter as SM
 
-from fortius_ant.constants import mode_Power, mode_Grade, OnRaspberry, mile
 import fortius_ant.debug as debug
-import fortius_ant.logfile as logfile
 import fortius_ant.FortiusAntCommand as cmd
-from fortius_ant.FortiusAntTitle import githubWindowTitle
+import fortius_ant.logfile as logfile
 import fortius_ant.RadarGraph as RadarGraph
 import fortius_ant.settings as settings
+from fortius_ant.constants import OnRaspberry, mile, mode_Grade, mode_Power
+from fortius_ant.FortiusAntTitle import githubWindowTitle
 
 # -------------------------------------------------------------------------------
 # constants

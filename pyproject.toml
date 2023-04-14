@@ -11,12 +11,12 @@ disable = [
 [tool.flake8]
 max-line-length = 88
 max-doc-length = 88
-count = true
 docstring-convention = "numpy"
-require-plugins = [
-    "flake8-docstyle",
-    "flake8-pylint",
-]
 extend-select = [
     "D417",
+]
+require-plugins = [     
+    "flake8-pydocstyle",
+    "flake8-pylint",
+    "flake8-json",
 ]

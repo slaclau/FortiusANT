@@ -1,3 +1,5 @@
+Linting status: [![lint](https://github.com/slaclau/FortiusANT/actions/workflows/linting.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/linting.yaml)
+
 | Target | Version |
 | ------ | ------- |
 | [![Test pip install](https://github.com/slaclau/FortiusANT/actions/workflows/pip-install.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/pip-install.yaml) | ![Upstream version](https://img.shields.io/github/v/tag/slaclau/FortiusANT?label=Upstream%20version)

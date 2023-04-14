@@ -21,18 +21,17 @@ __version__ = "2022-04-07"
 import asyncio
 import atexit
 import logging
-from socket import timeout
-import time
 import threading
+import time
 import traceback
-
+from socket import timeout
 from typing import Any, Dict
 
 from bless import (
-    BlessServer,
     BlessGATTCharacteristic,
-    GATTCharacteristicProperties,
+    BlessServer,
     GATTAttributePermissions,
+    GATTCharacteristicProperties,
 )
 
 

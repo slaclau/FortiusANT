@@ -74,12 +74,11 @@ import argparse
 import sys
 import time
 
+import fortius_ant.constants as constants
 import fortius_ant.debug as debug
 import fortius_ant.logfile as logfile
-
-from fortius_ant.constants import UseBluetooth, UseGui, OnRaspberry
-import fortius_ant.constants as constants
 import fortius_ant.settings as settings
+from fortius_ant.constants import OnRaspberry, UseBluetooth, UseGui
 
 if UseGui:
     import wx

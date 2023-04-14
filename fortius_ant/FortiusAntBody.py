@@ -2,6 +2,22 @@
 # Version info
 # -------------------------------------------------------------------------------
 __version__ = "2022-08-22"
+import argparse
+import binascii
+import glob
+import math
+import os
+import pickle
+import platform
+import random
+import struct
+import sys
+import threading
+import time
+
+import numpy
+import usb.core
+
 # 2022-08-22    AntDongle stores received messages in a queue.
 # 2022-08-10    Steering merged from marcoveeneman and switchable's code
 # 2022-05-12    Message added on failing calibration
@@ -217,33 +233,21 @@ __version__ = "2022-08-22"
 #               - test with Zwift; done 2019-12-24
 #               - calibration test; done 2020-01-07
 # -------------------------------------------------------------------------------
-from fortius_ant.constants import mode_Power, mode_Grade, UseBluetooth, UseGui
-
-import argparse
-import binascii
-import math
-import numpy
-import os
-import pickle
-import platform, glob
-import random
-import sys
-import struct
-import threading
-import time
-import usb.core
+from fortius_ant.constants import UseBluetooth, UseGui, mode_Grade, mode_Power
 
 if UseGui:
     import wx
 
 from datetime import datetime
 
+import fortius_ant.antCTRL as ctrl
 import fortius_ant.antDongle as ant
 import fortius_ant.antFE as fe
 import fortius_ant.antHRM as hrm
 import fortius_ant.antPWR as pwr
 import fortius_ant.antSCS as scs
-import fortius_ant.antCTRL as ctrl
+import fortius_ant.bleBless as bleBless
+import fortius_ant.bleDongle as bleDongle
 import fortius_ant.constants as constants
 import fortius_ant.debug as debug
 import fortius_ant.logfile as logfile
@@ -251,9 +255,6 @@ import fortius_ant.raspberry as raspberry
 import fortius_ant.steering as steering
 import fortius_ant.TCXexport as TCXexport
 import fortius_ant.usbTrainer as usbTrainer
-
-import fortius_ant.bleBless as bleBless
-import fortius_ant.bleDongle as bleDongle
 
 PrintWarnings = False  # Print warnings even when logging = off
 CycleTimeFast = 0.02  # TRAINER- SHOULD WRITE THEN READ 70MS LATER REALLY

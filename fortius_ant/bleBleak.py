@@ -81,25 +81,24 @@ __version__ = "2022-12-28"
 import asyncio
 import logging
 import os
+import struct
 from socket import timeout
 
-from bleak import BleakClient
-from bleak import discover
+from bleak import BleakClient, discover
 
 # from bleak import __version__ as bleakVersion      # No longer supported; #408
 # print("bleak = %s" % bleakVersion)
 
-import struct
 
 if True:
     BlessExample = False
     # ---------------------------------------------------------------------------
     # Import in the FortiusAnt context
     # ---------------------------------------------------------------------------
-    from fortius_ant.constants import mode_Power, mode_Grade, UseBluetooth
-    from fortius_ant.logfile import HexSpace
-    from fortius_ant.bleBlessClass import clsBleServer
     import fortius_ant.bleConstants as bc
+    from fortius_ant.bleBlessClass import clsBleServer
+    from fortius_ant.constants import UseBluetooth, mode_Grade, mode_Power
+    from fortius_ant.logfile import HexSpace
 
 else:
     BlessExample = True

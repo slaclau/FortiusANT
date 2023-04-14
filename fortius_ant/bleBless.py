@@ -36,14 +36,13 @@ __version__ = "2022-08-10"
 # -------------------------------------------------------------------------------
 import struct
 import time
-
 from typing import Any, Dict
 
 from bless import (
-    BlessServer,
     BlessGATTCharacteristic,
-    GATTCharacteristicProperties,
+    BlessServer,
     GATTAttributePermissions,
+    GATTCharacteristicProperties,
 )
 
 if True:
@@ -51,22 +50,23 @@ if True:
     # ---------------------------------------------------------------------------
     # Import in the FortiusAnt context
     # ---------------------------------------------------------------------------
+    import fortius_ant.bleConstants as bc
     import fortius_ant.debug as debug
     import fortius_ant.logfile as logfile
-    from fortius_ant.constants import mode_Power, mode_Grade, UseBluetooth
-    from fortius_ant.logfile import HexSpace
     from fortius_ant.bleBlessClass import clsBleServer
-    import fortius_ant.bleConstants as bc
+    from fortius_ant.constants import UseBluetooth, mode_Grade, mode_Power
+    from fortius_ant.logfile import HexSpace
 
 else:
     BlessExample = True
     # ---------------------------------------------------------------------------
     # Import and Constants for bless example context
     # ---------------------------------------------------------------------------
-    from FTMSserverClass import clsBleServer
+    import logging
+
     import FTMSconstants as bc
     from FTMSconstants import HexSpace
-    import logging
+    from FTMSserverClass import clsBleServer
 
     mode_Power = 1  # Target Power
     mode_Grade = 2  # Target Resistance

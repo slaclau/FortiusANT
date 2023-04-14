@@ -37,20 +37,20 @@ import sys
 import time
 
 MySelf = None
-from fortius_ant.constants import mode_Power, mode_Grade, OnRaspberry, mile
 import fortius_ant.constants as constants
 import fortius_ant.FortiusAntCommand as cmd
 import fortius_ant.logfile as logfile
+from fortius_ant.constants import OnRaspberry, mile, mode_Grade, mode_Power
 
 UseOutputDisplay = False
 if OnRaspberry:
     import gpiozero  # pylint: disable=import-error
 
     try:
-        from adafruit_rgb_display.rgb import color565  # pylint: disable=import-error
         import adafruit_rgb_display.st7789 as st7789  # pylint: disable=import-error
         import board  # pylint: disable=import-error
         import digitalio  # pylint: disable=import-error
+        from adafruit_rgb_display.rgb import color565  # pylint: disable=import-error
         from PIL import Image, ImageDraw, ImageFont  # pylint: disable=import-error
     except:
         pass
