@@ -33,6 +33,38 @@ For inspiration, visit the [Raspberry Pi Hall of Fame](https://github.com/Wouter
 
 ![image](https://raw.githubusercontent.com/WouterJD/FortiusANT/master/supportfiles/FortiusAntWorld.jpg)
 
+# Installation
+
+FortiusANT is available as a deb package built for Ubuntu focal or jammy as well as a snap. These packages include all Python dependencies.
+
+## .deb installation
+
+Run the following command:
+```bash
+sudo add-apt-repository ppa:slaclau/ppa
+sudo apt update
+sudo apt install fortius-ant
+```
+
+To obtain the latest development version use the following instead:
+```bash
+sudo add-apt-repository ppa:slaclau/ppa-pre
+sudo apt update
+sudo apt install fortius-ant
+```
+
+## snap installation
+
+Snap installation is currently work in progress, full releases are available in the snapcraft beta channel:
+```bash
+sudo snap install --channel=latest/beta --devmode fortius-ant
+```
+
+Development releases are available in the edge channel:
+```bash
+sudo snap install --channel=latest/edge --devmode fortius-ant
+```
+
 # License
 
 GPLv3

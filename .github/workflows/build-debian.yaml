@@ -65,9 +65,9 @@ jobs:
           echo $GPG_KEY_ID
           echo "${{ secrets.PPA_GPG_PRIVATE_KEY }}" | gpg --batch --import
           sed -i '1d' requirements.txt
-          dpkg-buildpackage -S -sa
+          dpkg-buildpackage -S -sa --compression=xz --compression-level=1
           dpkg-buildpackage -b
-          mv ../fortius-ant*.deb .
+          mv ../fortius-ant_*.* .
       - name: Install package
         run: |
           sudo apt install ./fortius-ant*.deb
@@ -81,13 +81,16 @@ jobs:
           name: ${{ matrix.os }}
           path: |
             fortius-ant*.deb
+            fortius-ant*.dsc
+            fortius-ant*.tar.xz
+            fortius-ant*.changes
       - name: Publish focal package
         run: |
           sudo apt install dput
-          dput ppa:slaclau/ppa-pre ../fortius-ant*source.changes
+          dput ppa:slaclau/ppa-pre fortius-ant*source.changes
         if: matrix.os == 'ubuntu-20.04'
       - name: Publish jammy package
         run: |
           sudo apt install dput
-          dput ppa:slaclau/ppa-pre ../fortius-ant*source.changes
+          dput ppa:slaclau/ppa-pre fortius-ant*source.changes
         if: matrix.os == 'ubuntu-22.04'
