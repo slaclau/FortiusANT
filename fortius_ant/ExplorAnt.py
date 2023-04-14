@@ -35,7 +35,6 @@ from datetime import datetime
 
 import numpy
 import usb.core
-import wx
 
 import fortius_ant.antDongle as ant
 import fortius_ant.antFE as fe

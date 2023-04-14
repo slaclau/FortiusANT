@@ -11,7 +11,6 @@ version = (
             "describe",
             "--tags",
             "--always",
-            "--long",
             "--match",
             f"[[:digit:]]*",
             "--exclude",
@@ -23,7 +22,7 @@ version = (
 )
 ubuntu_version = (
     subprocess.check_output(
-        ["git", "describe", "--tags", "--always", "--long", "--match", f"[[:digit:]]*"]
+        ["git", "describe", "--tags", "--always", "--match", f"[[:digit:]]*"]
     )
     .strip()
     .decode("utf-8")

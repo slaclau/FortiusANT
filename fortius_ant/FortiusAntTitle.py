@@ -6,6 +6,7 @@ import fortius_ant
 WindowTitle = (
     "Fortius Antifier " + fortius_ant.__shortversion__
 )  # Double quotes, see below!
+
 import time
 import urllib.request
 
