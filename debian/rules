@@ -5,6 +5,10 @@ SHELL := /bin/bash
 %:
 	dh $@ --with python-virtualenv
 
+override_dh_clean:
+	dh_clean
+	rm -r doc docs
+
 SYSPY := $(shell python3 useSystemPython.py)
 ifdef SYSPY
 override_dh_virtualenv:
