@@ -1,5 +1,11 @@
 fortius-ant (6.7.3-0ubuntu8) replaceme; urgency=medium
 
+  * Packaging update due to install fortius_ant from wheel
+
+ -- Sebastien Laclau <seb.laclau@gmail.com>  Fri, 14 Apr 2023 10:58:42 +0100
+
+fortius-ant (6.7.3-0ubuntu8) replaceme; urgency=medium
+
   * Packaging update due to attempted network use during build
 
  -- Sebastien Laclau <seb.laclau@gmail.com>  Fri, 14 Apr 2023 02:10:42 +0100
