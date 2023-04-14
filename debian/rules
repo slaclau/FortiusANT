@@ -6,8 +6,8 @@ SHELL := /bin/bash
 	dh $@ --with python-virtualenv
 
 override_dh_clean:
-	rm -r doc
-	rm -r docs
+	rm -r doc ||:
+	rm -r docs ||:
 	dh_clean
 
 SYSPY := $(shell python3 useSystemPython.py)
