@@ -20,6 +20,8 @@ override_dh_virtualenv:
 	--extra-pip-arg --find-links=pip_local \
 	--skip-install
 	debian/fortius-ant/opt/venvs/fortius-ant/bin/python -m pip install --force-reinstall pip_local/fortius_ant*.whl
+	sed -i "s/^.*\/opt/\#\!\/opt/" debian/opt/venvs/fortius-ant/bin/fortius-ant
+	sed -i "s/^.*\/opt/\#\!\/opt/" debian/opt/venvs/fortius-ant/bin/explorant
 else
 override_dh_virtualenv:
 	dh_virtualenv \
@@ -29,6 +31,8 @@ override_dh_virtualenv:
 	--extra-pip-arg --find-links=pip_local \
 	--skip-install
 	debian/fortius-ant/opt/venvs/fortius-ant/bin/python -m pip install --force-reinstall pip_local/fortius_ant*.whl
+	sed -i "s/^.*\/opt/\#\!\/opt/" debian/opt/venvs/fortius-ant/bin/fortius-ant
+	sed -i "s/^.*\/opt/\#\!\/opt/" debian/opt/venvs/fortius-ant/bin/explorant
 endif
 
 override_dh_strip:
