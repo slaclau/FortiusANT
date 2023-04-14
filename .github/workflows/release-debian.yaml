@@ -54,6 +54,10 @@ jobs:
       - name: Install package
         run: |
           sudo apt install ./fortius-ant*.deb
+      - name: Test package
+        run: |
+          fortius-ant --version
+          explorant --version
       - name: Upload debian package
         uses: actions/upload-artifact@v3
         with:
