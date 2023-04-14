@@ -5,12 +5,6 @@
 
 SYSPY := $(shell python3 useSystemPython.py)
 ifdef SYSPY
-override_dh_clean:
-	python3 wxPython-source.py
-	dh_clean
-	python3 -m pip download \
-	--destination-directory pip_local \
-	-r requirements.txt
 override_dh_virtualenv:
 	dh_virtualenv \
 	--python python3 \
@@ -18,12 +12,6 @@ override_dh_virtualenv:
 	--extra-pip-arg --no-index \
 	--extra-pip-arg --find-links=pip_local
 else
-override_dh_clean:
-	python3.9 wxPython-source.py
-	dh_clean
-	python3.9 -m pip download \
-	--destination-directory pip_local \
-	-r requirements.txt
 override_dh_virtualenv:
 	dh_virtualenv \
 	--python python3.9 \
