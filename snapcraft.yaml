@@ -21,7 +21,10 @@ apps:
     command: bin/fortius-ant
     plugs:
       - raw-usb
-
+  explorant:
+    command: bin/explorant
+    plugs:
+      - raw-usb
 parts:
   local:
     plugin: dump
