@@ -574,18 +574,26 @@ class clsTacxTrainer:
         self.WindSpeed = WindSpeed
         self.DraftingFactor = DraftingFactor
 
-    def SetUserConfiguration(self, UserWeight, BicycleWeight, BicycleWheelDiameter, GearRatio):
+    def SetUserConfiguration(
+        self, UserWeight, BicycleWeight, BicycleWheelDiameter, GearRatio
+    ):
         if debug.on(debug.Function):
-            logfile.Write ("SetUserConfiguration(%s[def=75kg], %s[def=10kg], %s, %s)" % (UserWeight, BicycleWeight, BicycleWheelDiameter, GearRatio))
+            logfile.Write(
+                "SetUserConfiguration(%s[def=75kg], %s[def=10kg], %s, %s)"
+                % (UserWeight, BicycleWeight, BicycleWheelDiameter, GearRatio)
+            )
 
         if (UserWeight + BicycleWeight) < 70:
-            logfile.Console("The sun of User- and Bike weight is set to %d, which is below the expected minimum of 70kg; it's ignored." % (UserWeight + BicycleWeight))
+            logfile.Console(
+                "The sun of User- and Bike weight is set to %d, which is below the expected minimum of 70kg; it's ignored."
+                % (UserWeight + BicycleWeight)
+            )
         else:
-            self.BicycleWeight          = BicycleWeight
-            self.BicycleWheelDiameter   = BicycleWheelDiameter
-            self.GearRatio              = GearRatio
-            self.UserWeight             = UserWeight
-            self.UserAndBikeWeight      = UserWeight + BicycleWeight
+            self.BicycleWeight = BicycleWeight
+            self.BicycleWheelDiameter = BicycleWheelDiameter
+            self.GearRatio = GearRatio
+            self.UserWeight = UserWeight
+            self.UserAndBikeWeight = UserWeight + BicycleWeight
 
     # ---------------------------------------------------------------------------
     # SendToTrainer() and ReceivedFromTrainer() to be defined by sub-class
