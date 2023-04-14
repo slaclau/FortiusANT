@@ -13,3 +13,5 @@ sphinx
 sphinx_rtd_theme
 pydata_sphinx_theme
 versioneer
+
+types-wxpython
