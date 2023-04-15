@@ -91,7 +91,8 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ${{ matrix.os }}.tar
+          files: fortius-ant*.deb
+          prerelease: true
       - name: Get root release
         run: |
           echo "SHORT_TAG=$(echo ${{ github.ref_name }} | sed -re 's/-[0-9]+ubuntu[0-9]+//g')" >> $GITHUB_ENV
@@ -99,8 +100,10 @@ jobs:
       - name: Update main release
         uses: softprops/action-gh-release@v1
         with:
-          files: ${{ matrix.os }}.tar
+          files: fortius-ant*.deb
           tag_name: ${{ env.SHORT_TAG }}
+          body: "Updated to include ${{ github.ref_name }}"
+          append_body: true
       - name: Publish focal package
         run: |
           sudo apt install dput
