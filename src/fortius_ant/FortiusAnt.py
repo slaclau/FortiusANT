@@ -54,7 +54,7 @@ from fortius_ant.FortiusAntTitle import githubWindowTitle
 if UseGui:
     import wx
 
-    from fortius_ant import FortiusAntGui as gui  # noqa: PLC0412
+    from fortius_ant import FortiusAntGui as gui  # noqa: PLC412
     from fortius_ant import RadarGraph
 # -------------------------------------------------------------------------------
 # Version info
@@ -371,7 +371,7 @@ class clsFortiusAntConsole:
             self.RunningSwitch = True
             Tacx2Dongle(self)
 
-    def SetValues(  # noqa: PLR0913 PLR0914
+    def SetValues(  # noqa: PLR913 PLR914
         self,
         fSpeed,
         iRevs,
@@ -381,8 +381,8 @@ class clsFortiusAntConsole:
         fTargetGrade,
         iTacx,
         iHeartRate,
-        iCranksetIndex,  # noqa: PLW0613
-        iCassetteIndex,  # noqa: PLW0613
+        iCranksetIndex,  # noqa: PLW613
+        iCassetteIndex,  # noqa: PLW613
         fReduction,
     ):
         """Set values to display on the console once per second."""
@@ -458,7 +458,7 @@ class clsFortiusAntConsole:
         if HRM is not None:
             logfile.Console("AntHRM - " + HRM)
 
-    def SetLeds(  # noqa: PLR0913
+    def SetLeds(  # noqa: PLR913
         self, ANT=None, BLE=None, Cadence=None, Shutdown=None, Tacx=None
     ):
         """Set LEDs to show state."""
@@ -753,7 +753,7 @@ class clsFortiusAntParent:
             logfile.Write(f"mp-MainRespondToGUI({command}, {rtn})")
         self.app_conn.send((command, rtn))
 
-    def SetValues(  # noqa: PLR0913
+    def SetValues(  # noqa: PLR913
         self,
         fSpeed,
         iRevs,
@@ -821,7 +821,7 @@ class clsFortiusAntParent:
             (cmd_PedalStrokeAnalysis, (info, Cadence))
         )  # x. Main sends messages to GUI; no response expected
 
-    def SetLeds(  # noqa: PLR0913
+    def SetLeds(  # noqa: PLR913
         self, ANT=None, BLE=None, Cadence=None, Shutdown=None, Tacx=None
     ):
         """Set LEDs to display on the GUI."""
