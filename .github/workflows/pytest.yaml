@@ -24,6 +24,9 @@ jobs:
         run: |
           pip install pytest pytest-cov pytest-md-report
           pytest --md-report src/ >> $GITHUB_STEP_SUMMARY
-      - name: Coverage
-        if: always()
-        run: pytest --cov=src src/
+     - name: Test & publish code coverage
+       uses: paambaati/codeclimate-action@v3.2.0
+       env:
+         CC_TEST_REPORTER_ID: d5ee13c196a94fa42f9ffcd4c6d659fb112b176012c9c1f9d698b9a4b3c1de53
+       with:
+         coverageCommand: pytest --cov=src src --cov-format=xml
