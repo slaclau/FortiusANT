@@ -30,7 +30,6 @@ jobs:
         run: |
           echo "useSystemPython=$(python3 useSystemPython.py)" >> $GITHUB_ENV
           echo "${{env.useSystemPython}}"
-
       - name: Install system python packages
         if: ${{ env.useSystemPython == 'yes' }}
         run: |
@@ -93,6 +92,15 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: ${{ matrix.os }}.tar
+      - name: Get root release
+        run: |
+          echo "SHORT_TAG=$(echo ${{ github.ref_name }} | sed -re 's/-[0-9]+ubuntu[0-9]+//g') >> $GITHUB_ENV
+          echo ${{ env.SHORT_TAG }}
+      - name: Update main release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ matrix.os }}.tar
+          tag_name: ${{ env.SHORT_TAG }}
       - name: Publish focal package
         run: |
           sudo apt install dput
