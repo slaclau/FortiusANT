@@ -1,3 +1,9 @@
+fortius-ant (6.7.3-0ubuntu11) rerplaceme; urgency=medium
+
+  * Update to packaging order to ensure version set correctly
+
+ -- Sebastien Laclau <seb.laclau@gmail.com>  Sat, 15 Apr 2023 11:45:48 +0100
+
 fortius-ant (6.7.3-0ubuntu10) replaceme; urgency=medium
 
   * Updates to compression and to remove unneeded files
