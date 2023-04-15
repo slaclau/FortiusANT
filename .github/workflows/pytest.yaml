@@ -26,4 +26,4 @@ jobs:
           pytest --md-report src/ >> $GITHUB_STEP_SUMMARY
       - name: Coverage
         if: always()
-        run: pytest --cov=src src:
+        run: pytest --cov=src src/
