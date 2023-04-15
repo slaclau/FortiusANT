@@ -1,6 +1,6 @@
 name: "lint"
 
-on: 
+on:
   push:
     branches:
       - "**"
@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-        
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -33,23 +33,23 @@ jobs:
         continue-on-error: true
         if: always()
         run: |
-          flake8 fortius_ant --format=json >> flake8.json
+          flake8 src --format=json >> flake8.json
       - name: mypy
         if: always()
         run: |
-          mypy --strict fortius_ant | mypy-json-report parse --output-file mypy.json
+          mypy --strict src | mypy-json-report parse --output-file mypy.json
       - name: black
         if: always()
         run: |
           echo "# black report" >> black.md
           echo "These files have not been formatted" >> black.md
-          black --check fortius_ant &>> black.md
+          black --check src &>> black.md
       - name: isort
         if: always()
         run: |
           echo "# isort report" >> isort.md
-          echo "These files have not been formatted" >> black.md
-          isort -c fortius_ant &>> isort.md
+          echo "These files have not been formatted" >> isort.md
+          isort -c src &>> isort.md
       - name: Convert reports
         if: always()
         run: |

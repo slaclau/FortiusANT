@@ -1,23 +1,28 @@
-"""Public module for FortiusANT."""
+"""Public module for FortiusANT."""  # noqa PLC0302
 import argparse
-import glob
+
+# import glob
 import multiprocessing
 import os
 import pickle
 import platform
-import random
-import struct
+
+# import random
+# import struct
 import sys
 import threading
 import time
 from datetime import datetime
+from importlib.metadata import version as get_version
 
 import numpy
 import usb.core
 
 from fortius_ant import FortiusAntBody
 from fortius_ant import FortiusAntCommand as cmd
-from fortius_ant import TCXexport, antCTRL
+from fortius_ant import TCXexport, __packagetype__, __packageversion__, __shortversion__
+from fortius_ant import __version__ as __fullversion__
+from fortius_ant import antCTRL
 from fortius_ant import antDongle as ant
 from fortius_ant import antFE as fe
 from fortius_ant import antHRM as hrm
@@ -150,7 +155,7 @@ def Settings(self, pRestartApplication: bool, pclv: cmd.CommandLineVariables):
     clv = pclv
 
     if debug.on(debug.Function):
-        logfile.Write("FortiusAnt.Settings(%s, %s)" % (pRestartApplication, pclv.debug))
+        logfile.Write(f"FortiusAnt.Settings({pRestartApplication}, {pclv.debug})")
 
     if testMode:
         print("")
@@ -267,7 +272,7 @@ def Tacx2Dongle(self):
 if UseGui:
 
     class frmFortiusAnt(gui.frmFortiusAntGui):
-        """This class extends the base GUI class with direct function calls."""
+        """Class to extend the base GUI class with direct function calls."""
 
         def callSettings(self, pRestartApplication, pclv):
             """Call FortiusAnt.Settings and return its result.
@@ -343,7 +348,7 @@ if UseGui:
 
 
 class clsFortiusAntConsole:
-    """This class provides a console GUI.
+    """Class providing a console GUI.
 
     Attributes
     ----------
@@ -366,7 +371,7 @@ class clsFortiusAntConsole:
             self.RunningSwitch = True
             Tacx2Dongle(self)
 
-    def SetValues(  # noqa: R0913 R0914
+    def SetValues(  # noqa: PLR0913 PLR0914
         self,
         fSpeed,
         iRevs,
@@ -376,12 +381,11 @@ class clsFortiusAntConsole:
         fTargetGrade,
         iTacx,
         iHeartRate,
-        iCranksetIndex,  # noqa: W0613
-        iCassetteIndex,  # noqa: W0613
+        iCranksetIndex,  # noqa: PLW0613
+        iCassetteIndex,  # noqa: PLW0613
         fReduction,
     ):
         """Set values to display on the console once per second."""
-        global clv
         # ----------------------------------------------------------------------
         # Console: Update current readings, once per second
         # ----------------------------------------------------------------------
@@ -397,50 +401,49 @@ class clsFortiusAntConsole:
                 s2 = "km/h"
 
             if iTargetMode == mode_Power:
-                sTarget = "%3.0fW" % iTargetPower
+                sTarget = f"{iTargetPower:3.0f}W"
             elif iTargetMode == mode_Grade:
-                sTarget = "%3.1f%%" % fTargetGrade
+                sTarget = f"{fTargetGrade:3.1f}%"
                 if iTargetPower > 0:  # 2020-01-22
                     sTarget += (
-                        "(%iW)" % iTargetPower
-                    )  # Target power added for reference
+                        f"({iTargetPower:i}W)"  # Target power added for reference
+                    )
             else:
                 sTarget = "None"
 
             if clv.hrm == -1:
                 h = ""
             else:
-                h = "hr=%3.0f " % iHeartRate
+                h = f"hr={iHeartRate:3.0f} "
 
-            all = False
+            allLeds = False
             self.leds = ""
-            if all or True:  # Led 1 = Tacx trainer; USB, ANT or Simulated
-                self.leds += "t" if self.StatusLeds[0] else "-"
 
-            if all or OnRaspberry:  # Led 2 = on raspberry only
-                self.leds += "s" if self.StatusLeds[1] else "-"
+            def setLed(condition, valIfTrue):
+                if condition:
+                    self.leds += valIfTrue
+                else:
+                    self.leds += "-"
+
+            setLed(self.StatusLeds[0], "t")
+            if allLeds or OnRaspberry:  # Led 2 = on raspberry only
+                setLed(self.StatusLeds[1], "s")
 
             if (
-                all or clv.Tacx_Cadence
+                allLeds or clv.Tacx_Cadence
             ):  # Led 3 = Cadence sensor (black because backgroup is white)
-                self.leds += "c" if self.StatusLeds[2] else "-"
+                setLed(self.StatusLeds[2], "c")
 
-            if all or clv.ble:  # Led 4 = Bluetooth CTP
-                self.leds += "b" if self.StatusLeds[3] else "-"
+            if allLeds or clv.ble:  # Led 4 = Bluetooth CTP
+                setLed(self.StatusLeds[3], "b")
 
-            if all or clv.antDeviceID != -1:  # Led 5 = ANT CTP
-                self.leds += "a" if self.StatusLeds[4] else "-"
+            if allLeds or clv.antDeviceID != -1:  # Led 5 = ANT CTP
+                setLed(self.StatusLeds[4], "a")
 
-            msg = "Target=%s %4.1f%s %sCurrent=%3.0fW Cad=%3.0f r=%4.0f %3s%% %s" % (
-                sTarget,
-                s1,
-                s2,
-                h,
-                iPower,
-                iRevs,
-                iTacx,
-                int(fReduction * 100),
-                self.leds,
+            msg = (
+                f"Target={sTarget} {s1:4.1f}{s2} {h} "
+                f"Current={iPower:3.0f}W Cad={iRevs:3.0f} "
+                f"r={iTacx:4.0f} {int(fReduction * 100):3s}% {self.leds}"
             )
             logfile.Console(msg)
 
@@ -455,7 +458,9 @@ class clsFortiusAntConsole:
         if HRM is not None:
             logfile.Console("AntHRM - " + HRM)
 
-    def SetLeds(self, ANT=None, BLE=None, Cadence=None, Shutdown=None, Tacx=None):
+    def SetLeds(  # noqa: PLR0913
+        self, ANT=None, BLE=None, Cadence=None, Shutdown=None, Tacx=None
+    ):
         """Set LEDs to show state."""
         if self.leds != "":
             self.leds = (
@@ -474,23 +479,10 @@ class clsFortiusAntConsole:
                 self.StatusLeds[4] = not self.StatusLeds[4] if ANT else False
 
 
-# ==============================================================================
-# Subclass FortiusAnt GUI with our multi-processing functions
-# ------------------------------------------------------------------------------
-# Description:  This class is functionally identical to frmFortiusAnt, with that
-#               difference that the required functions are not called, but
-#               requested through the multiprocessing pipe.
-#
-# Called:       cmd_IdleFunction, cmd_LocateHW, cmd_Runoff and cmd_Tacx2Dongle
-#               are sent to the main process for execution and the response is
-#               received.
-#
-# Functions:    For this purpose, GuiMessageToMain() is available.
-# ==============================================================================
 if UseGui:
 
     class frmFortiusAntChild(gui.frmFortiusAntGui):
-        """This class extends the base GUI class with multiprocessing function calls.
+        """Class to extend the base GUI class with multiprocessing function calls.
 
         Parameters
         ----------
@@ -514,7 +506,7 @@ if UseGui:
                 Command line variables to be set
             """
             self.gui_conn = conn
-            super(frmFortiusAntChild, self).__init__(parent, pclv)
+            super().__init__(parent, pclv)
 
         def GuiMessageToMain(self, command, wait=True, p1=None, p2=None):
             """Send a command to the main process.
@@ -527,11 +519,11 @@ if UseGui:
             command : int
                 This command is taken from a list of constants in this module. It
                 should be refactored as an enum.
-            wait : bool, default True
+            wait : bool
                 Whether to wait for the command to return a response.
-            p1 : object, default None
+            p1 : object
                 Parameter 1 for command
-            p2 : object, default None
+            p2 : object
                 Parameter 2 for command
 
             Returns
@@ -545,8 +537,7 @@ if UseGui:
             # ----------------------------------------------------------------------
             if debug.on(debug.MultiProcessing) and not command == cmd_Idle:
                 logfile.Write(
-                    "mp-GuiMessageToMain(conn, %s, %s, %s, %s)"
-                    % (command, wait, p1, p2)
+                    f"mp-GuiMessageToMain(conn, {command}, {wait}, {p1}, {p2})"
                 )
             self.gui_conn.send((command, p1, p2))
 
@@ -561,13 +552,14 @@ if UseGui:
                 # Step 4. GUI receives the response (command, rtn)
                 # ------------------------------------------------------------------
                 msg = self.gui_conn.recv()
-                cmd = msg[0]
+                received_command = msg[0]
                 rtn = msg[1]
                 if debug.on(debug.MultiProcessing) and not (
                     command == cmd_Idle and rtn == 0
                 ):
                     logfile.Write(
-                        "mp-GuiAnswerFromMain(conn) returns (%s, %s)" % (cmd, rtn)
+                        f"mp-GuiAnswerFromMain(conn) returns"
+                        f" ({received_command}, {rtn})"
                     )
 
                 # ------------------------------------------------------------------
@@ -579,11 +571,11 @@ if UseGui:
                 # we ignore the response here and cmd_StopButton does not start
                 # wait-loop to avoid some sort of nesting or so.
                 # ------------------------------------------------------------------
-                if cmd == command:
+                if received_command == command:
                     break  # command is ready
-                elif cmd == cmd_StopButton:
+                if received_command == cmd_StopButton:
                     pass
-                elif cmd == cmd_SetValues:
+                elif received_command == cmd_SetValues:
                     self.SetValues(
                         rtn[0],
                         rtn[1],
@@ -597,22 +589,22 @@ if UseGui:
                         rtn[9],
                         rtn[10],
                     )  # rtn is tuple
-                elif cmd == cmd_SetMessages:
+                elif received_command == cmd_SetMessages:
                     self.SetMessages(
                         rtn[0], rtn[1], rtn[2]
                     )  # rtn is (Tacx, Dongle, HRM) tuple
-                elif cmd == cmd_PedalStrokeAnalysis:
+                elif received_command == cmd_PedalStrokeAnalysis:
                     self.PedalStrokeAnalysis(
                         rtn[0], rtn[1]
                     )  # rtn is (info, Cadence) tuple
-                elif cmd == cmd_SetLeds:
+                elif received_command == cmd_SetLeds:
                     self.SetLeds(
                         rtn[0], rtn[1], rtn[2], rtn[3], rtn[4]
                     )  # rtn is (ANT, BLE, Cadence, Shutdown, Tacx) tuple
                 else:
                     logfile.Console(
-                        "%s active but unknown response received (%s, %s); "
-                        "the message is ignored." % (command, cmd, rtn)
+                        f"{command} active but unknown response received "
+                        f"({received_command}, {rtn}); the message is ignored."
                     )
                     break
             return rtn
@@ -625,12 +617,12 @@ if UseGui:
         #     Runoff/Tacx2Dongle: the main process can also send information to be
         #     displayed!
         # --------------------------------------------------------------------------
-        def callSettings(self, RestartApplication, pclv):
+        def callSettings(self, pRestartApplication, pclv):
             """Call :func:`GuiMessageToMain` with :const:`cmd_Settings`.
 
             Parameters
             ----------
-            RestartApplication : bool
+            pRestartApplication : bool
                 Application restart state to be set
             pclv : FortiusAntCommand.CommandLineVariables
                 Command line variables to be set
@@ -641,7 +633,7 @@ if UseGui:
                 The value returned by :func:`GuiMessageToMain`
             """
             rtn = self.GuiMessageToMain(
-                cmd_Settings, True, RestartApplication, self.clv
+                cmd_Settings, True, pRestartApplication, self.clv
             )
             return rtn
 
@@ -715,28 +707,6 @@ if UseGui:
             gui.frmFortiusAntGui.OnClose(self, event)
 
 
-# ==============================================================================
-# Class to create a parent-process
-# ------------------------------------------------------------------------------
-# Description:  This class creates the parent, which receives commands from the
-#               GUI child process, calls the required function and returns the
-#               result.
-#
-# Called:       cmd_IdleFunction, cmd_LocateHW, cmd_Runoff and cmd_Tacx2Dongle
-#               are called and the response is sent to the child process.
-#
-# Functions:    For this purpose, MainCommandFromGui() and MainRespondToGUI()
-#               are available.
-#
-#               SetMessages() and SetValues() are called by the functions and
-#               send the data to be displayed to the child, not awaiting an
-#               answer.
-#
-#               RunoffThread() and Tacx2DongleThread() act as function to create
-#               a thread to execute the functions, whilst not blocking the
-#               the process to receive messages from the GUI client, which can
-#               order to stop.
-# ==============================================================================
 class clsFortiusAntParent:
     """Main process when multiprocessing is used.
 
@@ -768,9 +738,7 @@ class clsFortiusAntParent:
         p1 = msg[1]
         p2 = msg[2]
         if debug.on(debug.MultiProcessing) and not command == cmd_Idle:
-            logfile.Write(
-                "mp-MainCommandFromGui() returns (%s, %s, %s)" % (command, p1, p2)
-            )
+            logfile.Write(f"mp-MainCommandFromGui() returns ({command}, {p1}, {p2})")
         return command, p1, p2
 
     def MainRespondToGUI(self, command, rtn):
@@ -779,13 +747,13 @@ class clsFortiusAntParent:
         Parameters
         ----------
         command : int
-        rtn
+        rtn : tuple
         """
         if debug.on(debug.MultiProcessing) and not (command == cmd_Idle and rtn == 0):
-            logfile.Write("mp-MainRespondToGUI(%s, %s)" % (command, rtn))
+            logfile.Write(f"mp-MainRespondToGUI({command}, {rtn})")
         self.app_conn.send((command, rtn))
 
-    def SetValues(
+    def SetValues(  # noqa: PLR0913
         self,
         fSpeed,
         iRevs,
@@ -805,21 +773,10 @@ class clsFortiusAntParent:
             self.LastTime = time.time()  # Time in seconds
             if debug.on(debug.MultiProcessing):
                 logfile.Write(
-                    "mp-MainDataToGUI(%s, (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s))"
-                    % (
-                        cmd_SetValues,
-                        fSpeed,
-                        iRevs,
-                        iPower,
-                        iTargetMode,
-                        iTargetPower,
-                        fTargetGrade,
-                        iTacx,
-                        iHeartRate,
-                        iCranksetIndex,
-                        iCassetteIndex,
-                        fReduction,
-                    )
+                    f"mp-MainDataToGUI({cmd_SetValues}, ({fSpeed}, {iRevs}, "
+                    f"{iPower}, {iTargetMode}, {iTargetPower}, {fTargetGrade}, "
+                    f"{iTacx}, {iHeartRate}, {iCranksetIndex}, "
+                    f"{iCassetteIndex}, {fReduction}))"
                 )
             self.app_conn.send(
                 (
@@ -843,12 +800,12 @@ class clsFortiusAntParent:
     def SetMessages(self, Tacx=None, Dongle=None, HRM=None):
         """Set messages to display on the GUI."""
         newMessages = (Tacx, Dongle, HRM)
-        if newMessages != self.PreviousMessages:  # Send immediatly if changed
+        if newMessages != self.PreviousMessages:  # Send immediately if changed
             self.PreviousMessages = newMessages
             if debug.on(debug.MultiProcessing):
                 logfile.Write(
-                    "mp-MainDataToGUI(%s, (%s, %s, %s))"
-                    % (cmd_SetMessages, Tacx, Dongle, HRM)
+                    f"mp-MainDataToGUI({cmd_SetMessages}, ({Tacx}, {Dongle}, "
+                    f"{HRM}))"
                 )
             self.app_conn.send(
                 (cmd_SetMessages, (Tacx, Dongle, HRM))
@@ -858,18 +815,20 @@ class clsFortiusAntParent:
         """Display pedal stroke analysis."""
         if debug.on(debug.MultiProcessing):
             logfile.Write(
-                "mp-MainDataToGUI(%s, (info, %s))" % (cmd_PedalStrokeAnalysis, Cadence)
+                f"mp-MainDataToGUI({cmd_PedalStrokeAnalysis}, (info, {Cadence}))"
             )
         self.app_conn.send(
             (cmd_PedalStrokeAnalysis, (info, Cadence))
         )  # x. Main sends messages to GUI; no response expected
 
-    def SetLeds(self, ANT=None, BLE=None, Cadence=None, Shutdown=None, Tacx=None):
+    def SetLeds(  # noqa: PLR0913
+        self, ANT=None, BLE=None, Cadence=None, Shutdown=None, Tacx=None
+    ):
         """Set LEDs to display on the GUI."""
         if debug.on(debug.MultiProcessing):
             logfile.Write(
-                "mp-MainDataToGUI(%s, (%s, %s, %s, %d, %s))"
-                % (cmd_SetLeds, Tacx, Shutdown, Cadence, BLE, ANT)
+                f"mp-MainDataToGUI({cmd_SetLeds}, ({Tacx}, {Shutdown}, "
+                f"{Cadence}, {BLE:d}, {ANT}))"
             )
         self.app_conn.send(
             (cmd_SetLeds, (ANT, BLE, Cadence, Shutdown, Tacx))
@@ -892,8 +851,7 @@ class clsFortiusAntParent:
 
             if gui_command == cmd_EndExecution:
                 break
-
-            elif gui_command == cmd_Settings:
+            if gui_command == cmd_Settings:
                 rtn = Settings(self, gui_p1, gui_p2)
                 self.MainRespondToGUI(cmd_Settings, rtn)
 
@@ -923,23 +881,11 @@ class clsFortiusAntParent:
                 self.MainRespondToGUI(cmd_StopButton, True)
 
             else:
-                logfile.Console("Unexpected command from GUI: %s" % gui_command)
+                logfile.Console(f"Unexpected command from GUI: {gui_command}")
                 rtn = False
 
 
-# ------------------------------------------------------------------------------
-# F o r t i u s A n t C h i l d
-# ------------------------------------------------------------------------------
-# Input:        clv     Command line variables
-#               conn    the child-side of the multiprocessing pipe
-#
-# Description:  Here the user-interface is created.
-#               The user-interface will call the callback functions as defined
-#               above.
-#
-# Output:       none
-# ------------------------------------------------------------------------------
-def FortiusAntChild(clv, conn):
+def FortiusAntChild(pclv, conn):
     """Initialize the child process.
 
     This function creates the GUI in a child process as an instance of
@@ -948,7 +894,7 @@ def FortiusAntChild(clv, conn):
 
     Parameters
     ----------
-    clv: FortiusAntCommand.CommandLineVariables
+    pclv: FortiusAntCommand.CommandLineVariables
         Command line variables to be set
     conn: multiprocessing.connection.Connection
         GUI end of multiprocessing pipe
@@ -956,7 +902,7 @@ def FortiusAntChild(clv, conn):
     # --------------------------------------------------------------------------
     # Initialize the child process, create our own logfile
     # --------------------------------------------------------------------------
-    debug.activate(clv.debug)
+    debug.activate(pclv.debug)
     if debug.on(debug.Any):
         logfile.Open("FortiusAntGUI")
         logfile.Console("FortiusAnt GUI started in child-process")
@@ -965,10 +911,10 @@ def FortiusAntChild(clv, conn):
     # Start the user-interface
     # --------------------------------------------------------------------------
     app = wx.App(0)
-    frame = frmFortiusAntChild(None, conn, clv)
+    frame = frmFortiusAntChild(None, conn, pclv)
     app.SetTopWindow(frame)
     frame.Show()
-    if clv.autostart:
+    if pclv.autostart:
         frame.Autostart()
     app.MainLoop()
 
@@ -999,7 +945,7 @@ def mainProgram():
     if debug.on(debug.Any):
         logfile.Open()
         logfile.Console("FortiusANT started")
-        logfile.Write("    Restart=%s debug=%s" % (RestartApplication, clv.debug))
+        logfile.Write(f"    Restart={RestartApplication} debug={clv.debug}")
         clv.print()
         logfile.Console("------------------")
 
@@ -1009,74 +955,7 @@ def mainProgram():
     # Component info
     # -------------------------------------------------------------------------------
     if debug.on(debug.Any):
-        # ----------------------------------------------------------------------
-        if getattr(sys, "frozen", False):
-            logfile.Write("Windows executable started")
-        else:
-            logfile.Write("Python version started")
-        # ----------------------------------------------------------------------
-        logfile.Write("Version info for the components")
-        logfile.Write(githubWindowTitle())
-        s = " %20s = %s"
-        logfile.Write(s % ("FortiusAnt", __version__))
-        logfile.Write(s % ("antCTRL", antCTRL.__version__))
-        logfile.Write(s % ("antDongle", ant.__version__))
-        logfile.Write(s % ("antFE", fe.__version__))
-        logfile.Write(s % ("antHRM", hrm.__version__))
-        logfile.Write(s % ("antPWR", pwr.__version__))
-        logfile.Write(s % ("antSCS", scs.__version__))
-        logfile.Write(s % ("bleBless", bleBless.__version__))
-        logfile.Write(s % ("bleBlessClass", bleBlessClass.__version__))
-        logfile.Write(s % ("bleDongle", bleDongle.__version__))
-        logfile.Write(s % ("constants", constants.__version__))
-        logfile.Write(s % ("debug", debug.__version__))
-        logfile.Write(s % ("FortiusAntBody", FortiusAntBody.__version__))
-        logfile.Write(s % ("FortiusAntCommand", cmd.__version__))
-        if UseGui:
-            logfile.Write(s % ("FortiusAntGui", gui.__version__))
-        logfile.Write(s % ("logfile", logfile.__version__))
-        if UseGui:
-            logfile.Write(s % ("RadarGraph", RadarGraph.__version__))
-        logfile.Write(s % ("raspberry", raspberry.__version__))
-        logfile.Write(s % ("settings", settings.__version__))
-        logfile.Write(s % ("structConstants", sc.__version__))
-        logfile.Write(s % ("TCXexport", TCXexport.__version__))
-        logfile.Write(s % ("usbTrainer", usbTrainer.__version__))
-
-        # See https://github.com/kevincar/bless/issues/98
-        # importlib_metadata_version("modulename")
-        #       does not work for argparse, binascii, math or os
-        #       but works for bless and numpy
-        #   I did not try them all.
-        logfile.Write(s % ("argparse", argparse.__version__))
-        try:
-            logfile.Write(s % ("bless", importlib_metadata_version("bless")))
-        except:
-            pass
-        #   logfile.Write(s % ('binascii',             binascii.__version__ ))
-        #   logfile.Write(s % ('math',                     math.__version__ ))
-        logfile.Write(s % ("numpy", numpy.__version__))
-        logfile.Write(s % ("os", os.name))
-        if os.name == "nt":
-            v = sys.getwindowsversion()  # noqa : PLE1101
-            logfile.Write((s + ".%s") % ("windows", v.major, v.minor))
-        logfile.Write(s % ("pickle", pickle.format_version))
-        logfile.Write(s % ("platform", platform.__version__))
-        logfile.Write(s % ("glob", glob.__version__))
-        logfile.Write(s % ("random", random.__version__))
-        logfile.Write(s % ("sys (python)", sys.version))
-        logfile.Write(s % ("struct", struct.__version__))
-        logfile.Write(s % ("threading", threading.__version__))
-        logfile.Write(s % ("time", time.__version__))
-        logfile.Write(s % ("usb", usb.__version__))
-        if UseGui:
-            logfile.Write(s % ("wx", wx.__version__))
-
-        logfile.Write("FortiusANT code flags")
-        logfile.Write(s % ("UseMultiProcessing", UseMultiProcessing))
-        logfile.Write(s % ("UseGui", UseGui))
-        logfile.Write(s % ("UseBluetooth", UseBluetooth))
-        logfile.Write("------------------")
+        print_component_info()
 
     # -------------------------------------------------------------------------------
     # Modify ANT deviceNumbers if requested
@@ -1088,13 +967,12 @@ def mainProgram():
 
         settings.OpenDialog(None, None, clv)
     elif clv.VersionOnly:
-        import fortius_ant
-
-        print(f"This is FortiusAnt version {fortius_ant.__shortversion__}")
-        print(f"The full version is {fortius_ant.__version__}")
-        if fortius_ant.__packagetype__ != "":
+        print(f"This is FortiusAnt version {__shortversion__}")
+        print(f"The full version is {__fullversion__}")
+        if __packagetype__ != "":
             print(
-                f"This copy was distributed as a {fortius_ant.__packagetype__}, the package version is {fortius_ant.__packageversion__}"
+                f"This copy was distributed as a {__packagetype__}, "
+                f"the package version is {__packageversion__}"
             )
     elif not clv.gui:
         # --------------------------------------------------------------------------
@@ -1128,7 +1006,7 @@ def mainProgram():
         pChild.start()
 
         # --------------------------------------------------------------------------
-        # Poll child-process untill done
+        # Poll child-process until done
         # --------------------------------------------------------------------------
         parent = clsFortiusAntParent(app_conn)  # The child process has the GUI
         parent.ListenToChild()
@@ -1148,13 +1026,75 @@ def mainProgram():
         logfile.Close()
 
 
+def print_component_info():
+    """Print version information of libraries, interpeter, and os."""
+    # ----------------------------------------------------------------------
+    if getattr(sys, "frozen", False):
+        logfile.Write("Windows executable started")
+    else:
+        logfile.Write("Python version started")
+    # ----------------------------------------------------------------------
+    logfile.Write("Version info for the components")
+    logfile.Write(githubWindowTitle())
+    s = " %20s = %s"
+    logfile.Write(s % ("FortiusAnt", __version__))
+    logfile.Write(s % ("antCTRL", antCTRL.__version__))
+    logfile.Write(s % ("antDongle", ant.__version__))
+    logfile.Write(s % ("antFE", fe.__version__))
+    logfile.Write(s % ("antHRM", hrm.__version__))
+    logfile.Write(s % ("antPWR", pwr.__version__))
+    logfile.Write(s % ("antSCS", scs.__version__))
+    logfile.Write(s % ("bleBless", bleBless.__version__))
+    logfile.Write(s % ("bleBlessClass", bleBlessClass.__version__))
+    logfile.Write(s % ("bleDongle", bleDongle.__version__))
+    logfile.Write(s % ("constants", constants.__version__))
+    logfile.Write(s % ("debug", debug.__version__))
+    logfile.Write(s % ("FortiusAntBody", FortiusAntBody.__version__))
+    logfile.Write(s % ("FortiusAntCommand", cmd.__version__))
+    if UseGui:
+        logfile.Write(s % ("FortiusAntGui", gui.__version__))
+    logfile.Write(s % ("logfile", logfile.__version__))
+    if UseGui:
+        logfile.Write(s % ("RadarGraph", RadarGraph.__version__))
+    logfile.Write(s % ("raspberry", raspberry.__version__))
+    logfile.Write(s % ("settings", settings.__version__))
+    logfile.Write(s % ("structConstants", sc.__version__))
+    logfile.Write(s % ("TCXexport", TCXexport.__version__))
+    logfile.Write(s % ("usbTrainer", usbTrainer.__version__))
+    logfile.Write(s % ("argparse", argparse.__version__))
+    logfile.Write(s % ("bless", get_version("bless")))
+    #   logfile.Write(s % ('binascii',             binascii.__version__ ))
+    #   logfile.Write(s % ('math',                     math.__version__ ))
+    logfile.Write(s % ("numpy", numpy.__version__))
+    logfile.Write(s % ("os", os.name))
+    if os.name == "nt":
+        v = sys.getwindowsversion()  # noqa : PLE1101
+        logfile.Write((s + ".%s") % ("windows", v.major, v.minor))
+    logfile.Write(s % ("pickle", pickle.format_version))
+    logfile.Write(s % ("platform", platform.__version__))
+    #   logfile.Write(s % ("glob", glob.__version__))
+    #   logfile.Write(s % ("random", random.__version__))
+    logfile.Write(s % ("sys (python)", sys.version))
+    #   logfile.Write(s % ("struct", struct.__version__))
+    #   logfile.Write(s % ("threading", threading.__version__))
+    #   logfile.Write(s % ("time", time.__version__))
+    logfile.Write(s % ("usb", usb.__version__))
+    if UseGui:
+        logfile.Write(s % ("wx", wx.__version__))
+    logfile.Write("FortiusANT code flags")
+    logfile.Write(s % ("UseMultiProcessing", UseMultiProcessing))
+    logfile.Write(s % ("UseGui", UseGui))
+    logfile.Write(s % ("UseBluetooth", UseBluetooth))
+    logfile.Write("------------------")
+
+
 # -----------------------------------------------------------------------------------
 # Main program; when restart is required due to new parameters we will loop
 # -----------------------------------------------------------------------------------
 def main():
     """Loop :meth:`mainProgram` unless :data:`RestartApplication` is False on return."""
     multiprocessing.freeze_support()
-    global RestartApplication, clv
+    global RestartApplication
 
     RestartApplication = False
     while True:

@@ -1,4 +1,5 @@
 -r wxPython-source.txt
+importlib
 bless
 lib_programname
 numpy != 1.19.4

@@ -5,6 +5,7 @@
 *.json
 *.png
 .pydevproject
+.settings
 Thumbs.db
 fortius_ant/build/
 fortius_ant/dist/

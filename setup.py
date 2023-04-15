@@ -9,6 +9,7 @@ setup(
     author="Sebastien Laclau",
     author_email="seb.laclau@gmail.com",
     packages=["fortius_ant"],
+    package_dir={"": "src"},
     package_data={
         "fortius_ant": ["./*"],
     },

@@ -7,6 +7,7 @@ load-plugins = [
 [tool.pylint.MESSAGES-CONTROL]
 disable = [
     "invalid-name",
+    "global-statement",
 ]
 [tool.flake8]
 max-line-length = 88
@@ -20,3 +21,6 @@ require-plugins = [
     "flake8-pylint",
     "flake8-json",
 ]
+docstring_style = "numpy"
+[tool.mypy]
+ignore_missing_imports = true
