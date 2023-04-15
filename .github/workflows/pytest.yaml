@@ -25,7 +25,7 @@ jobs:
           pip install pytest pytest-cov pytest-md-report
           pytest --md-report src/ >> $GITHUB_STEP_SUMMARY
       - name: Test & publish code coverage
-        if: always
+        if: always()
         uses: paambaati/codeclimate-action@v3.2.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE }}
