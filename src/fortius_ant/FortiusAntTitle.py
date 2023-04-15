@@ -1,15 +1,16 @@
+"""Dynamically set window title based on GitHub and installed versions."""
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-import fortius_ant
-
-WindowTitle = (
-    "Fortius Antifier " + fortius_ant.__shortversion__
-)  # Double quotes, see below!
-
+import json
 import time
-import urllib.request
 
+import requests
+
+import fortius_ant
+from fortius_ant import debug, logfile
+
+# 2023-04-15                    Use GitHub API to get latest release
 # 2023-03-11    Version 6.7.3   Improve git versioning
 # 2023-03-10    Version 6.7.2   Update versioning system to use python-versioneer
 # 2022-12-28    Version 6.7     #404 BLE does not work when debug=0
@@ -27,7 +28,8 @@ import urllib.request
 #                               settings can be modified interactively
 #                               #120 font/rear changing
 #                               #195 power changing from headunit
-# 2021-01-04                    master branch (5.0) merged into 4.2 Quality upgrade branch
+# 2021-01-04                    master branch (5.0) merged into 4.2 Quality upgrade
+#                               branch
 # 2021-01-04    Version 5.0     #117 Tacx Bushido and #101 Genius implemented
 # 2020-12-20    Version 4.2     #173 Version 4.0 Communicates Much Higher Power vs. 3.8
 #                               #184 Power in Rouvy issue
@@ -43,8 +45,6 @@ import urllib.request
 # 2020-11-05    Version 3.5
 # 2020-11-04    First version
 # -------------------------------------------------------------------------------
-import fortius_ant.debug as debug
-import fortius_ant.logfile as logfile
 
 
 # -------------------------------------------------------------------------------
@@ -60,43 +60,30 @@ import fortius_ant.logfile as logfile
 # returns:      WindowTitle [version on github=WindowTitle]
 # -------------------------------------------------------------------------------
 def githubWindowTitle():
-    rtn = WindowTitle
-    url = "https://raw.githubusercontent.com/WouterJD/FortiusANT/master/pythoncode/FortiusAntTitle.py"
+    """Get the version from GitHub.
+
+    Returns
+    -------
+    rtn : string
+    """
+    rtn = fortius_ant.__shortversion__
+
+    url = "https://api.github.com/repos/slaclau/FortiusANT/releases/latest"
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
 
     try:
-        file = urllib.request.urlopen(url)
-    except:
+        response = requests.get(url, headers=headers, timeout=1)
+        responseDict = json.loads(response.text)
+        remoteVersion = responseDict["name"]
+        if remoteVersion != fortius_ant.__shortversion__:
+            rtn = rtn + " [version on github=" + remoteVersion + "]"
+    except requests.exceptions.RequestException:
         if debug.on(debug.Function):
             logfile.Write("No access to FortiusAntTitle.py on github")
-        pass
-    else:
-        if debug.on(debug.Function):
-            logfile.Write("Check FortiusAntTitle.py on github")
-        for line in file:
-            DecodedLine = line.decode("utf-8")
 
-            if DecodedLine[: len("WindowTitle")] == "WindowTitle":
-                # ---------------------------------------------------------------
-                # We read ourselves, so second token must be WindowTitle
-                # ---------------------------------------------------------------
-                githubWindowTitle = DecodedLine.split('"')[1]
-                # ---------------------------------------------------------------
-                # Check if equal; unequal is considered newer
-                # ---------------------------------------------------------------
-                if debug.on(debug.Any):
-                    logfile.Write(
-                        "Version="
-                        + WindowTitle
-                        + ", on github="
-                        + githubWindowTitle
-                        + "."
-                    )
-                if githubWindowTitle == WindowTitle:
-                    pass
-                else:
-                    rtn = rtn + " [version on github=" + githubWindowTitle + "]"
-                break
-        file = None
     return rtn
 
 
@@ -107,4 +94,4 @@ if __name__ == "__main__":
     t1 = time.time()
     print(githubWindowTitle())
     t2 = time.time()
-    print("Executed in %5.3f seconds" % (t2 - t1))
+    print(f"Executed in {t2 - t1:5.3f} seconds")

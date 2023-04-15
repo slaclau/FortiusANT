@@ -1,7 +1,9 @@
+"""Provide interface for communicating as ANT+ speed and cadence sensor."""
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-__version__ = "2020-12-27"
+__version__ = "2023-04-15"
+# 2023-04-15    Improve flake8 compliance
 # 2020-12-27    Rollover more according specification
 # 2020-06-16    Modified: device-by-zero due to zero Cadence/SpeedKmh
 # 2020-06-09    First version, based upon antHRM.py
@@ -9,11 +11,19 @@ __version__ = "2020-12-27"
 import time
 
 import fortius_ant.antDongle as ant
-import fortius_ant.logfile as logfile
+from fortius_ant import logfile
+
+PedalEchoPreviousCount = None  # There is no previous
+CadenceEventTime = None  # Initiate the even variables
+CadenceEventCount = None
+SpeedEventTime = None
+SpeedEventCount = None
 
 
 def Initialize():
-    global PedalEchoPreviousCount, CadenceEventTime, CadenceEventCount, SpeedEventTime, SpeedEventCount
+    """Initialize interface."""
+    global PedalEchoPreviousCount, CadenceEventTime, CadenceEventCount
+    global SpeedEventTime, SpeedEventCount
     PedalEchoPreviousCount = 0  # There is no previous
     CadenceEventTime = 0  # Initiate the even variables
     CadenceEventCount = 0
@@ -22,7 +32,21 @@ def Initialize():
 
 
 def BroadcastMessage(_PedalEchoTime, PedalEchoCount, SpeedKmh, Cadence):
-    global PedalEchoPreviousCount, CadenceEventTime, CadenceEventCount, SpeedEventTime, SpeedEventCount
+    """Create next message to be sent as speed and cadence sensor.
+
+    Parameters
+    ----------
+    PedalEchoCount : int
+    SpeedKmh : int
+    Cadence : int
+
+    Returns
+    -------
+    rtn : bytes
+        Message to be sent
+    """
+    global PedalEchoPreviousCount, CadenceEventTime, CadenceEventCount
+    global SpeedEventTime, SpeedEventCount
 
     # -------------------------------------------------------------------------
     # If pedal passed the magnet, calculate new values
@@ -84,12 +108,12 @@ def BroadcastMessage(_PedalEchoTime, PedalEchoCount, SpeedKmh, Cadence):
         SpeedEventTime,
         SpeedEventCount,
     )
-    scsdata = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+    rtn = ant.ComposeMessage(ant.msgID_BroadcastData, info)
 
     # -------------------------------------------------------------------------
     # Return message to be sent
     # -------------------------------------------------------------------------
-    return scsdata
+    return rtn
 
 
 # -------------------------------------------------------------------------------

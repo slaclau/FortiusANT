@@ -1,7 +1,9 @@
+"""Provide interface for communicating as ANT+ fitness equipment."""
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-__version__ = "2020-12-28"
+__version__ = "2023-04-15"
+# 2023-04-15    Improve flake8 compliance
 # 2020-12-28    AccumulatedPower not negative
 # 2020-12-27    Interleave and EventCount more according specification
 #               see comment in antPWR.py for more info.
@@ -13,9 +15,18 @@ import time
 
 import fortius_ant.antDongle as ant
 
+Interleave = None
+EventCount = None
+AccumulatedPower = None
+AccumulatedTime = None
+DistanceTravelled = None
+AccumulatedLastTime = None
+
 
 def Initialize():
-    global Interleave, EventCount, AccumulatedPower, AccumulatedTime, DistanceTravelled, AccumulatedLastTime
+    """Initialize interface."""
+    global Interleave, EventCount, AccumulatedPower, AccumulatedTime
+    global DistanceTravelled, AccumulatedLastTime
     Interleave = 0
     EventCount = 0
     AccumulatedPower = 0
@@ -29,15 +40,48 @@ def Initialize():
 # ------------------------------------------------------------------------------
 # input:        Cadence, CurrentPower, SpeedKmh, HeartRate
 #
-# Description:  Create next message to be sent for FE-C device.
-#               Refer to D000001231_-_ANT+_Device_Profile_-_Fitness_Equipment_-_Rev_5.0_(6).pdf
+# Description:  Create next message to be sent for FE-C device. Refer to
+#               D000001231_-_ANT+_Device_Profile_-_Fitness_Equipment_-_Rev_5.0_(6).pdf
 #
 # Output:       Interleave, AccumulatedPower, AccumulatedTime, DistanceTravelled
 #
 # Returns:      fedata; next message to be broadcasted on ANT+ channel
 # ------------------------------------------------------------------------------
 def BroadcastTrainerDataMessage(Cadence, CurrentPower, SpeedKmh, HeartRate):
-    global Interleave, EventCount, AccumulatedPower, AccumulatedTime, DistanceTravelled, AccumulatedLastTime
+    """Create next message to be sent to FE-C device.
+
+    Four types of page are sent here:
+
+    * Page 80 - Manufacturer’s Identification
+    * Page 81 - Product Information
+    * Page 16 - GeneralFE Data
+        This page contains the following information:
+
+        * Elapsed time
+        * Distance travelled
+        * Speed
+        * Heart rate
+    * Page 25 - Specific Trainer/Stationary BikeData
+        This page contains the following information:
+
+        * Instantaneous cadence
+        * Accumulated power
+        * Instantaneous power
+
+    Parameters
+    ----------
+    Cadence : int
+    CurrentPower : int
+    SpeedKmh : float
+    HeartRate : int
+
+    Returns
+    -------
+    rtn : bytes
+        Message to be sent
+    """
+    global Interleave, EventCount, AccumulatedPower, AccumulatedTime
+    global DistanceTravelled, AccumulatedLastTime
     # ---------------------------------------------------------------------------
     # Prepare data to be sent to ANT+
     # ---------------------------------------------------------------------------
@@ -65,7 +109,7 @@ def BroadcastTrainerDataMessage(Cadence, CurrentPower, SpeedKmh, HeartRate):
             ant.Manufacturer_tacx,
             ant.ModelNumber_FE,
         )
-        fedata = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+        rtn = ant.ComposeMessage(ant.msgID_BroadcastData, info)
 
     elif Interleave % 64 in (
         62,
@@ -82,7 +126,7 @@ def BroadcastTrainerDataMessage(Cadence, CurrentPower, SpeedKmh, HeartRate):
             ant.SWrevisionMain_FE,
             ant.SerialNumber_FE,
         )
-        fedata = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+        rtn = ant.ComposeMessage(ant.msgID_BroadcastData, info)
 
     elif Interleave % 3 == 0:
         # -----------------------------------------------------------------------
@@ -104,7 +148,7 @@ def BroadcastTrainerDataMessage(Cadence, CurrentPower, SpeedKmh, HeartRate):
         info = ant.msgPage16_GeneralFEdata(
             ant.channel_FE, AccumulatedTime, DistanceTravelled, Speed * 1000, HeartRate
         )
-        fedata = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+        rtn = ant.ComposeMessage(ant.msgID_BroadcastData, info)
 
     else:
         EventCount += 1
@@ -120,7 +164,7 @@ def BroadcastTrainerDataMessage(Cadence, CurrentPower, SpeedKmh, HeartRate):
         info = ant.msgPage25_TrainerData(
             ant.channel_FE, EventCount, Cadence, AccumulatedPower, CurrentPower
         )
-        fedata = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+        rtn = ant.ComposeMessage(ant.msgID_BroadcastData, info)
 
     # -------------------------------------------------------------------------
     # Prepare for next event
@@ -131,7 +175,7 @@ def BroadcastTrainerDataMessage(Cadence, CurrentPower, SpeedKmh, HeartRate):
     # -------------------------------------------------------------------------
     # Return message to be sent
     # -------------------------------------------------------------------------
-    return fedata
+    return rtn
 
 
 # -------------------------------------------------------------------------------

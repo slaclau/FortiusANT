@@ -1,7 +1,9 @@
+"""Provide interface for communicating as ANT+ power sensor."""
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-__version__ = "2020-12-28"
+__version__ = "2023-04-15"
+# 2023-04-15    Improve flake8 compliance
 # 2020-12-28    AccumulatedPower not negative
 # 2020-12-27    Interleave and EventCount improved according
 #               D00001086_ANT+Device_Profile-_Bicycle_Power_Rev_5.1.pdf
@@ -21,7 +23,7 @@ __version__ = "2020-12-28"
 #               Refer to (regarding roll over values):
 #                   D000001231_-_ANT+_Device_Profile_-_Fitness_Equipment_-_Rev_5.0_(6).pdf
 #                   9.1.1 Calculating accumulated values
-#                       NOTE: All accumulating message fields must use only positive values.
+#                       NOTE: All accumulating message fields must use only positive values. # noqa: E501 W505 PLC301
 #                   9.1.2 Receiving and Calculating Data from Accumulated Values
 #               Most important change: Interleave counting is separate from
 #                   the AccumulatedPower related EventCount.
@@ -29,8 +31,13 @@ __version__ = "2020-12-28"
 # -------------------------------------------------------------------------------
 import fortius_ant.antDongle as ant
 
+AccumulatedPower = None
+EventCount = None
+Interleave = None
+
 
 def Initialize():
+    """Initialize interface."""
     global AccumulatedPower, EventCount, Interleave
     AccumulatedPower = 0
     EventCount = 0
@@ -38,6 +45,31 @@ def Initialize():
 
 
 def BroadcastMessage(CurrentPower, Cadence):
+    """Create next message to be sent as power sensor.
+
+    three types of page are sent here:
+
+    * Page 80 - Manufacturer’s Identification
+    * Page 81 - Product Information
+    * Page 82 - Battery Status
+    * Page 16 - Power Data
+        This page contains the following information:
+
+        * Instantaneous cadence
+        * Accumulated power
+        * Instantaneous power
+
+
+    Parameters
+    ----------
+    CurrentPower : int
+    Cadence : int
+
+    Returns
+    -------
+    rtn : bytes
+        Message to be sent
+    """
     global AccumulatedPower, EventCount, Interleave
 
     if Interleave == 61:  # Transmit page 0x52 = 82
@@ -75,7 +107,7 @@ def BroadcastMessage(CurrentPower, Cadence):
             ant.channel_PWR, EventCount, Cadence, AccumulatedPower, CurrentPower
         )
 
-    pwrdata = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+    rtn = ant.ComposeMessage(ant.msgID_BroadcastData, info)
 
     # -------------------------------------------------------------------------
     # Prepare for next event
@@ -85,7 +117,7 @@ def BroadcastMessage(CurrentPower, Cadence):
     # -------------------------------------------------------------------------
     # Return message to be sent
     # -------------------------------------------------------------------------
-    return pwrdata
+    return rtn
 
 
 # -------------------------------------------------------------------------------

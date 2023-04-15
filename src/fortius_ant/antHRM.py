@@ -1,7 +1,9 @@
+"""Provide interface for communicating as ANT+ heart rate monitor."""
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-__version__ = "2020-12-27"
+__version__ = "2023-04-15"
+# 2023-04-15    Improve flake8 compliance
 # 2020-12-27    Interleave like antPWR.py
 # 2020-05-07    devAntDongle not needed, not used
 # 2020-05-07    pylint error free
@@ -11,9 +13,17 @@ import time
 
 import fortius_ant.antDongle as ant
 
+Interleave = None
+HeartBeatCounter = None
+HeartBeatEventTime = None
+HeartBeatTime = None
+PageChangeToggle = None
+
 
 def Initialize():
-    global Interleave, HeartBeatCounter, HeartBeatEventTime, HeartBeatTime, PageChangeToggle
+    """Initialize interface."""
+    global Interleave, HeartBeatCounter, HeartBeatEventTime
+    global HeartBeatTime, PageChangeToggle
     Interleave = 0
     HeartBeatCounter = 0
     HeartBeatEventTime = 0
@@ -22,24 +32,26 @@ def Initialize():
 
 
 def BroadcastHeartrateMessage(HeartRate):
-    global Interleave, HeartBeatCounter, HeartBeatEventTime, HeartBeatTime, PageChangeToggle
-    # ---------------------------------------------------------------------------
-    # Check if heart beat has occurred as tacx only reports
-    # instantaneous heart rate data
-    # Last heart beat is at HeartBeatEventTime
-    # If now - HeartBeatEventTime > time taken for hr to occur, trigger beat.
-    #
-    # We pass here every 250ms.
-    # If one heart_beat occurred, increment counter and time.
-    # Ignore that multiple heart-beats could have occurred; increment
-    #   with one beat per cycle only.
-    #
-    # Page 0 is the main page and transmitted most often
-    # In every set of 64 data-pages, page 2 and 3 must be transmitted 4
-    #   times.
-    # To make this fit in the Interleave cycle (0...255) I have
-    # chosen blocks of 64 messages as below:
-    # -------------------------------------------------------------------------
+    """Create next message to be sent.
+
+    Three types of page are sent here:
+
+    * Page 0 - Default or Unknown Data
+        This page contains the heart rate
+    * Page 2 - Manufacturer Information
+    * Page 3 - Product Information
+
+    Parameters
+    ----------
+    HeartRate : int
+
+    Returns
+    -------
+    rtn : bytes
+        Message to be sent
+    """
+    global Interleave, HeartBeatCounter, HeartBeatEventTime
+    global HeartBeatTime, PageChangeToggle
     if (time.time() - HeartBeatTime) >= (60 / float(HeartRate)):
         HeartBeatCounter += 1  # Increment heart beat count
         HeartBeatEventTime += 60 / float(HeartRate)  # Reset last time of heart beat

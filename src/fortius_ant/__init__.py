@@ -1,3 +1,4 @@
+"""FortiusANT program."""
 __all__ = [
     "antCTRL",
     "antDongle",
@@ -25,7 +26,6 @@ __all__ = [
     "settings",
     "structConstants",
     "TCXexport",
-    "TestMultiprocessing",
     "usbTrainer",
 ]
 
@@ -36,16 +36,20 @@ __shortversion__ = _version.get_versions()["version"].split("+")[0]
 __packageversion__ = ""
 __packagetype__ = ""
 try:
-    from . import _snapversion
+    from . import _snapversion  # noqa: PLW406
 
     __packageversion__ = _snapversion.__version__
     __packagetype__ = "snap"
-except:
+except ModuleNotFoundError:
+    pass
+except ImportError:
     pass
 try:
-    from . import _debversion
+    from . import _debversion  # noqa: PLW406
 
     __packageversion__ = _debversion.__version__
     __packagetype__ = "deb"
-except:
+except ModuleNotFoundError:
+    pass
+except ImportError:
     pass

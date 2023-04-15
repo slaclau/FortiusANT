@@ -1,7 +1,9 @@
+"""Provide interface for communicating with ANT+ controls."""
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-__version__ = "2020-12-27"
+__version__ = "2023-04-15"
+# 2023-04-15    Improve flake8 compliance
 # 2020-12-27    Interleave like antPWR.py
 # 2020-12-14    First version, obtained from switchable
 # -------------------------------------------------------------------------------
@@ -38,13 +40,23 @@ CommandName = {
     NoAction: "NoAction",
 }
 
+Interleave = None
+
 
 def Initialize():
+    """Initialize interface."""
     global Interleave
     Interleave = 0
 
 
 def BroadcastControlMessage():
+    """Create control message.
+
+    Returns
+    -------
+    rtn : bytes
+        Message to be sent
+    """
     global Interleave
 
     if Interleave == 64:  # Transmit page 0x50 = 80
@@ -74,7 +86,7 @@ def BroadcastControlMessage():
             ant.channel_CTRL, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10
         )
 
-    ctrldata = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+    rtn = ant.ComposeMessage(ant.msgID_BroadcastData, info)
 
     # -------------------------------------------------------------------------
     # Prepare for next event
@@ -84,7 +96,7 @@ def BroadcastControlMessage():
     # -------------------------------------------------------------------------
     # Return message to be sent
     # -------------------------------------------------------------------------
-    return ctrldata
+    return rtn
 
 
 # -------------------------------------------------------------------------------
