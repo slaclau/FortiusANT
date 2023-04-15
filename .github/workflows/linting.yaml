@@ -24,7 +24,7 @@ jobs:
           cache: 'pip'
       - name: Install requirements
         run: |
-          pip install distro
+          pip install distro setuptools
           python wxPython-source.py
           pip install -r requirements.txt
       - name: Install development requirements
