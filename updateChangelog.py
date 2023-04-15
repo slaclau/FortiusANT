@@ -49,5 +49,5 @@ for line in fileinput.input("debian/changelog", inplace=True):
 for line in fileinput.input("debian/changelog", inplace=True):
     print(line.replace(ubuntu_tag, ubuntu_version), end="")
 
-with open("fortius_ant/_debversion.py", "x") as f:
+with open("src/fortius_ant/_debversion.py", "x") as f:
     f.write('__version__ = "' + ubuntu_version + "~" + codename + '"')
