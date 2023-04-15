@@ -6,9 +6,15 @@ with open(sys.argv[1]) as f:
     if len(sys.argv) > 1:
         print(f"# {sys.argv[2]}")
     n = 0
+    errors = {}
     for i in data:
         n += len(data[i])
+        errors[i] = len(data[i])
     print(f"{len(data)} files checked, {n} issues found")
+    print("| File | Issues |")
+    print("| - | - |")
+    for i in errors:
+        print(f"| {i} | {errors[i]} |")
     for i in data:
         if len(data[i]) > 0:
             print(f"## {i.capitalize()}:")

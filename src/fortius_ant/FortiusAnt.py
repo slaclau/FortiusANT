@@ -59,7 +59,8 @@ if UseGui:
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-__version__ = "2023-03-17"
+__version__ = "2023-04-15"
+# 2023-04-15    Improve flake8 compliance and refactor importlib setup.
 # 2023-03-17    #422 importlib not found; ignore that issue
 # 2022-11-19    importlib_metadata_version used to print bless.version
 # 2022-03-08    bleBless, bleBlessClass added
