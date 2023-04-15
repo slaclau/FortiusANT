@@ -1,3 +1,4 @@
+"""Process the command line variables for the ``explorant`` program."""
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
@@ -12,14 +13,15 @@ __version__ = "2023-04-12"
 # -------------------------------------------------------------------------------
 import argparse
 
-import fortius_ant.debug as debug
-import fortius_ant.logfile as logfile
+from fortius_ant import debug, logfile
 
 
 # -------------------------------------------------------------------------------
 # E x p l o r   A N T   -   C o m m a n d L i n e V a r i a b l e s
 # -------------------------------------------------------------------------------
-class CommandLineVariables(object):
+class CommandLineVariables:  # noqa PLR902 PLR903
+    """A wrapper for the command line variables set when running the program."""
+
     args = None
 
     autostart = False
@@ -36,6 +38,7 @@ class CommandLineVariables(object):
     # Define and process command line
     # ---------------------------------------------------------------------------
     def __init__(self):
+        """Initialize parser."""
         # -----------------------------------------------------------------------
         # Define and process command line
         # -----------------------------------------------------------------------
@@ -114,9 +117,9 @@ class CommandLineVariables(object):
         if args.debug:
             try:
                 self.debug = int(args.debug)
-            except:
+            except ValueError:
                 logfile.Console(
-                    "Command line error; -d incorrect debugging flags=%s" % args.debug
+                    f"Command line error; -d incorrect debugging flags={args.debug}"
                 )
 
         # -----------------------------------------------------------------------
@@ -125,9 +128,9 @@ class CommandLineVariables(object):
         if args.dongle:
             try:
                 self.dongle = int(args.dongle)
-            except:
+            except ValueError:
                 logfile.Console(
-                    "Command line error; -D incorrect dongle=%s" % args.dongle
+                    f"Command line error; -D incorrect dongle={args.dongle}"
                 )
         # -----------------------------------------------------------------------
         # Get HRM
@@ -135,17 +138,17 @@ class CommandLineVariables(object):
         if args.hrm:
             try:
                 self.hrm = int(args.hrm)
-            except:
-                logfile.Console("Command line error; -H incorrect HRM=%s" % args.hrm)
+            except ValueError:
+                logfile.Console(f"Command line error; -H incorrect HRM={args.hrm}")
         # -----------------------------------------------------------------------
         # Get FE
         # -----------------------------------------------------------------------
         if args.fe:
             try:
                 self.fe = int(args.fe)
-            except:
+            except ValueError:
                 logfile.Console(
-                    "Command line error; -F incorrect Fitness Equipment=%s" % args.fe
+                    f"Command line error; -F incorrect Fitness Equipment={args.fe}"
                 )
 
         # -----------------------------------------------------------------------
@@ -154,9 +157,9 @@ class CommandLineVariables(object):
         if args.scs:
             try:
                 self.scs = int(args.scs)
-            except:
+            except ValueError:
                 logfile.Console(
-                    "Command line error; -S incorrect Speed Cadence Sensor=%s" % args.fe
+                    f"Command line error; -S incorrect Speed Cadence Sensor={args.scs}"
                 )
 
         # -----------------------------------------------------------------------
@@ -165,12 +168,13 @@ class CommandLineVariables(object):
         if args.vtx:
             try:
                 self.vtx = int(args.vtx)
-            except:
+            except ValueError:
                 logfile.Console(
-                    "Command line error; -V incorrect Tacx i-Vortex=%s" % args.fe
+                    f"Command line error; -V incorrect Tacx i-Vortex={args.vtx}"
                 )
 
     def print(self):
+        """Print command line variables to console."""
         try:
             v = debug.on(
                 debug.Any
@@ -180,19 +184,19 @@ class CommandLineVariables(object):
             if self.SimulateTrainer:
                 logfile.Console("-s")
             if v or self.args.debug:
-                logfile.Console("-d %s (%s)" % (self.debug, bin(self.debug)))
+                logfile.Console(f"-d {self.debug} ({bin(self.debug)})")
             if v or self.args.dongle:
-                logfile.Console("-D %s (%s)" % (self.dongle, hex(self.dongle)))
+                logfile.Console(f"-D {self.dongle} ({hex(self.dongle)})")
             if v or self.args.hrm:
-                logfile.Console("-H %s (%s)" % (self.hrm, hex(self.hrm)))
+                logfile.Console(f"-H {self.hrm} ({hex(self.hrm)})")
             if v or self.args.fe:
-                logfile.Console("-F %s (%s)" % (self.fe, hex(self.fe)))
+                logfile.Console(f"-F {self.fe} ({hex(self.fe)})")
             if v or self.args.scs:
-                logfile.Console("-S %s (%s)" % (self.scs, hex(self.scs)))
+                logfile.Console(f"-S {self.scs} ({hex(self.scs)})")
             if v or self.args.vtx:
-                logfile.Console("-V %s (%s)" % (self.vtx, hex(self.vtx)))
-        except:
-            pass  # May occur when incorrect command line parameters, error already given before
+                logfile.Console(f"-V {self.vtx} ({hex(self.vtx)})")
+        except ValueError:
+            pass  # May occur when incorrect command line parameters, error given before
 
 
 # -------------------------------------------------------------------------------
