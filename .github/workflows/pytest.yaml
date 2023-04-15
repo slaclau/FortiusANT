@@ -30,4 +30,4 @@ jobs:
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE }}
         with:
-          coverageCommand: pytest --cov=src src --cov-format=xml
+          coverageCommand: pytest --cov=src src --cov-report=xml
