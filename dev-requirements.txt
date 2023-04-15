@@ -3,15 +3,19 @@ flake8-json
 flake8-pydocstyle
 flake8-pylint
 flake8-pyproject
+
 isort
 black
-darglint
+
 mypy
 mypy-json-report
+
 docformatter
+
 sphinx
 sphinx_rtd_theme
 pydata_sphinx_theme
+
 versioneer
 
 types-wxpython
