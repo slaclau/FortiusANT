@@ -1,0 +1,20 @@
+name: "Create initial ubuntu release"
+
+on:
+  push:
+    tags:
+      - "*.*"
+      - "!*.*-*ubuntu*"
+      
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.TAG_PAT }}
+      - name: Make Ubuntu tag
+        run: |
+          git tag "${{ github.ref_name }}-0ubuntu1"
+          git push && git push --tags
