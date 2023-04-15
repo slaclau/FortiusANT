@@ -2,7 +2,7 @@
 importlib-metadata
 bless
 lib_programname
-numpy != 1.19.4
+numpy >= 1.22
 pyusb
 requests
 service_identity
