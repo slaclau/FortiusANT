@@ -32,9 +32,9 @@ parts:
     override-pull: |
       snapcraftctl pull
       snapcraftctl set-version "$(git describe --tags --always --long --match [[:digit:]]* --exclude *ubuntu*)"
-      echo "__version__ = \"$(git describe --tags --always --long --match [[:digit:]]* --exclude *ubuntu*)\"" >> fortius_ant/_snapversion.py
+      echo "__version__ = \"$(git describe --tags --always --long --match [[:digit:]]* --exclude *ubuntu*)\"" >> src/fortius_ant/_snapversion.py
     stage: 
-      - fortius_ant/_snapversion.py
+      - src/fortius_ant/_snapversion.py
     prime:
       - -*
   fortius-ant:
@@ -44,7 +44,7 @@ parts:
     requirements: [snap-requirements.txt]
     source: https://github.com/slaclau/FortiusANT.git
     override-build: |
-      mv $SNAPCRAFT_STAGE/fortius_ant/_snapversion.py ./fortius_ant/
+      mv $SNAPCRAFT_STAGE/src/fortius_ant/_snapversion.py ./src/fortius_ant/
       snapcraftctl build
     stage-packages:
       - libusb-1.0-0
@@ -138,4 +138,3 @@ parts:
       - libxss1
       - libxtst6
       - libxxf86vm1
-
