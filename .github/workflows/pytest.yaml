@@ -24,5 +24,8 @@ jobs:
           cache: 'pip'
       - name: Test
         run: |
-          pip install pytest pytest-cov
-          pytest src
+          pip install pytest pytest-cov pytest-md-report
+          pytest --md-report src/ >> $GITHUB_STEP_SUMMARY
+      - name: Coverage
+        if: always()
+          pytest --cov=src src:
