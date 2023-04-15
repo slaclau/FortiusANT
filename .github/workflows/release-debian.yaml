@@ -94,7 +94,7 @@ jobs:
           files: ${{ matrix.os }}.tar
       - name: Get root release
         run: |
-          echo "SHORT_TAG=$(echo ${{ github.ref_name }} | sed -re 's/-[0-9]+ubuntu[0-9]+//g') >> $GITHUB_ENV
+          echo "SHORT_TAG=$(echo ${{ github.ref_name }} | sed -re 's/-[0-9]+ubuntu[0-9]+//g')" >> $GITHUB_ENV
           echo ${{ env.SHORT_TAG }}
       - name: Update main release
         uses: softprops/action-gh-release@v1
