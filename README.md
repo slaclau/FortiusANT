@@ -2,11 +2,11 @@ Linting status: [![lint](https://github.com/slaclau/FortiusANT/actions/workflows
 
 | Target | Version |
 | ------ | ------- |
-| [![Test pip install](https://github.com/slaclau/FortiusANT/actions/workflows/pip-install.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/pip-install.yaml) | ![Upstream version](https://img.shields.io/github/v/tag/slaclau/FortiusANT?label=Upstream%20version)
+| [![Test pip install](https://github.com/slaclau/FortiusANT/actions/workflows/pip-install.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/pip-install.yaml) | ![Upstream version](https://img.shields.io/github/v/release/slaclau/FortiusANT?label=Upstream%20version)
 | [![Build debian packages](https://github.com/slaclau/FortiusANT/actions/workflows/build-debian.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/build-debian.yaml)
-| [![Build snap for edge](https://github.com/slaclau/FortiusANT/actions/workflows/build-snap.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/build-snap.yaml) | ![Snap edge version](https://badgen.net/snapcraft/v/fortius-ant) |
+| [![Build snap for edge](https://github.com/slaclau/FortiusANT/actions/workflows/build-snap.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/build-snap.yaml) | ![Snap edge version](https://badgen.net/snapcraft/v/fortius-ant/amd64/edge) |
 | [![Build snap for stable](https://github.com/slaclau/FortiusANT/actions/workflows/release-snap.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/release-snap.yaml) | ![Snap beta version](https://badgen.net/snapcraft/v/fortius-ant/amd64/beta) |
-| [![Release debian packages](https://github.com/slaclau/FortiusANT/actions/workflows/release-debian.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/release-debian.yaml) | ![Ubuntu package version](https://img.shields.io/github/v/release/slaclau/FortiusANT?label=Ubuntu%20Package)
+| [![Release debian packages](https://github.com/slaclau/FortiusANT/actions/workflows/release-debian.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/release-debian.yaml) | ![Ubuntu package version](https://img.shields.io/github/v/tag/slaclau/FortiusANT?label=Ubuntu%20Package)
 
 # FortiusANT
 FortiusANT enables a pre-smart Tacx trainer (usb- or ANT-connected) to communicate with TrainerRoad, Rouvy or Zwift through ANT.
