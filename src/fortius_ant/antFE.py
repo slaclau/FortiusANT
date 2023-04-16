@@ -14,9 +14,8 @@ __version__ = "2023-04-15"
 import time
 
 from fortius_ant.antInterface import AntInterface
-from fortius_ant.antPage import Page80, Page81, FEPage16, FEPage25
 from fortius_ant.antMessage import AntMessage, Manufacturer_tacx, msgID_BroadcastData
-from pip._vendor.typing_extensions import Self
+from fortius_ant.antPage import Page80, Page81, FEPage16, FEPage25
 
 ModelNumber_FE = 2875  # short antifier-value=0x8385, Tacx Neo=2875
 SerialNumber_FE = 19590705  # int   1959-7-5
@@ -28,7 +27,7 @@ channel_FE = 0  # ANT+ channel for Fitness Equipment
 
 
 class antFE(AntInterface):
-    """Interface for communicating as an ANT+ control."""
+    """Interface for communicating as an ANT+ Fitness Equipment."""
 
     interleave_reset = 256
 
@@ -104,6 +103,7 @@ class antFE(AntInterface):
             self.accumulated_time += ElapsedTime * 4  # in 0.25s
 
             Speed = SpeedKmh * 1000 / 3600  # convert SpeedKmh to m/s
+            Speed = Speed * 1000
             Speed = int(min(0xFFFF, Speed))
             Distance = ElapsedTime * Speed  # meters
             self.distance_travelled += Distance  # meters
@@ -121,7 +121,7 @@ class antFE(AntInterface):
                 channel_FE,
                 self.accumulated_time,
                 self.distance_travelled,
-                Speed * 1000,
+                Speed,
                 HeartRate,
             )
 

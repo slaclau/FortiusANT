@@ -1,9 +1,9 @@
 """Test subclasses of AntPage."""
 import pytest
 
-from fortius_ant.antPage import AntPage, FEPage16, FEPage25
+from fortius_ant.antPage import AntPage, FEPage16, FEPage25, HRMPage, list_of_pages
 
-pages = AntPage.__subclasses__()
+pages = list_of_pages
 
 
 @pytest.mark.parametrize("page_type", pages)
@@ -19,7 +19,6 @@ def test_page(page_type: AntPage):
     ) + response_vector[1:]
 
     response = page_type.unpage(page_type.page(*test_vector))
-
     if page_type == FEPage16:
         for i in range(0, response_vector_length):
             if i != 2 & i != response_vector_length:
@@ -28,5 +27,5 @@ def test_page(page_type: AntPage):
         for i in range(0, response_vector_length):
             if i != response_vector_length:
                 assert response[i] == response_vector[i]
-    else:
+    elif page_type == HRMPage:
         assert response == response_vector

@@ -61,6 +61,54 @@ class Page2(AntPage):
     )
 
 
+class Page80(AntPage):
+    """Page 80 contains manufacturer information."""
+
+    data_page_number = 80
+
+    fChannel = sc.unsigned_char  # First byte of the ANT+ message content
+    fDataPageNumber = sc.unsigned_char  # First byte of the ANT+ datapage (payload)
+    fReserved1 = sc.unsigned_char
+    fReserved2 = sc.unsigned_char
+    fHWrevision = sc.unsigned_char
+    fManufacturerID = sc.unsigned_short
+    fModelNumber = sc.unsigned_short
+
+    message_format = (
+        sc.no_alignment
+        + fChannel
+        + fDataPageNumber
+        + fReserved1
+        + fReserved2
+        + fHWrevision
+        + fManufacturerID
+        + fModelNumber
+    )
+
+
+class Page81(AntPage):
+    """Page 81 contains device information."""
+
+    data_page_number = 81
+
+    fChannel = sc.unsigned_char  # First byte of the ANT+ message content
+    fDataPageNumber = sc.unsigned_char  # First byte of the ANT+ datapage (payload)
+    fReserved1 = sc.unsigned_char
+    fSWrevisionSupp = sc.unsigned_char
+    fSWrevisionMain = sc.unsigned_char
+    fSerialNumber = sc.unsigned_int
+
+    message_format = (
+        sc.no_alignment
+        + fChannel
+        + fDataPageNumber
+        + fReserved1
+        + fSWrevisionSupp
+        + fSWrevisionMain
+        + fSerialNumber
+    )
+
+
 class FEPage16(AntPage):
     """Page 16 contains generic trainer information."""
 
@@ -148,49 +196,36 @@ class FEPage25(AntPage):
         return super(FEPage25, cls).get_num_args() - 1
 
 
-class Page80(AntPage):
-    """Page 80 contains manufacturer information."""
-
-    data_page_number = 80
+class HRMPage(AntPage):
+    """Base class for HRM data pages."""
 
     fChannel = sc.unsigned_char  # First byte of the ANT+ message content
     fDataPageNumber = sc.unsigned_char  # First byte of the ANT+ datapage (payload)
-    fReserved1 = sc.unsigned_char
-    fReserved2 = sc.unsigned_char
-    fHWrevision = sc.unsigned_char
-    fManufacturerID = sc.unsigned_short
-    fModelNumber = sc.unsigned_short
+    fSpec1 = sc.unsigned_char
+    fSpec2 = sc.unsigned_char
+    fSpec3 = sc.unsigned_char
+    fHeartBeatEventTime = sc.unsigned_short
+    fHeartBeatCount = sc.unsigned_char
+    fHeartRate = sc.unsigned_char
 
     message_format = (
         sc.no_alignment
         + fChannel
         + fDataPageNumber
-        + fReserved1
-        + fReserved2
-        + fHWrevision
-        + fManufacturerID
-        + fModelNumber
+        + fSpec1
+        + fSpec2
+        + fSpec3
+        + fHeartBeatEventTime
+        + fHeartBeatCount
+        + fHeartRate
     )
 
+    @classmethod
+    def page(cls, data_page_number, *args):
+        print(*args)
+        cls.data_page_number = data_page_number
+        args = args
+        return super(HRMPage, cls).page(*args)
 
-class Page81(AntPage):
-    """Page 81 contains device information."""
 
-    data_page_number = 81
-
-    fChannel = sc.unsigned_char  # First byte of the ANT+ message content
-    fDataPageNumber = sc.unsigned_char  # First byte of the ANT+ datapage (payload)
-    fReserved1 = sc.unsigned_char
-    fSWrevisionSupp = sc.unsigned_char
-    fSWrevisionMain = sc.unsigned_char
-    fSerialNumber = sc.unsigned_int
-
-    message_format = (
-        sc.no_alignment
-        + fChannel
-        + fDataPageNumber
-        + fReserved1
-        + fSWrevisionSupp
-        + fSWrevisionMain
-        + fSerialNumber
-    )
+list_of_pages = (Page2, Page80, Page81, FEPage16, FEPage25)

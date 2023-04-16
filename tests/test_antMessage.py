@@ -2,9 +2,9 @@
 import pytest
 
 from fortius_ant.antMessage import AntMessage
-from fortius_ant.antPage import AntPage
+from fortius_ant.antPage import AntPage, list_of_pages
 
-pages = AntPage.__subclasses__()
+pages = list_of_pages
 
 
 @pytest.mark.parametrize("page_type", pages)
