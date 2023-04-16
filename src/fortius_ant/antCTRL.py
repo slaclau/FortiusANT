@@ -81,7 +81,7 @@ class antCTRL(AntInterface):
 
 
 ctrl = antCTRL()
-Interleave = None
+Interleave = ctrl.interleave
 
 
 def BroadcastControlMessage():

@@ -39,6 +39,7 @@ class antFE(AntInterface):
         self.accumulated_time = None
         self.distance_travelled = None
         self.accumulated_last_time = None
+        self.initialize()
 
     def initialize(self):
         super().initialize()
@@ -158,14 +159,14 @@ class antFE(AntInterface):
 
 
 fe = antFE()
-Interleave = None
+Interleave = fe.interleave
 
 
-def BroadcastTrainerDataMessage():
+def BroadcastTrainerDataMessage(*args):
     """Used for compatibility with old implementation, to be updated."""
     global Interleave
     fe.interleave = Interleave
-    rtn = fe.broadcast_message()
+    rtn = fe.broadcast_message(*args)
     Interleave = fe.interleave
     return rtn
 

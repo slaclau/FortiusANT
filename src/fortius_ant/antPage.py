@@ -27,6 +27,10 @@ class AntPage(bytes):
         """Convert the supplied page to a tuple of its data."""
         return struct.unpack(cls.message_format, page)
 
+    @classmethod
+    def get_num_args(cls) -> int:
+        return len(cls.message_format) - 2
+
 
 class Page2(AntPage):
     """Page 2 contains control information."""
@@ -94,6 +98,19 @@ class FEPage16(AntPage):
         + fCapabilities
     )
 
+    @classmethod
+    def page(cls, *args):
+        args = (
+            args[0],
+            cls.EquipmentType,
+        ) + args[1:]
+        args = args + (cls.Capabilities,)
+        return super(FEPage16, cls).page(*args)
+
+    @classmethod
+    def get_num_args(cls) -> int:
+        return super(FEPage16, cls).get_num_args() - 2
+
 
 class FEPage25(AntPage):
     """Page 25 contains specific trainer information."""
@@ -110,7 +127,7 @@ class FEPage25(AntPage):
     fInstPower = sc.unsigned_short  # The first four bits have another meaning!!
     fFlags = sc.unsigned_char
 
-    format = (
+    message_format = (
         sc.no_alignment
         + fChannel
         + fDataPageNumber
@@ -123,8 +140,12 @@ class FEPage25(AntPage):
 
     @classmethod
     def page(cls, *args):
-        args = args + (cls.Flags)
-        return super(FEPage25, cls).page()
+        args = args + (cls.Flags,)
+        return super(FEPage25, cls).page(*args)
+
+    @classmethod
+    def get_num_args(cls) -> int:
+        return super(FEPage25, cls).get_num_args() - 1
 
 
 class Page80(AntPage):
