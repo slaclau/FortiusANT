@@ -23,7 +23,7 @@ jobs:
       - name: Test
         run: |
           pip install pytest pytest-cov pytest-md-report
-          pytest --md-report tests/ >> $GITHUB_STEP_SUMMARY
+          pytest --md-report --md-report-color never tests/ >> $GITHUB_STEP_SUMMARY
       - name: Test & publish code coverage
         if: always()
         uses: paambaati/codeclimate-action@v3.2.0
