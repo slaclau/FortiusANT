@@ -1,0 +1,33 @@
+name: "pytest"
+
+on:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "*"
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+      - name: Test
+        run: |
+          pip install pytest pytest-cov pytest-md-report
+          pytest --md-report tests/ >> $GITHUB_STEP_SUMMARY
+      - name: Test & publish code coverage
+        if: always()
+        uses: paambaati/codeclimate-action@v3.2.0
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE }}
+        with:
+          coverageCommand: pytest --cov=src tests --cov-report=xml

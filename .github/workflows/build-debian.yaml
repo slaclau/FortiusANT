@@ -88,9 +88,9 @@ jobs:
         run: |
           sudo apt install dput
           dput ppa:slaclau/ppa-pre fortius-ant*source.changes
-        if: matrix.os == 'ubuntu-20.04'
+        if: matrix.os == 'ubuntu-20.04' && github.ref == 'refs/heads/upstream/slaclau'
       - name: Publish jammy package
         run: |
           sudo apt install dput
           dput ppa:slaclau/ppa-pre fortius-ant*source.changes
-        if: matrix.os == 'ubuntu-22.04'
+        if: matrix.os == 'ubuntu-22.04' && github.ref == 'refs/heads/upstream/slaclau'
