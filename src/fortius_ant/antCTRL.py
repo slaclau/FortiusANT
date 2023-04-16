@@ -7,7 +7,18 @@ __version__ = "2023-04-15"
 # 2020-12-27    Interleave like antPWR.py
 # 2020-12-14    First version, obtained from switchable
 # -------------------------------------------------------------------------------
-import fortius_ant.antDongle as ant
+
+from fortius_ant.antInterface import AntInterface
+from fortius_ant.antMessage import AntMessage, Manufacturer_dev, msgID_BroadcastData
+from fortius_ant.antPage import Page2, Page80, Page81
+
+ModelNumber_CTRL = 1234  # short
+SerialNumber_CTRL = 19590709  # int   1959-7-9
+HWrevision_CTRL = 1  # char
+SWrevisionMain_CTRL = 1  # char
+SWrevisionSupp_CTRL = 1  # char
+
+channel_CTRL = 6  # ANT+ Channel for Remote Control
 
 # ---------------------------------------------------------------------------
 # ANT+ Control command codes
@@ -40,69 +51,47 @@ CommandName = {
     NoAction: "NoAction",
 }
 
-Interleave = None
+
+class antCTRL(AntInterface):
+    """Interface for communicating as an ANT+ control."""
+
+    interleave_reset = 129
+
+    def _broadcast_message(self, interleave: int, *args):
+        if interleave == 64:
+            page = Page80.page(
+                channel_CTRL,
+                0xFF,
+                0xFF,
+                HWrevision_CTRL,
+                Manufacturer_dev,
+                ModelNumber_CTRL,
+            )
+        elif interleave == 129:
+            page = Page81.page(
+                channel_CTRL,
+                0xFF,
+                SWrevisionSupp_CTRL,
+                SWrevisionMain_CTRL,
+                SerialNumber_CTRL,
+            )
+        else:
+            page = Page2.page(channel_CTRL, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10)
+        return AntMessage.compose(msgID_BroadcastData, page)
 
 
-def Initialize():
-    """Initialize interface."""
-    global Interleave
-    Interleave = 0
+ctrl = antCTRL()
+Interleave = ctrl.interleave
 
 
 def BroadcastControlMessage():
-    """Create control message.
-
-    Returns
-    -------
-    rtn : bytes
-        Message to be sent
-    """
+    """Used for compatibility with old implementation, to be updated."""
     global Interleave
-
-    if Interleave == 64:  # Transmit page 0x50 = 80
-        info = ant.msgPage80_ManufacturerInfo(
-            ant.channel_CTRL,
-            0xFF,
-            0xFF,
-            ant.HWrevision_CTRL,
-            ant.Manufacturer_dev,
-            ant.ModelNumber_CTRL,
-        )
-
-    elif Interleave == 129:  # Transmit page 0x51 = 81
-        info = ant.msgPage81_ProductInformation(
-            ant.channel_CTRL,
-            0xFF,
-            ant.SWrevisionSupp_CTRL,
-            ant.SWrevisionMain_CTRL,
-            ant.SerialNumber_CTRL,
-        )
-
-        Interleave = 0  # Restart after the last interleave message
-
-    else:
-        # support generic control only
-        info = ant.msgPage2_CTRL(
-            ant.channel_CTRL, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10
-        )
-
-    rtn = ant.ComposeMessage(ant.msgID_BroadcastData, info)
-
-    # -------------------------------------------------------------------------
-    # Prepare for next event
-    # -------------------------------------------------------------------------
-    Interleave += 1
-
-    # -------------------------------------------------------------------------
-    # Return message to be sent
-    # -------------------------------------------------------------------------
+    ctrl.interleave = Interleave
+    rtn = ctrl.broadcast_message()
+    Interleave = ctrl.interleave
     return rtn
 
 
-# -------------------------------------------------------------------------------
-# Main program for module test
-# -------------------------------------------------------------------------------
-if __name__ == "__main__":
-    Initialize()
-    ctrldata = BroadcastControlMessage()
-    print(ctrldata)
+def Initialize():
+    ctrl.initialize()

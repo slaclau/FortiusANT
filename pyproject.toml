@@ -16,6 +16,9 @@ docstring-convention = "numpy"
 extend-select = [
     "D417",
 ]
+extend-ignore = [
+	"E203",
+]
 extend-exclude = [
 	"src/fortius_ant/_version.py"
 ]
