@@ -29,101 +29,92 @@ __version__ = "2023-04-15"
 #                   the AccumulatedPower related EventCount.
 # 2020-06-11    First version, based upon antHRM.py
 # -------------------------------------------------------------------------------
-import fortius_ant.antDongle as ant
+from fortius_ant.antInterface import AntInterface
+from fortius_ant.antMessage import AntMessage, Manufacturer_garmin, msgID_BroadcastData
+from fortius_ant.antPage import Page80, Page81, Page82, PWRPage16
 
-AccumulatedPower = None
-EventCount = None
-Interleave = None
+ModelNumber_PWR = 2161  # Garmin Vector 2 (profile.xlsx, garmin_product)
+SerialNumber_PWR = 19570702  # int   1957-7-2
+HWrevision_PWR = 1  # char
+SWrevisionMain_PWR = 1  # char
+SWrevisionSupp_PWR = 1  # char
 
-
-def Initialize():
-    """Initialize interface."""
-    global AccumulatedPower, EventCount, Interleave
-    AccumulatedPower = 0
-    EventCount = 0
-    Interleave = 0
+channel_PWR = 2  # ANT+ Channel for Power Profile
 
 
-def BroadcastMessage(CurrentPower, Cadence):
-    """Create next message to be sent as power sensor.
+class AntPWR(AntInterface):
+    """Interface for communicating as an ANT+ power sensor."""
 
-    three types of page are sent here:
+    interleave_reset = 121
 
-    * Page 80 - Manufacturer’s Identification
-    * Page 81 - Product Information
-    * Page 82 - Battery Status
-    * Page 16 - Power Data
-        This page contains the following information:
+    def __init__(self):
+        self.interleave = None
+        self.accumulated_power = None
+        self.event_count = None
+        self.initialize()
 
-        * Instantaneous cadence
-        * Accumulated power
-        * Instantaneous power
+    def initialize(self):
+        self.interleave = 0
+        self.accumulated_power = 0
+        self.event_count = 0
+
+    def _broadcast_message(self, interleave: int, CurrentPower, Cadence):
+        Cadence = int(min(0xFF, Cadence))
+        CurrentPower = int(max(0, min(0x0FFF, CurrentPower)))  # 2021-02-19
+        if self.interleave == 61:  # Transmit page 0x52 = 82
+            page = Page82.page(channel_PWR)
+
+        elif self.interleave == 120:  # Transmit page 0x50 = 80
+            page = Page80.page(
+                channel_PWR,
+                0xFF,
+                0xFF,
+                HWrevision_PWR,
+                Manufacturer_garmin,
+                ModelNumber_PWR,
+            )
+
+        elif self.interleave == 121:  # Transmit page 0x51 = 81
+            page = Page81.page(
+                channel_PWR,
+                0xFF,
+                SWrevisionSupp_PWR,
+                SWrevisionMain_PWR,
+                SerialNumber_PWR,
+            )
+
+        else:
+            self.event_count += 1
+            self.accumulated_power += max(0, CurrentPower)  # No decrement allowed
+
+            self.event_count = int(self.event_count) & 0xFF  # roll-over at 255
+            self.accumulated_power = (
+                int(self.accumulated_power) & 0xFFFF
+            )  # roll-over at 65535
+
+            page = PWRPage16.page(
+                channel_PWR,
+                self.event_count,
+                Cadence,
+                self.accumulated_power,
+                CurrentPower,
+            )
+
+        return AntMessage.compose(msgID_BroadcastData, page)
 
 
-    Parameters
-    ----------
-    CurrentPower : int
-    Cadence : int
+pwr = AntPWR()
+Interleave = pwr.interleave
 
-    Returns
-    -------
-    rtn : bytes
-        Message to be sent
-    """
-    global AccumulatedPower, EventCount, Interleave
 
-    if Interleave == 61:  # Transmit page 0x52 = 82
-        info = ant.msgPage82_BatteryStatus(ant.channel_PWR)
-
-    elif Interleave == 120:  # Transmit page 0x50 = 80
-        info = ant.msgPage80_ManufacturerInfo(
-            ant.channel_PWR,
-            0xFF,
-            0xFF,
-            ant.HWrevision_PWR,
-            ant.Manufacturer_garmin,
-            ant.ModelNumber_PWR,
-        )
-
-    elif Interleave == 121:  # Transmit page 0x51 = 81
-        info = ant.msgPage81_ProductInformation(
-            ant.channel_PWR,
-            0xFF,
-            ant.SWrevisionSupp_PWR,
-            ant.SWrevisionMain_PWR,
-            ant.SerialNumber_PWR,
-        )
-
-        Interleave = 0  # Restart after the last interleave message
-
-    else:
-        EventCount += 1
-        AccumulatedPower += max(0, CurrentPower)  # No decrement allowed
-
-        EventCount = int(EventCount) & 0xFF  # roll-over at 255
-        AccumulatedPower = int(AccumulatedPower) & 0xFFFF  # roll-over at 65535
-
-        info = ant.msgPage16_PowerOnly(
-            ant.channel_PWR, EventCount, Cadence, AccumulatedPower, CurrentPower
-        )
-
-    rtn = ant.ComposeMessage(ant.msgID_BroadcastData, info)
-
-    # -------------------------------------------------------------------------
-    # Prepare for next event
-    # -------------------------------------------------------------------------
-    Interleave += 1
-
-    # -------------------------------------------------------------------------
-    # Return message to be sent
-    # -------------------------------------------------------------------------
+def BroadcastMessage(*args):
+    """Used for compatibility with old implementation, to be updated."""
+    global Interleave
+    pwr.interleave = Interleave
+    rtn = pwr.broadcast_message(*args)
+    Interleave = pwr.interleave
     return rtn
 
 
-# -------------------------------------------------------------------------------
-# Main program for module test
-# -------------------------------------------------------------------------------
-if __name__ == "__main__":
-    Initialize()
-    pwrdata = BroadcastMessage(456.7, 123)
-    print(pwrdata)
+def Initialize():
+    pwr.initialize()

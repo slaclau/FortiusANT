@@ -109,6 +109,40 @@ class Page81(AntPage):
     )
 
 
+class Page82(AntPage):
+    """Page 82 contains the battery status."""
+
+    data_page_number = 82
+
+    fChannel = sc.unsigned_char  # First byte of the ANT+ message content
+    fDataPageNumber = sc.unsigned_char  # First byte of the ANT+ datapage (payload)
+    fReserved1 = sc.unsigned_char
+    fBatteryIdentifier = sc.unsigned_char
+    fCumulativeTime1 = sc.unsigned_char
+    fCumulativeTime2 = sc.unsigned_char
+    fCumulativeTime3 = sc.unsigned_char
+    fBatteryVoltage = sc.unsigned_char
+    fDescriptiveBitField = sc.unsigned_char
+
+    message_format = (
+        sc.no_alignment
+        + fChannel
+        + fDataPageNumber
+        + fReserved1
+        + fBatteryIdentifier
+        + fCumulativeTime1
+        + fCumulativeTime2
+        + fCumulativeTime3
+        + fBatteryVoltage
+        + fDescriptiveBitField
+    )
+
+    @classmethod
+    def page(cls, *args):
+        args = (args[0], 0xFF, 0x00, 0, 0, 0, 0, 0x0F | 0x10 | 0x00)
+        return super(Page82, cls).page(*args)
+
+
 class FEPage16(AntPage):
     """Page 16 contains generic trainer information."""
 
@@ -224,8 +258,37 @@ class HRMPage(AntPage):
     def page(cls, data_page_number, *args):
         print(*args)
         cls.data_page_number = data_page_number
-        args = args
         return super(HRMPage, cls).page(*args)
+
+
+class PWRPage16(AntPage):
+    """This page contains power sensor data."""
+
+    data_page_number = 16
+
+    fChannel = sc.unsigned_char  # First byte of the ANT+ message content
+    fDataPageNumber = sc.unsigned_char  # First byte of the ANT+ datapage (payload)
+    fEventCount = sc.unsigned_char
+    fPedalPower = sc.unsigned_char
+    fInstantaneousCadence = sc.unsigned_char
+    fAccumulatedPower = sc.unsigned_short
+    fInstantaneousPower = sc.unsigned_short
+
+    message_format = (
+        sc.no_alignment
+        + fChannel
+        + fDataPageNumber
+        + fEventCount
+        + fPedalPower
+        + fInstantaneousCadence
+        + fAccumulatedPower
+        + fInstantaneousPower
+    )
+
+    @classmethod
+    def page(cls, *args):
+        args = args[0:2] + (0xFF,) + args[2:]
+        return super(PWRPage16, cls).page(*args)
 
 
 list_of_pages = (Page2, Page80, Page81, FEPage16, FEPage25)
