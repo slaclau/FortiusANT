@@ -1,13 +1,51 @@
-from mypy.typeshed.stdlib.builtins import staticmethod
+"""Provide a class structure for ANT+ messages."""
+import binascii
 import struct
+
 import fortius_ant.structConstants as sc
+from fortius_ant.antPage import AntPage
+
+msgID_RF_EVENT = 0x01
+
+msgID_ANTversion = 0x3E
+msgID_BroadcastData = 0x4E
+msgID_AcknowledgedData = 0x4F
+msgID_ChannelResponse = 0x40
+msgID_Capabilities = 0x54
+
+msgID_UnassignChannel = 0x41
+msgID_AssignChannel = 0x42
+msgID_ChannelPeriod = 0x43
+msgID_ChannelSearchTimeout = 0x44
+msgID_ChannelRfFrequency = 0x45
+msgID_SetNetworkKey = 0x46
+msgID_ResetSystem = 0x4A
+msgID_OpenChannel = 0x4B
+msgID_RequestMessage = 0x4D
+
+msgID_ChannelID = 0x51  # Set, but also receive master channel - but how/when?
+msgID_ChannelTransmitPower = 0x60
+
+msgID_StartUp = 0x6F
+
+msgID_BurstData = 0x50
+
+# Manufacturer ID       see FitSDKRelease_21.20.00 profile.xlsx
+Manufacturer_garmin = 1
+Manufacturer_dynastream = 15
+Manufacturer_tacx = 89
+Manufacturer_trainer_road = 281
+Manufacturer_dev = 255
 
 
-class AntMessage(struct):
+class AntMessage(bytes):
     """A message to be sent over an ANT+ interface."""
 
-    @staticmethod
-    def Compose(messageID: int, info: struct) -> AntMessage:
+    def __init__(self, data: bytes):
+        super(bytes, data)
+
+    @classmethod
+    def compose(cls, messageID: int, info: AntPage):
         """Compose a message from its id and contents."""
         fSynch = sc.unsigned_char
         fLength = sc.unsigned_char
@@ -20,16 +58,16 @@ class AntMessage(struct):
         # Add the checksum
         # (antifier added \00\00 after each message for unknown reason)
         # -----------------------------------------------------------------------
-        data += CalcChecksum(data)
+        data += _calc_checksum(data)
 
-        return data
+        return cls(data)
 
-    @staticmethod
-    def Decompose(message) -> tuple(int):
+    @classmethod
+    def decompose(cls, message) -> tuple:
         """Decompose a message into its constituent parts."""
         synch = 0
         length = 0
-        id = 0
+        messageID = 0
         checksum = 0
         info = binascii.unhexlify("")  # NULL-string bytes
         rest = ""  # No remainder (normal)
@@ -39,7 +77,7 @@ class AntMessage(struct):
         if len(message) > 1:
             length = message[1]
         if len(message) > 2:
-            id = message[2]
+            messageID = message[2]
         if len(message) > 3 + length:
             if length:
                 info = message[3 : 3 + length]  # Info, if length > 0
@@ -60,14 +98,14 @@ class AntMessage(struct):
         #      be implemented as soon as we will use msgID_BurstData
         # ---------------------------------------------------------------------------
 
-        if id == msgID_BurstData:
-            _SequenceNumber = (Channel & 0b11100000) >> 5  # Upper 3 bits
+        if messageID == msgID_BurstData:
+            _SequenceNumber = (Channel & 0b11100000) >> 5  # Upper 3 bits # noqa: F841
             Channel = Channel & 0b00011111  # Lower 5 bits
 
-        return synch, length, id, info, checksum, rest, Channel, DataPageNumber
+        return synch, length, messageID, info, checksum, rest, Channel, DataPageNumber
 
 
-def CalcChecksum(message):
+def _calc_checksum(message):
     xor_value = 0
     length = message[1]  # byte 1; length of info
     length += 3  # Add synch, len, id
