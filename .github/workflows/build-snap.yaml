@@ -2,10 +2,6 @@ name: Build snap
 
 on:
   push:
-    branches:
-      - "**"
-    tags-ignore:
-      - "*"
   workflow_call:
 
 jobs:
@@ -22,7 +18,7 @@ jobs:
       - name: Install snap
         run: |
           sudo snap install --devmode ${{ steps.build.outputs.snap }}
-      - name: Test snap
+      - name: Check installed versions
         run: |
           fortius-ant --version
           fortius-ant.explorant --version
@@ -31,11 +27,27 @@ jobs:
         with:
           name: snap
           path: ${{ steps.build.outputs.snap }}
-      - name: Publish snap
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ steps.build.outputs.snap }}
+        if: contains(github.ref, 'refs/tags/') && !contains(github.ref, 'ubuntu')
+      - name: Publish snap to edge
         uses: snapcore/action-publish@v1
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
         with:
           snap: ${{ steps.build.outputs.snap }}
           release: edge
-        if: github.ref == 'refs/heads/upstream/slaclau'
+        if: github.ref == 'refs/heads/develop'
+      - name: Publish snap to beta
+        uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+        with:
+          snap: ${{ steps.build.outputs.snap }}
+          release: edge
+        if: contains(github.ref, 'refs/tags/') && !contains(github.ref, 'ubuntu')
+        
+permissions:
+  contents: write  
