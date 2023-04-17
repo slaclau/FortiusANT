@@ -19,3 +19,4 @@ pydata_sphinx_theme
 versioneer
 
 types-wxpython
+deptry

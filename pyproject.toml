@@ -27,3 +27,4 @@ require-plugins = [
 docstring_style = "numpy"
 [tool.mypy]
 ignore_missing_imports = true
+
