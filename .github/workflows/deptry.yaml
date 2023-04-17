@@ -46,7 +46,7 @@ jobs:
         continue-on-error: true
         run: |
           pip install deptry
-          deptry fortius_ant --json-output deptry.json
+          deptry src --json-output deptry.json
       - name: Convert report
         if: always()
         run: |
