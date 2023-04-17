@@ -13,6 +13,7 @@ def test_antCTRL(data_regression):
 def test_antFE(data_regression, mocker):
     mocker.patch('time.time',return_value=0)
     antFE.Initialize()
+    output = ()
     for i in range(0,500):
         output = output + (antFE.BroadcastTrainerDataMessage(
         random.randint() / 3,
