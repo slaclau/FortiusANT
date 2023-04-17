@@ -39,4 +39,4 @@ jobs:
         with:
           name: data
           path: |
-            tests/test_antCTRL
+            tests
