@@ -9,7 +9,7 @@ def test_full_cycle(mocker):
     antFE.Initialize()
     out = ()
     for i in range(0, 255):
-        message = antFE.BroadcastTrainerDataMessage(random(0,100), random(0,100), random(0,100), random(0,100))
+        message = antFE.BroadcastTrainerDataMessage(randint(0,100), randint(0,100), randint(0,100), randint(0,100))
         out = out + (message,)
         assert message == expected_result[i]
     print(out)
