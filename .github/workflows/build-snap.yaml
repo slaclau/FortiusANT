@@ -31,7 +31,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: ${{ steps.build.outputs.snap }}
-        if: contains(github.ref, 'refs/tags/') && !contains(github.ref, 'ubuntu')
+        if: "!contains(github.ref_name,'ubuntu')" && github.ref_type == 'tag'
       - name: Publish snap to edge
         uses: snapcore/action-publish@v1
         env:
@@ -39,7 +39,7 @@ jobs:
         with:
           snap: ${{ steps.build.outputs.snap }}
           release: edge
-        if: github.ref == 'refs/heads/develop'
+        if: github.ref == 'refs/heads/master'
       - name: Publish snap to beta
         uses: snapcore/action-publish@v1
         env:
@@ -47,7 +47,7 @@ jobs:
         with:
           snap: ${{ steps.build.outputs.snap }}
           release: edge
-        if: contains(github.ref, 'refs/tags/') && !contains(github.ref, 'ubuntu')
+        if: "!contains(github.ref_name,'ubuntu')" && github.ref_type == 'tag'
         
 permissions:
   contents: write  
