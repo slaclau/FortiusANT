@@ -54,9 +54,16 @@ sudo apt update
 sudo apt install fortius-ant
 ```
 
-To obtain the latest development version use the following instead:
+To obtain the latest prerelease version use the following instead:
 ```bash
 sudo add-apt-repository ppa:slaclau/ppa-pre
+sudo apt update
+sudo apt install fortius-ant
+```
+
+To obtain the latest development version use the following instead:
+```bash
+sudo add-apt-repository ppa:slaclau/ppa-develop
 sudo apt update
 sudo apt install fortius-ant
 ```
@@ -67,12 +74,12 @@ Formal releases are also available from [GitHub](https://github.com/slaclau/Fort
 
 Snap installation is currently work in progress, full releases are available in the snapcraft beta channel:
 ```bash
-sudo snap install --channel=latest/beta --devmode fortius-ant
+sudo snap install --beta --devmode fortius-ant
 ```
 
-Development releases are available in the edge channel:
+Prereleases are available in the edge channel:
 ```bash
-sudo snap install --channel=latest/edge --devmode fortius-ant
+sudo snap install --edge --devmode fortius-ant
 ```
 
 # License
