@@ -55,6 +55,7 @@ class antFE(AntInterface):
         CurrentPower = max(0, CurrentPower)  # Not negative
         CurrentPower = min(4093, CurrentPower)  # Limit to 4093
         Cadence = min(253, Cadence)  # Limit to 253
+        Cadence = int(max(0,Cadence)
 
         if interleave % 64 in (
             30,
@@ -105,6 +106,7 @@ class antFE(AntInterface):
             Speed = SpeedKmh * 1000 / 3600  # convert SpeedKmh to m/s
             Speed = Speed * 1000
             Speed = int(min(0xFFFF, Speed))
+            Speed = max(0,Speed)
             Distance = ElapsedTime * Speed  # meters
             self.distance_travelled += Distance  # meters
             HeartRate = int(min(0xFF, HeartRate))
@@ -146,15 +148,6 @@ class antFE(AntInterface):
                 CurrentPower,
             )
 
-        # -------------------------------------------------------------------------
-        # Prepare for next event
-        # -------------------------------------------------------------------------
-        interleave += 1  # Increment and ...
-        interleave &= 0xFF  # maximize to 255
-
-        # -------------------------------------------------------------------------
-        # Return message to be sent
-        # -------------------------------------------------------------------------
         return AntMessage.compose(msgID_BroadcastData, page)
 
 
