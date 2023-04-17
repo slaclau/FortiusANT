@@ -136,6 +136,7 @@ def BroadcastTrainerDataMessage(Cadence, CurrentPower, SpeedKmh, HeartRate):
         ElapsedTime = t - AccumulatedLastTime  # time since previous event
         AccumulatedLastTime = t
         AccumulatedTime += ElapsedTime * 4  # in 0.25s
+        Cadence = min(max(Cadence,0),255)
 
         Speed = SpeedKmh * 1000 / 3600  # convert SpeedKmh to m/s
         Distance = ElapsedTime * Speed  # meters
