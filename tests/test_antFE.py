@@ -1,6 +1,6 @@
 from fortius_ant import antFE
 
-from random import random, seed
+from random import randint, seed
 
 seed(0)
 
