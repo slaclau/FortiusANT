@@ -104,10 +104,11 @@ class antFE(AntInterface):
             self.accumulated_time += ElapsedTime * 4  # in 0.25s
 
             Speed = SpeedKmh * 1000 / 3600  # convert SpeedKmh to m/s
+            
+            Distance = ElapsedTime * Speed  # meters
             Speed = Speed * 1000
             Speed = int(min(0xFFFF, Speed))
             Speed = max(0,Speed)
-            Distance = ElapsedTime * Speed  # meters
             self.distance_travelled += Distance  # meters
             HeartRate = int(min(0xFF, HeartRate))
 
