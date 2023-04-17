@@ -23,6 +23,7 @@ jobs:
       - name: Test
         run: |
           pip install pytest pytest-cov pytest-md-report pytest-mock .
+          pip install pyusb
           pytest --md-report --md-report-color never --md-report-output=pytest.md tests/
           cat pytest.md >> $GITHUB_STEP_SUMMARY
       - name: Test & publish code coverage
