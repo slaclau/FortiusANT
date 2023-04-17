@@ -8,7 +8,7 @@ def test_antCTRL(data_regression):
     output = ()
     for i in range(0,500):
         output = output + (antCTRL.BroadcastControlMessage(),)
-    data_regression.check(output)
+    data_regression.check(repr(output))
         
 def test_antFE(data_regression, mocker):
     mocker.patch('time.time',return_value=0)
@@ -21,4 +21,4 @@ def test_antFE(data_regression, mocker):
         random.randint(-1000, 1000) / 3,
         random.randint(-1000, 1000) / 3
         ),)
-    data_regression.check(output)
+    data_regression.check(repr(output))
