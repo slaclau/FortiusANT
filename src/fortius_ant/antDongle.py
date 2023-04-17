@@ -41,7 +41,7 @@ __version__ = "2023-03-15"
 # 2020-06-09    Added: SpeedAndCadenceSensor
 # 2020-05-26    Added: msgPage71_CommandStatus
 # 2020-05-25    Changed: DongleDebugMessage() adjusted with some more info
-# 2020-05-20    Changed: AntMessage.deAntMessage.composeMessage() made foolproof against wrong data
+# 2020-05-20    Changed: AntMessage.deAntMessage.compose() made foolproof against wrong data
 #                        msgPage172_TacxVortexHU_ChangeHeadunitMode wrong page
 #                        DongleDebugMessage; VHU pages added
 #               Added:  Headunit mode constants
@@ -564,7 +564,7 @@ class clsAntDongle:
                                     _rest,
                                     _c,
                                     _d,
-                                ) = AntMessage.deAntMessage.composeMessage(s)
+                                ) = AntMessage.deAntMessage.compose(s)
                                 if synch == 0xA4 and length == 0x01 and id == 0x6F:
                                     found_available_ant_stick = True
                                     self.Message = (
@@ -1469,7 +1469,7 @@ def DongleDebugMessage(text, d):
             _rest,
             Channel,
             p,
-        ) = AntMessage.deAntMessage.composeMessage(d)
+        ) = AntMessage.deAntMessage.compose(d)
 
         # -----------------------------------------------------------------------
         # info_ is the payload of the message
@@ -1649,7 +1649,7 @@ def DongleDebugMessage(text, d):
 def msg41_UnassignChannel(ChannelNumber):
     format = sc.no_alignment + sc.unsigned_char
     info = struct.pack(format, ChannelNumber)
-    msg = AntMessage.composeMessage(0x41, info)
+    msg = AntMessage.compose(0x41, info)
     return msg
 
 
@@ -1659,7 +1659,7 @@ def msg41_UnassignChannel(ChannelNumber):
 def msg42_AssignChannel(ChannelNumber, ChannelType, NetworkNumber):
     format = sc.no_alignment + sc.unsigned_char + sc.unsigned_char + sc.unsigned_char
     info = struct.pack(format, ChannelNumber, ChannelType, NetworkNumber)
-    msg = AntMessage.composeMessage(0x42, info)
+    msg = AntMessage.compose(0x42, info)
     return msg
 
 
@@ -1669,7 +1669,7 @@ def msg42_AssignChannel(ChannelNumber, ChannelType, NetworkNumber):
 def msg43_ChannelPeriod(ChannelNumber, ChannelPeriod):
     format = sc.no_alignment + sc.unsigned_char + sc.unsigned_short
     info = struct.pack(format, ChannelNumber, ChannelPeriod)
-    msg = AntMessage.composeMessage(0x43, info)
+    msg = AntMessage.compose(0x43, info)
     return msg
 
 
@@ -1679,7 +1679,7 @@ def msg43_ChannelPeriod(ChannelNumber, ChannelPeriod):
 def msg44_ChannelSearchTimeout(ChannelNumber, SearchTimeout):
     format = sc.no_alignment + sc.unsigned_char + sc.unsigned_short
     info = struct.pack(format, ChannelNumber, SearchTimeout)
-    msg = AntMessage.composeMessage(0x44, info)
+    msg = AntMessage.compose(0x44, info)
     return msg
 
 
@@ -1689,7 +1689,7 @@ def msg44_ChannelSearchTimeout(ChannelNumber, SearchTimeout):
 def msg45_ChannelRfFrequency(ChannelNumber, RfFrequency):
     format = sc.no_alignment + sc.unsigned_char + sc.unsigned_char
     info = struct.pack(format, ChannelNumber, RfFrequency)
-    msg = AntMessage.composeMessage(0x45, info)
+    msg = AntMessage.compose(0x45, info)
     return msg
 
 
@@ -1699,7 +1699,7 @@ def msg45_ChannelRfFrequency(ChannelNumber, RfFrequency):
 def msg46_SetNetworkKey(NetworkNumber=0x00, NetworkKey=0x45C372BDFB21A5B9):
     format = sc.no_alignment + sc.unsigned_char + sc.unsigned_long_long
     info = struct.pack(format, NetworkNumber, NetworkKey)
-    msg = AntMessage.composeMessage(0x46, info)
+    msg = AntMessage.compose(0x46, info)
     return msg
 
 
@@ -1709,7 +1709,7 @@ def msg46_SetNetworkKey(NetworkNumber=0x00, NetworkKey=0x45C372BDFB21A5B9):
 def msg4A_ResetSystem():
     format = sc.no_alignment + sc.unsigned_char
     info = struct.pack(format, 0x00)
-    msg = AntMessage.composeMessage(0x4A, info)
+    msg = AntMessage.compose(0x4A, info)
     return msg
 
 
@@ -1719,7 +1719,7 @@ def msg4A_ResetSystem():
 def msg4B_OpenChannel(ChannelNumber):
     format = sc.no_alignment + sc.unsigned_char
     info = struct.pack(format, ChannelNumber)
-    msg = AntMessage.composeMessage(0x4B, info)
+    msg = AntMessage.compose(0x4B, info)
     return msg
 
 
@@ -1729,7 +1729,7 @@ def msg4B_OpenChannel(ChannelNumber):
 def msg4D_RequestMessage(ChannelNumber, RequestedMessageID):
     format = sc.no_alignment + sc.unsigned_char + sc.unsigned_char
     info = struct.pack(format, ChannelNumber, RequestedMessageID)
-    msg = AntMessage.composeMessage(0x4D, info)
+    msg = AntMessage.compose(0x4D, info)
     return msg
 
 
@@ -1752,7 +1752,7 @@ def msg51_ChannelID(ChannelNumber, DeviceNumber, DeviceTypeID, TransmissionType)
     info = struct.pack(
         format, ChannelNumber, DeviceNumber, DeviceTypeID, TransmissionType
     )
-    msg = AntMessage.composeMessage(0x51, info)
+    msg = AntMessage.compose(0x51, info)
     return msg
 
 
@@ -1776,7 +1776,7 @@ def unmsg51_ChannelID(info):
 def msg60_ChannelTransmitPower(ChannelNumber, TransmitPower):
     format = sc.no_alignment + sc.unsigned_char + sc.unsigned_char
     info = struct.pack(format, ChannelNumber, TransmitPower)
-    msg = AntMessage.composeMessage(0x60, info)
+    msg = AntMessage.compose(0x60, info)
     return msg
 
 
