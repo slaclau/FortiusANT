@@ -1,4 +1,8 @@
 """Provide a class structure for ANT+ messages."""
+
+__version__ = "2023-04-16"
+# 2023-04-16    Rewritten in class based fashion
+
 import binascii
 import struct
 

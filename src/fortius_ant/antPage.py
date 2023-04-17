@@ -1,4 +1,8 @@
 """Provide a class structure for ANT+ data pages."""
+
+__version__ = "2023-04-16"
+# 2023-04-16    Rewritten in class based fashion
+
 import struct
 
 import fortius_ant.structConstants as sc
@@ -289,6 +293,29 @@ class PWRPage16(AntPage):
     def page(cls, *args):
         args = args[0:2] + (0xFF,) + args[2:]
         return super(PWRPage16, cls).page(*args)
+
+
+class SCSPage(AntPage):
+    """This page contains speed and cadence sensor data."""
+
+    fChannel = sc.unsigned_char  # First byte of the ANT+ message content
+    fCadenceEventTime = sc.unsigned_short
+    fCadenceRevolutionCount = sc.unsigned_short
+    fSpeedEventTime = sc.unsigned_short
+    fSpeedRevolutionCount = sc.unsigned_short
+
+    message_format = (
+        sc.no_alignment
+        + fChannel
+        + fCadenceEventTime
+        + fCadenceRevolutionCount
+        + fSpeedEventTime
+        + fSpeedRevolutionCount
+    )
+
+    @classmethod
+    def page(cls, *args):
+        return cls(struct.pack(cls.message_format, *args))
 
 
 list_of_pages = (Page2, Page80, Page81, FEPage16, FEPage25)

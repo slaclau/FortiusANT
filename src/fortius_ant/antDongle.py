@@ -41,7 +41,7 @@ __version__ = "2023-03-15"
 # 2020-06-09    Added: SpeedAndCadenceSensor
 # 2020-05-26    Added: msgPage71_CommandStatus
 # 2020-05-25    Changed: DongleDebugMessage() adjusted with some more info
-# 2020-05-20    Changed: DecomposeMessage() made foolproof against wrong data
+# 2020-05-20    Changed: AntMessage.deAntMessage.composeMessage() made foolproof against wrong data
 #                        msgPage172_TacxVortexHU_ChangeHeadunitMode wrong page
 #                        DongleDebugMessage; VHU pages added
 #               Added:  Headunit mode constants
@@ -130,6 +130,8 @@ import fortius_ant.debug as debug
 import fortius_ant.FortiusAntCommand as cmd
 import fortius_ant.logfile as logfile
 import fortius_ant.structConstants as sc
+
+from fortius_ant.antMessage import AntMessage
 
 # ---------------------------------------------------------------------------
 # Our own choice what channels are used
@@ -562,7 +564,7 @@ class clsAntDongle:
                                     _rest,
                                     _c,
                                     _d,
-                                ) = DecomposeMessage(s)
+                                ) = AntMessage.deAntMessage.composeMessage(s)
                                 if synch == 0xA4 and length == 0x01 and id == 0x6F:
                                     found_available_ant_stick = True
                                     self.Message = (
@@ -1442,93 +1444,6 @@ def EnumerateAll():
 
 
 # -------------------------------------------------------------------------------
-# C a l c C h e c k s u m
-# -------------------------------------------------------------------------------
-# input     ANT message,
-#               e.g. "a40340000103e5" where last byte may be the checksum itself
-#                     s l i .1.2.3    synch=a4, len=03, id=40, info=000103, checksum=e5
-#
-# function  Calculate the checksum over synch + length + id + info (3 + info)
-#
-# returns   checksum, which should match the last two characters
-# -------------------------------------------------------------------------------
-def calc_checksum(message):
-    return CalcChecksum(message)  # alias for compatibility
-
-
-def CalcChecksum(message):
-    xor_value = 0
-    length = message[1]  # byte 1; length of info
-    length += 3  # Add synch, len, id
-    for i in range(0, length):  # Process bytes as defined in length
-        xor_value = xor_value ^ message[i]
-
-    #   print('checksum', logfile.HexSpace(message), xor_value, bytes([xor_value]))
-
-    return bytes([xor_value])
-
-
-# -------------------------------------------------------------------------------
-# C o m p o s e   A N T   M e s s a g e
-# -------------------------------------------------------------------------------
-def ComposeMessage(id, info):
-    fSynch = sc.unsigned_char
-    fLength = sc.unsigned_char
-    fId = sc.unsigned_char
-    fInfo = str(len(info)) + sc.char_array  # 9 character string
-
-    format = sc.no_alignment + fSynch + fLength + fId + fInfo
-    data = struct.pack(format, 0xA4, len(info), id, info)
-    # -----------------------------------------------------------------------
-    # Add the checksum
-    # (antifier added \00\00 after each message for unknown reason)
-    # -----------------------------------------------------------------------
-    data += calc_checksum(data)
-
-    return data
-
-
-def DecomposeMessage(d):
-    synch = 0
-    length = 0
-    id = 0
-    checksum = 0
-    info = binascii.unhexlify("")  # NULL-string bytes
-    rest = ""  # No remainder (normal)
-
-    if len(d) > 0:
-        synch = d[0]  # Carefull approach
-    if len(d) > 1:
-        length = d[1]
-    if len(d) > 2:
-        id = d[2]
-    if len(d) > 3 + length:
-        if length:
-            info = d[3 : 3 + length]  # Info, if length > 0
-        checksum = d[3 + length]  # Character after info
-    if len(d) > 4 + length:
-        rest = d[4 + length :]  # Remainder (should not occur)
-
-    Channel = -1
-    DataPageNumber = -1
-    if length >= 1:
-        Channel = d[3]
-    if length >= 2:
-        DataPageNumber = d[4]
-
-    # ---------------------------------------------------------------------------
-    # Special treatment for Burst data
-    # Note that SequenceNumber is not returned and therefore lost, which is to
-    #      be implemented as soon as we will use msgID_BurstData
-    # ---------------------------------------------------------------------------
-    if id == msgID_BurstData:
-        _SequenceNumber = (Channel & 0b11100000) >> 5  # Upper 3 bits
-        Channel = Channel & 0b00011111  # Lower 5 bits
-
-    return synch, length, id, info, checksum, rest, Channel, DataPageNumber
-
-
-# -------------------------------------------------------------------------------
 # D e b u g M e s s a g e
 # -------------------------------------------------------------------------------
 # input     msg, d
@@ -1545,7 +1460,16 @@ def DecomposeMessage(d):
 # -------------------------------------------------------------------------------
 def DongleDebugMessage(text, d):
     if debug.on(debug.Data1):
-        synch, length, id, info, checksum, _rest, Channel, p = DecomposeMessage(d)
+        (
+            synch,
+            length,
+            id,
+            info,
+            checksum,
+            _rest,
+            Channel,
+            p,
+        ) = AntMessage.deAntMessage.composeMessage(d)
 
         # -----------------------------------------------------------------------
         # info_ is the payload of the message
@@ -1725,7 +1649,7 @@ def DongleDebugMessage(text, d):
 def msg41_UnassignChannel(ChannelNumber):
     format = sc.no_alignment + sc.unsigned_char
     info = struct.pack(format, ChannelNumber)
-    msg = ComposeMessage(0x41, info)
+    msg = AntMessage.composeMessage(0x41, info)
     return msg
 
 
@@ -1735,7 +1659,7 @@ def msg41_UnassignChannel(ChannelNumber):
 def msg42_AssignChannel(ChannelNumber, ChannelType, NetworkNumber):
     format = sc.no_alignment + sc.unsigned_char + sc.unsigned_char + sc.unsigned_char
     info = struct.pack(format, ChannelNumber, ChannelType, NetworkNumber)
-    msg = ComposeMessage(0x42, info)
+    msg = AntMessage.composeMessage(0x42, info)
     return msg
 
 
@@ -1745,7 +1669,7 @@ def msg42_AssignChannel(ChannelNumber, ChannelType, NetworkNumber):
 def msg43_ChannelPeriod(ChannelNumber, ChannelPeriod):
     format = sc.no_alignment + sc.unsigned_char + sc.unsigned_short
     info = struct.pack(format, ChannelNumber, ChannelPeriod)
-    msg = ComposeMessage(0x43, info)
+    msg = AntMessage.composeMessage(0x43, info)
     return msg
 
 
@@ -1755,7 +1679,7 @@ def msg43_ChannelPeriod(ChannelNumber, ChannelPeriod):
 def msg44_ChannelSearchTimeout(ChannelNumber, SearchTimeout):
     format = sc.no_alignment + sc.unsigned_char + sc.unsigned_short
     info = struct.pack(format, ChannelNumber, SearchTimeout)
-    msg = ComposeMessage(0x44, info)
+    msg = AntMessage.composeMessage(0x44, info)
     return msg
 
 
@@ -1765,7 +1689,7 @@ def msg44_ChannelSearchTimeout(ChannelNumber, SearchTimeout):
 def msg45_ChannelRfFrequency(ChannelNumber, RfFrequency):
     format = sc.no_alignment + sc.unsigned_char + sc.unsigned_char
     info = struct.pack(format, ChannelNumber, RfFrequency)
-    msg = ComposeMessage(0x45, info)
+    msg = AntMessage.composeMessage(0x45, info)
     return msg
 
 
@@ -1775,7 +1699,7 @@ def msg45_ChannelRfFrequency(ChannelNumber, RfFrequency):
 def msg46_SetNetworkKey(NetworkNumber=0x00, NetworkKey=0x45C372BDFB21A5B9):
     format = sc.no_alignment + sc.unsigned_char + sc.unsigned_long_long
     info = struct.pack(format, NetworkNumber, NetworkKey)
-    msg = ComposeMessage(0x46, info)
+    msg = AntMessage.composeMessage(0x46, info)
     return msg
 
 
@@ -1785,7 +1709,7 @@ def msg46_SetNetworkKey(NetworkNumber=0x00, NetworkKey=0x45C372BDFB21A5B9):
 def msg4A_ResetSystem():
     format = sc.no_alignment + sc.unsigned_char
     info = struct.pack(format, 0x00)
-    msg = ComposeMessage(0x4A, info)
+    msg = AntMessage.composeMessage(0x4A, info)
     return msg
 
 
@@ -1795,7 +1719,7 @@ def msg4A_ResetSystem():
 def msg4B_OpenChannel(ChannelNumber):
     format = sc.no_alignment + sc.unsigned_char
     info = struct.pack(format, ChannelNumber)
-    msg = ComposeMessage(0x4B, info)
+    msg = AntMessage.composeMessage(0x4B, info)
     return msg
 
 
@@ -1805,7 +1729,7 @@ def msg4B_OpenChannel(ChannelNumber):
 def msg4D_RequestMessage(ChannelNumber, RequestedMessageID):
     format = sc.no_alignment + sc.unsigned_char + sc.unsigned_char
     info = struct.pack(format, ChannelNumber, RequestedMessageID)
-    msg = ComposeMessage(0x4D, info)
+    msg = AntMessage.composeMessage(0x4D, info)
     return msg
 
 
@@ -1828,7 +1752,7 @@ def msg51_ChannelID(ChannelNumber, DeviceNumber, DeviceTypeID, TransmissionType)
     info = struct.pack(
         format, ChannelNumber, DeviceNumber, DeviceTypeID, TransmissionType
     )
-    msg = ComposeMessage(0x51, info)
+    msg = AntMessage.composeMessage(0x51, info)
     return msg
 
 
@@ -1852,7 +1776,7 @@ def unmsg51_ChannelID(info):
 def msg60_ChannelTransmitPower(ChannelNumber, TransmitPower):
     format = sc.no_alignment + sc.unsigned_char + sc.unsigned_char
     info = struct.pack(format, ChannelNumber, TransmitPower)
-    msg = ComposeMessage(0x60, info)
+    msg = AntMessage.composeMessage(0x60, info)
     return msg
 
 

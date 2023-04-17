@@ -2,7 +2,8 @@
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-__version__ = "2023-04-15"
+__version__ = "2023-04-16"
+# 2023-04-16    Rewritten in class based fashion
 # 2023-04-15    Improve flake8 compliance
 # 2020-12-28    AccumulatedPower not negative
 # 2020-12-27    Interleave and EventCount improved according
@@ -61,10 +62,10 @@ class AntPWR(AntInterface):
     def _broadcast_message(self, interleave: int, CurrentPower, Cadence):
         Cadence = int(min(0xFF, Cadence))
         CurrentPower = int(max(0, min(0x0FFF, CurrentPower)))  # 2021-02-19
-        if self.interleave == 61:  # Transmit page 0x52 = 82
+        if interleave == 61:  # Transmit page 0x52 = 82
             page = Page82.page(channel_PWR)
 
-        elif self.interleave == 120:  # Transmit page 0x50 = 80
+        elif interleave == 120:  # Transmit page 0x50 = 80
             page = Page80.page(
                 channel_PWR,
                 0xFF,
@@ -74,7 +75,7 @@ class AntPWR(AntInterface):
                 ModelNumber_PWR,
             )
 
-        elif self.interleave == 121:  # Transmit page 0x51 = 81
+        elif interleave == 121:  # Transmit page 0x51 = 81
             page = Page81.page(
                 channel_PWR,
                 0xFF,

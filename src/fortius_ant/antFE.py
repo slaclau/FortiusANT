@@ -2,7 +2,8 @@
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-__version__ = "2023-04-15"
+__version__ = "2023-04-16"
+# 2023-04-16    Rewritten in class based fashion
 # 2023-04-15    Improve flake8 compliance
 # 2020-12-28    accumulated_power not negative
 # 2020-12-27    Interleave and EventCount more according specification

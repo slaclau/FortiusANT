@@ -1,5 +1,8 @@
 """Provide an inheritable class for implemented an ANT+ device."""
 
+__version__ = "2023-04-16"
+# 2023-04-16    Rewritten in class based fashion
+
 
 class AntInterface:
     """Interface for communicating as an ANT+ device."""

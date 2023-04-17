@@ -2,7 +2,8 @@
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
-__version__ = "2023-04-15"
+__version__ = "2023-04-16"
+# 2023-04-16    Rewritten in class based fashion
 # 2023-04-15    Improve flake8 compliance
 # 2020-12-27    Interleave like antPWR.py
 # 2020-05-07    devAntDongle not needed, not used
