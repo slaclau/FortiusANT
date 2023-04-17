@@ -1,12 +1,15 @@
 from fortius_ant import antFE
 
+from random import random, seed
+
+seed(0)
 
 def test_full_cycle(mocker):
     mocker.patch("time.time", return_value=0)
     antFE.Initialize()
     out = ()
     for i in range(0, 255):
-        message = antFE.BroadcastTrainerDataMessage(98, 234, 35.6, 123)
+        message = antFE.BroadcastTrainerDataMessage(random(0,100), random(0,100), random(0,100), random(0,100))
         out = out + (message,)
         assert message == expected_result[i]
     print(out)
