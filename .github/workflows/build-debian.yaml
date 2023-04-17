@@ -2,10 +2,6 @@ name: "Build debian packages"
 
 on: 
   push:
-    branches:
-      - "**"
-    tags-ignore:
-      - "*"
   workflow_call:
 
 jobs:
@@ -84,13 +80,37 @@ jobs:
             fortius-ant*.dsc
             fortius-ant*.tar.xz
             fortius-ant*.changes
-      - name: Publish focal package
+}}
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: fortius-ant*.deb
+          prerelease: true
+        if: ${{ github.refname }} = "*.*-*ubuntu*" 
+      - name: Get root release
+        run: |
+          echo "SHORT_TAG=$(echo ${{ github.ref_name }} | sed -re 's/-[0-9]+ubuntu[0-9]+//g')" >> $GITHUB_ENV
+          echo ${{ env.SHORT_TAG }}
+      - name: Update main release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: fortius-ant*.deb
+          tag_name: ${{ env.SHORT_TAG }}
+          body: "Updated to include ${{ github.ref_name }}"
+          append_body: true
+        if: ${{ github.refname }} = "*.*-*ubuntu*"
+      - name: Publish package to prerelease PPA
         run: |
           sudo apt install dput
           dput ppa:slaclau/ppa-pre fortius-ant*source.changes
-        if: matrix.os == 'ubuntu-20.04'
-      - name: Publish jammy package
+        if: github.ref == 'refs/heads/master'
+      - name: Publish package to develop PPA
+        run: |
+          sudo apt install dput
+          dput ppa:slaclau/ppa-develop fortius-ant*source.changes
+        if: github.ref == 'refs/heads/develop'
+      - name: Publish package to PPA
         run: |
           sudo apt install dput
           dput ppa:slaclau/ppa-pre fortius-ant*source.changes
-        if: matrix.os == 'ubuntu-22.04'
+        if: github.ref == 'refs/heads/master' && ${{ github.refname }} = "*.*-*ubuntu*"
