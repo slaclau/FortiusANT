@@ -141,8 +141,8 @@ def BroadcastTrainerDataMessage(Cadence, CurrentPower, SpeedKmh, HeartRate):
         Speed = SpeedKmh * 1000 / 3600  * 1000 # convert SpeedKmh to mm/s
         Speed = max(Speed, 0)
         Speed = min(Speed, 65535)
-        Heartrate = max(Heartrate, 0)
-        Heartrate = min(Speed, 255)
+        HeartRate = max(HeartRate, 0)
+        HeartRate = min(HeartRate, 255)
         Distance = ElapsedTime * Speed  # meters
         DistanceTravelled += Distance  # meters
 
