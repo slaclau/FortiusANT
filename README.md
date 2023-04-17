@@ -1,12 +1,18 @@
-Linting status: [![lint](https://github.com/slaclau/FortiusANT/actions/workflows/linting.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/linting.yaml)
+| Checks |
+| ------ |
+| [![linting](https://github.com/slaclau/FortiusANT/actions/workflows/linting.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/linting.yaml) |
+| [![deptry](https://github.com/slaclau/FortiusANT/actions/workflows/deptry.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/deptry.yaml) |
+| [![pytest](https://github.com/slaclau/FortiusANT/actions/workflows/pytest.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/pytest.yaml) |
+| [![Test pip install](https://github.com/slaclau/FortiusANT/actions/workflows/pip-install.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/pip-install.yaml) |
+| [![Build debian packages](https://github.com/slaclau/FortiusANT/actions/workflows/build-debian.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/build-debian.yaml) |
+| [![Build snap](https://github.com/slaclau/FortiusANT/actions/workflows/build-snap.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/build-snap.yaml) |
 
-| Target | Version |
-| ------ | ------- |
-| [![Test pip install](https://github.com/slaclau/FortiusANT/actions/workflows/pip-install.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/pip-install.yaml) | ![Upstream version](https://img.shields.io/github/v/release/slaclau/FortiusANT?label=Upstream%20version)
-| [![Build debian packages](https://github.com/slaclau/FortiusANT/actions/workflows/build-debian.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/build-debian.yaml)
-| [![Build snap for edge](https://github.com/slaclau/FortiusANT/actions/workflows/build-snap.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/build-snap.yaml) | ![Snap edge version](https://badgen.net/snapcraft/v/fortius-ant/amd64/edge?label=Snap%20Edge%20Channel) |
-| [![Build snap for stable](https://github.com/slaclau/FortiusANT/actions/workflows/release-snap.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/release-snap.yaml) | ![Snap beta version](https://badgen.net/snapcraft/v/fortius-ant/amd64/beta?label=Snap%20Beta%20Channel) |
-| [![Release debian packages](https://github.com/slaclau/FortiusANT/actions/workflows/release-debian.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/release-debian.yaml) | ![Ubuntu package version](https://img.shields.io/github/v/tag/slaclau/FortiusANT?label=Ubuntu%20Package)
+| Available versions |
+| ------------------ |
+| ![Upstream version](https://img.shields.io/github/v/release/slaclau/FortiusANT?label=Upstream%20version) |
+| ![Ubuntu package version](https://img.shields.io/github/v/tag/slaclau/FortiusANT?label=Ubuntu%20Package) |
+| ![Snap edge version](https://badgen.net/snapcraft/v/fortius-ant/amd64/edge?label=Snap%20Edge%20Channel) |
+| ![Snap beta version](https://badgen.net/snapcraft/v/fortius-ant/amd64/beta?label=Snap%20Beta%20Channel) |
 
 # FortiusANT
 FortiusANT enables a pre-smart Tacx trainer (usb- or ANT-connected) to communicate with TrainerRoad, Rouvy or Zwift through ANT.
@@ -48,9 +54,16 @@ sudo apt update
 sudo apt install fortius-ant
 ```
 
-To obtain the latest development version use the following instead:
+To obtain the latest prerelease version use the following instead:
 ```bash
 sudo add-apt-repository ppa:slaclau/ppa-pre
+sudo apt update
+sudo apt install fortius-ant
+```
+
+To obtain the latest development version use the following instead:
+```bash
+sudo add-apt-repository ppa:slaclau/ppa-develop
 sudo apt update
 sudo apt install fortius-ant
 ```
@@ -61,12 +74,12 @@ Formal releases are also available from [GitHub](https://github.com/slaclau/Fort
 
 Snap installation is currently work in progress, full releases are available in the snapcraft beta channel:
 ```bash
-sudo snap install --channel=latest/beta --devmode fortius-ant
+sudo snap install --beta --devmode fortius-ant
 ```
 
-Development releases are available in the edge channel:
+Prereleases are available in the edge channel:
 ```bash
-sudo snap install --channel=latest/edge --devmode fortius-ant
+sudo snap install --edge --devmode fortius-ant
 ```
 
 # License
