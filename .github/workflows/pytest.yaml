@@ -32,3 +32,9 @@ jobs:
           CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE }}
         with:
           coverageCommand: pytest --cov=src tests --cov-report=xml
+      - name: Upload data
+        uses: actions/upload-artifact@v3
+        with:
+          name: data
+          path: |
+            tests/test_antCTRL

@@ -1,7 +1,7 @@
 from fortius_ant import antCTRL
 
-def test_antCTRL(regression_data):
+def test_antCTRL(data_regression):
     antCTRL.Initialize()
     for i in range(0,500):
         output = antCTRL.BroadcastMessage()
-        regression_data.check(output)
+        data_regression.check(output)
