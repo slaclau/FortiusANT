@@ -16,9 +16,9 @@ def test_antFE(data_regression, mocker):
     output = ()
     for i in range(0,500):
         output = output + (antFE.BroadcastTrainerDataMessage(
-        random.randint() / 3,
-        random.randint() / 3,
-        random.randint() / 3,
-        random.randint() / 3
+        random.randint(-1000, 1000) / 3,
+        random.randint(-1000, 1000) / 3,
+        random.randint(-1000, 1000) / 3,
+        random.randint(-1000, 1000) / 3
         ),)
     data_regression.check(output)
