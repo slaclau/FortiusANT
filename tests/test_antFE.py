@@ -11,8 +11,9 @@ def test_full_cycle(mocker):
     for i in range(0, 255):
         message = antFE.BroadcastTrainerDataMessage(randint(0,100), randint(0,100), randint(0,100), randint(0,100))
         out = out + (message,)
-        assert message == expected_result[i]
+        # assert message == expected_result[i]
     print(out)
+    assert False
 
 
 expected_result = (
