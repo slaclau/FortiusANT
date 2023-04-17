@@ -35,6 +35,7 @@ jobs:
           coverageCommand: pytest --cov=src tests --cov-report=xml
       - name: Upload data
         uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: data
           path: |
