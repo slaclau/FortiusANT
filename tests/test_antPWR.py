@@ -9,7 +9,7 @@ def test_full_cycle(mocker):
     antPWR.Initialize()
     out = ()
     for i in range(0, 500):
-        message = antPWR.BroadcastMessage(randint(0,1000)
+        message = antPWR.BroadcastMessage(randint(0,1000))
         out = out + (message,)
         # assert message == expected_result[i]
     print(out)
