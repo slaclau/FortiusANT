@@ -53,7 +53,7 @@ class antFE(AntInterface):
         self, interleave: int, Cadence, CurrentPower, SpeedKmh, HeartRate
     ):
         CurrentPower = max(0, CurrentPower)  # Not negative
-        CurrentPower = min(4093, CurrentPower)  # Limit to 4093
+        CurrentPower = int(min(4093, CurrentPower)) # Limit to 4093
         Cadence = min(253, Cadence)  # Limit to 253
         Cadence = int(max(0,Cadence))
 
