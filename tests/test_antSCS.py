@@ -9,8 +9,13 @@ def test_full_cycle(mocker):
     antSCS.Initialize()
     out = ()
     for i in range(0, 500):
-        message = antSCS.BroadcastMessage(randint(0,100), randint(0,100), randint(0,100), randint(0,100))
+        a = randint(0,100)
+        b = randint(0,100)
+        c = randint(0,100)
+        d = randint(0,100)
+        message = antSCS.BroadcastMessage(a,b,c,d)
         out = out + (message,)
+        print(
         assert message == expected_result[i]
     print(out)
     
