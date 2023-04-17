@@ -80,7 +80,6 @@ jobs:
             fortius-ant*.dsc
             fortius-ant*.tar.xz
             fortius-ant*.changes
-}}
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
