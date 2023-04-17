@@ -111,6 +111,7 @@ class antFE(AntInterface):
             Speed = max(0,Speed)
             self.distance_travelled += Distance  # meters
             HeartRate = int(min(0xFF, HeartRate))
+            HeartRate = max(0, HeartRate)
 
             self.accumulated_time = (
                 int(self.accumulated_time) & 0xFF
