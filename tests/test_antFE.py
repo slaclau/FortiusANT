@@ -15,7 +15,7 @@ def test_full_cycle(mocker):
         message = antFE.BroadcastTrainerDataMessage(a,b,c,d)
         out = out + (message,)
         input = input + (args,)
-        #assert message == expected_result[i]
+        assert message == expected_result[i]
     #print(out)
     print(input)
     assert False
