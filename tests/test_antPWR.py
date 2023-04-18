@@ -10,7 +10,7 @@ def test_full_cycle(mocker):
     input = ()
     out = ()
     for i in range(0, 500):
-    args = (randint(0,100),randint(0,1000))
+        args = (randint(0,100),randint(0,1000))
         message = antPWR.BroadcastMessage(*args)
         out = out + (message,)
         input = input + (args,)
