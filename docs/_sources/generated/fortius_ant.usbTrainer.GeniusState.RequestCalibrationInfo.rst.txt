@@ -1,6 +1,0 @@
-fortius\_ant.usbTrainer.GeniusState.RequestCalibrationInfo
-==========================================================
-
-.. currentmodule:: fortius_ant.usbTrainer
-
-.. autoattribute:: GeniusState.RequestCalibrationInfo

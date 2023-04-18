@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.msgPage16\_GeneralFEdata
-===============================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: msgPage16_GeneralFEdata

@@ -1,6 +1,0 @@
-fortius\_ant.usbTrainer.clsTacxTrainer.PedalEchoTime
-====================================================
-
-.. currentmodule:: fortius_ant.usbTrainer
-
-.. autoattribute:: clsTacxTrainer.PedalEchoTime

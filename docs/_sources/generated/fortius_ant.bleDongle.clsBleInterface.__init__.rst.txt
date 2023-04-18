@@ -1,6 +1,0 @@
-fortius\_ant.bleDongle.clsBleInterface.\_\_init\_\_
-===================================================
-
-.. currentmodule:: fortius_ant.bleDongle
-
-.. automethod:: clsBleInterface.__init__

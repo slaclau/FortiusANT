@@ -1,6 +1,0 @@
-fortius\_ant.debug.deactivate
-=============================
-
-.. currentmodule:: fortius_ant.debug
-
-.. autofunction:: deactivate

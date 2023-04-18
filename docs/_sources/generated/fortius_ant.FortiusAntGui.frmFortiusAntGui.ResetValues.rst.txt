@@ -1,6 +1,0 @@
-fortius\_ant.FortiusAntGui.frmFortiusAntGui.ResetValues
-=======================================================
-
-.. currentmodule:: fortius_ant.FortiusAntGui
-
-.. automethod:: frmFortiusAntGui.ResetValues

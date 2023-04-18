@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.msgPage220\_01\_TacxGeniusSetTarget
-==========================================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: msgPage220_01_TacxGeniusSetTarget

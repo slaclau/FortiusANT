@@ -1,6 +1,0 @@
-fortius\_ant.usbTrainer.clsTacxAntBushidoTrainer.HandleANTmessage
-=================================================================
-
-.. currentmodule:: fortius_ant.usbTrainer
-
-.. automethod:: clsTacxAntBushidoTrainer.HandleANTmessage

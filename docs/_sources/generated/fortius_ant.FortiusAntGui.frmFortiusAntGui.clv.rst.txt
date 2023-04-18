@@ -1,6 +1,0 @@
-fortius\_ant.FortiusAntGui.frmFortiusAntGui.clv
-===============================================
-
-.. currentmodule:: fortius_ant.FortiusAntGui
-
-.. autoattribute:: frmFortiusAntGui.clv

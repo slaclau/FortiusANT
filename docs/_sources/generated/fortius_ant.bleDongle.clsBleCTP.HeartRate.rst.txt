@@ -1,6 +1,0 @@
-fortius\_ant.bleDongle.clsBleCTP.HeartRate
-==========================================
-
-.. currentmodule:: fortius_ant.bleDongle
-
-.. autoattribute:: clsBleCTP.HeartRate

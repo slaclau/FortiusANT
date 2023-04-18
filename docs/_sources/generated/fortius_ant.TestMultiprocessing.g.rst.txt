@@ -1,6 +1,0 @@
-fortius\_ant.TestMultiprocessing.g
-==================================
-
-.. currentmodule:: fortius_ant.TestMultiprocessing
-
-.. autofunction:: g

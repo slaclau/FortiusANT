@@ -1,6 +1,0 @@
-fortius\_ant.antSCS.BroadcastMessage
-====================================
-
-.. currentmodule:: fortius_ant.antSCS
-
-.. autofunction:: BroadcastMessage

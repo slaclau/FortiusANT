@@ -1,6 +1,0 @@
-fortius\_ant.settings.JsonFileExists
-====================================
-
-.. currentmodule:: fortius_ant.settings
-
-.. autofunction:: JsonFileExists

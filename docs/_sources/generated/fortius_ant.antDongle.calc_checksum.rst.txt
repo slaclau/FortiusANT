@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.calc\_checksum
-=====================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: calc_checksum

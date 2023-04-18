@@ -1,6 +1,0 @@
-fortius\_ant.usbTrainer.GeniusState.Running
-===========================================
-
-.. currentmodule:: fortius_ant.usbTrainer
-
-.. autoattribute:: GeniusState.Running

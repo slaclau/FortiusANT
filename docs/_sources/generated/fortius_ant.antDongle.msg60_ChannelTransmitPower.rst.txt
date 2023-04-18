@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.msg60\_ChannelTransmitPower
-==================================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: msg60_ChannelTransmitPower

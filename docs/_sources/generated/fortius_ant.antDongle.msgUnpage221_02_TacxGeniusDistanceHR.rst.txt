@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.msgUnpage221\_02\_TacxGeniusDistanceHR
-=============================================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: msgUnpage221_02_TacxGeniusDistanceHR

@@ -1,6 +1,0 @@
-fortius\_ant.antPWR.BroadcastMessage
-====================================
-
-.. currentmodule:: fortius_ant.antPWR
-
-.. autofunction:: BroadcastMessage

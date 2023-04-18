@@ -1,6 +1,0 @@
-fortius\_ant.FortiusAntCommand.CommandLineVariables.exportTCX
-=============================================================
-
-.. currentmodule:: fortius_ant.FortiusAntCommand
-
-.. autoattribute:: CommandLineVariables.exportTCX

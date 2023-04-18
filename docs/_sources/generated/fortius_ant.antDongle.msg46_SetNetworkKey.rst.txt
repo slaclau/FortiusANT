@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.msg46\_SetNetworkKey
-===========================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: msg46_SetNetworkKey

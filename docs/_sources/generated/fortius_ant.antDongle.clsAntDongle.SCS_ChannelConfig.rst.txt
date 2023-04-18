@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.clsAntDongle.SCS\_ChannelConfig
-======================================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. automethod:: clsAntDongle.SCS_ChannelConfig

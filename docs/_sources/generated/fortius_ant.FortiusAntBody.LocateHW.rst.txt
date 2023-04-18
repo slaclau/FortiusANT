@@ -1,6 +1,0 @@
-fortius\_ant.FortiusAntBody.LocateHW
-====================================
-
-.. currentmodule:: fortius_ant.FortiusAntBody
-
-.. autofunction:: LocateHW

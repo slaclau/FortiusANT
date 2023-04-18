@@ -1,6 +1,0 @@
-fortius\_ant.bleBlessClass.clsBleServer.\_\_init\_\_
-====================================================
-
-.. currentmodule:: fortius_ant.bleBlessClass
-
-.. automethod:: clsBleServer.__init__

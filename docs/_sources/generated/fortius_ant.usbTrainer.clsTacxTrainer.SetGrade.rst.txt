@@ -1,6 +1,0 @@
-fortius\_ant.usbTrainer.clsTacxTrainer.SetGrade
-===============================================
-
-.. currentmodule:: fortius_ant.usbTrainer
-
-.. automethod:: clsTacxTrainer.SetGrade

@@ -1,6 +1,0 @@
-fortius\_ant.logfile.Open
-=========================
-
-.. currentmodule:: fortius_ant.logfile
-
-.. autofunction:: Open

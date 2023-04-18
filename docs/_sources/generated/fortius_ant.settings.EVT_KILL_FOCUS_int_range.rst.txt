@@ -1,6 +1,0 @@
-fortius\_ant.settings.EVT\_KILL\_FOCUS\_int\_range
-==================================================
-
-.. currentmodule:: fortius_ant.settings
-
-.. autofunction:: EVT_KILL_FOCUS_int_range

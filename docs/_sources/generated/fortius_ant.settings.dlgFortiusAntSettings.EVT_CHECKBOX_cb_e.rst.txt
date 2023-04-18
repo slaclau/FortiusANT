@@ -1,6 +1,0 @@
-fortius\_ant.settings.dlgFortiusAntSettings.EVT\_CHECKBOX\_cb\_e
-================================================================
-
-.. currentmodule:: fortius_ant.settings
-
-.. automethod:: dlgFortiusAntSettings.EVT_CHECKBOX_cb_e

@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.clsAntDongle.Calibrate
-=============================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. automethod:: clsAntDongle.Calibrate

@@ -1,6 +1,0 @@
-fortius\_ant.RadarGraph.clsRadarGraph.PolarToCartesian
-======================================================
-
-.. currentmodule:: fortius_ant.RadarGraph
-
-.. automethod:: clsRadarGraph.PolarToCartesian

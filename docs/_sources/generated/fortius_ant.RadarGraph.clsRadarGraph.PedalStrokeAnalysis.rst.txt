@@ -1,6 +1,0 @@
-fortius\_ant.RadarGraph.clsRadarGraph.PedalStrokeAnalysis
-=========================================================
-
-.. currentmodule:: fortius_ant.RadarGraph
-
-.. automethod:: clsRadarGraph.PedalStrokeAnalysis

@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.DongleDebugMessage
-=========================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: DongleDebugMessage

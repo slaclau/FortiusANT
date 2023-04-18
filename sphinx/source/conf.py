@@ -67,7 +67,7 @@ html_static_path = ["_static"]
 
 html_theme_options = {
     "logo": {
-        "image_light": "logo-light.png",
-        "image_dark": "logo-dark.png",
+        "image_light": "icon.png",
+        "image_dark": "icon.png",
     }
 }

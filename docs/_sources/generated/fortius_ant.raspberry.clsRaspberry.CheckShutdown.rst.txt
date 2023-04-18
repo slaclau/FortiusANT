@@ -1,6 +1,0 @@
-fortius\_ant.raspberry.clsRaspberry.CheckShutdown
-=================================================
-
-.. currentmodule:: fortius_ant.raspberry
-
-.. automethod:: clsRaspberry.CheckShutdown

@@ -1,6 +1,0 @@
-fortius\_ant.FortiusAntCommand.CommandLineVariables.DeviceNumberBase
-====================================================================
-
-.. currentmodule:: fortius_ant.FortiusAntCommand
-
-.. autoattribute:: CommandLineVariables.DeviceNumberBase

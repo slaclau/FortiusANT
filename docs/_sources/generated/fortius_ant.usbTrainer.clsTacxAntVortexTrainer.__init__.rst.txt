@@ -1,6 +1,0 @@
-fortius\_ant.usbTrainer.clsTacxAntVortexTrainer.\_\_init\_\_
-============================================================
-
-.. currentmodule:: fortius_ant.usbTrainer
-
-.. automethod:: clsTacxAntVortexTrainer.__init__

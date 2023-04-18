@@ -1,6 +1,0 @@
-fortius\_ant.usbTrainer.BushidoState.Pairing
-============================================
-
-.. currentmodule:: fortius_ant.usbTrainer
-
-.. autoattribute:: BushidoState.Pairing

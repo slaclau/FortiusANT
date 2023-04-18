@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.msgUnpage03\_TacxVortexDataCalibration
-=============================================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: msgUnpage03_TacxVortexDataCalibration

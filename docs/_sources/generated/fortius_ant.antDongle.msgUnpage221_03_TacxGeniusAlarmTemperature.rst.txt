@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.msgUnpage221\_03\_TacxGeniusAlarmTemperature
-===================================================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: msgUnpage221_03_TacxGeniusAlarmTemperature

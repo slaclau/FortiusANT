@@ -1,6 +1,0 @@
-fortius\_ant.FortiusAnt.clsFortiusAntParent.SetValues
-=====================================================
-
-.. currentmodule:: fortius_ant.FortiusAnt
-
-.. automethod:: clsFortiusAntParent.SetValues

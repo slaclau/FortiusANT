@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.msgUnpage173\_01\_TacxVortexHU\_SerialMode
-=================================================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: msgUnpage173_01_TacxVortexHU_SerialMode

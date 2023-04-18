@@ -1,6 +1,0 @@
-fortius\_ant.antHRM.BroadcastHeartrateMessage
-=============================================
-
-.. currentmodule:: fortius_ant.antHRM
-
-.. autofunction:: BroadcastHeartrateMessage

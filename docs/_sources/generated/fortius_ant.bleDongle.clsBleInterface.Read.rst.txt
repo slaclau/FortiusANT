@@ -1,6 +1,0 @@
-fortius\_ant.bleDongle.clsBleInterface.Read
-===========================================
-
-.. currentmodule:: fortius_ant.bleDongle
-
-.. automethod:: clsBleInterface.Read

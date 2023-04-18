@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.msgPage000\_TacxVortexHU\_StayAlive
-==========================================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: msgPage000_TacxVortexHU_StayAlive

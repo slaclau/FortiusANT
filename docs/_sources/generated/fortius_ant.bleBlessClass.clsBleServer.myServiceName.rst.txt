@@ -1,6 +1,0 @@
-fortius\_ant.bleBlessClass.clsBleServer.myServiceName
-=====================================================
-
-.. currentmodule:: fortius_ant.bleBlessClass
-
-.. autoattribute:: clsBleServer.myServiceName
