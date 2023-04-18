@@ -45,11 +45,11 @@ jobs:
         run: |
           sudo apt install make
           cd sphinx
-          make html
+          make github
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: sphinx/build/html
+          path: docs
   # Deployment job
   deploy:
     environment:
