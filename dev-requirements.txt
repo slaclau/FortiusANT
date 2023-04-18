@@ -16,6 +16,7 @@ sphinx
 sphinx-pyreverse
 sphinx_rtd_theme
 pydata_sphinx_theme
+graphviz
 
 versioneer
 
