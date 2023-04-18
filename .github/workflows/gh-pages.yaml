@@ -47,8 +47,6 @@ jobs:
           sudo apt install make
           cd sphinx
           make github
-      - name: Generate coverage report
-        run: pytest --cov-report html:docs/cov --cov=src
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
