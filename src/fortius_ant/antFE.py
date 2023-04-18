@@ -49,6 +49,14 @@ class antFE(AntInterface):
         self.accumulated_time = 0
         self.distance_travelled = 0
         self.accumulated_last_time = time.time()
+        
+    def broadcast_message(self, *args):
+        """Assemble the message to be sent."""
+        message = self._broadcast_message(self.interleave, *args)
+        self.interleave += 1
+        if self.interleave == self.interleave_reset:
+            self.interleave = 0
+        return message
 
     def _broadcast_message(
         self, interleave: int, Cadence, CurrentPower, SpeedKmh, HeartRate
@@ -146,13 +154,6 @@ class antFE(AntInterface):
                 self.accumulated_power,
                 CurrentPower,
             )
-
-        # -------------------------------------------------------------------------
-        # Prepare for next event
-        # -------------------------------------------------------------------------
-        interleave += 1  # Increment and ...
-        interleave &= 0xFF  # maximize to 255
-
         # -------------------------------------------------------------------------
         # Return message to be sent
         # -------------------------------------------------------------------------
