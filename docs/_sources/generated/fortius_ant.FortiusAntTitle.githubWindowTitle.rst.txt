@@ -1,6 +1,0 @@
-fortius\_ant.FortiusAntTitle.githubWindowTitle
-==============================================
-
-.. currentmodule:: fortius_ant.FortiusAntTitle
-
-.. autofunction:: githubWindowTitle

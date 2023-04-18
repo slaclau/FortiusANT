@@ -1,6 +1,0 @@
-fortius\_ant.bleBless.clsFTMS\_bless.logfileConsole
-===================================================
-
-.. currentmodule:: fortius_ant.bleBless
-
-.. automethod:: clsFTMS_bless.logfileConsole

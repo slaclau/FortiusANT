@@ -1,6 +1,0 @@
-fortius\_ant.bleBless.clsFTMS\_bless.Simulator
-==============================================
-
-.. currentmodule:: fortius_ant.bleBless
-
-.. automethod:: clsFTMS_bless.Simulator

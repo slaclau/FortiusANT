@@ -1,6 +1,0 @@
-fortius\_ant.antFE.Initialize
-=============================
-
-.. currentmodule:: fortius_ant.antFE
-
-.. autofunction:: Initialize

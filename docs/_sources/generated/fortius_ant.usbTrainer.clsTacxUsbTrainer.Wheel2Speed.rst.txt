@@ -1,6 +1,0 @@
-fortius\_ant.usbTrainer.clsTacxUsbTrainer.Wheel2Speed
-=====================================================
-
-.. currentmodule:: fortius_ant.usbTrainer
-
-.. automethod:: clsTacxUsbTrainer.Wheel2Speed

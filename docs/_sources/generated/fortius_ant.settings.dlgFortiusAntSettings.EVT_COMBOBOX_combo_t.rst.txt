@@ -1,6 +1,0 @@
-fortius\_ant.settings.dlgFortiusAntSettings.EVT\_COMBOBOX\_combo\_t
-===================================================================
-
-.. currentmodule:: fortius_ant.settings
-
-.. automethod:: dlgFortiusAntSettings.EVT_COMBOBOX_combo_t

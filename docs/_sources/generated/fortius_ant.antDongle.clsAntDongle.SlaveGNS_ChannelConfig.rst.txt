@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.clsAntDongle.SlaveGNS\_ChannelConfig
-===========================================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. automethod:: clsAntDongle.SlaveGNS_ChannelConfig

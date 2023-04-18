@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.msgUnpage49\_TargetPower
-===============================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: msgUnpage49_TargetPower

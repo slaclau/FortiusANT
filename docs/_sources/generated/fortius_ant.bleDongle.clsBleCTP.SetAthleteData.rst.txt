@@ -1,6 +1,0 @@
-fortius\_ant.bleDongle.clsBleCTP.SetAthleteData
-===============================================
-
-.. currentmodule:: fortius_ant.bleDongle
-
-.. automethod:: clsBleCTP.SetAthleteData

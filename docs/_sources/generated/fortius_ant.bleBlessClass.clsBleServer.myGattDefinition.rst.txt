@@ -1,6 +1,0 @@
-fortius\_ant.bleBlessClass.clsBleServer.myGattDefinition
-========================================================
-
-.. currentmodule:: fortius_ant.bleBlessClass
-
-.. autoattribute:: clsBleServer.myGattDefinition

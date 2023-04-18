@@ -1,6 +1,0 @@
-fortius\_ant.bleBless.clsFTMS\_bless.\_\_init\_\_
-=================================================
-
-.. currentmodule:: fortius_ant.bleBless
-
-.. automethod:: clsFTMS_bless.__init__

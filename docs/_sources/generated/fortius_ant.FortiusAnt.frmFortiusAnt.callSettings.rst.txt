@@ -1,6 +1,0 @@
-fortius\_ant.FortiusAnt.frmFortiusAnt.callSettings
-==================================================
-
-.. currentmodule:: fortius_ant.FortiusAnt
-
-.. automethod:: frmFortiusAnt.callSettings

@@ -1,6 +1,0 @@
-fortius\_ant.RadarGraph.clsRadarGraph.OnPaint
-=============================================
-
-.. currentmodule:: fortius_ant.RadarGraph
-
-.. automethod:: clsRadarGraph.OnPaint

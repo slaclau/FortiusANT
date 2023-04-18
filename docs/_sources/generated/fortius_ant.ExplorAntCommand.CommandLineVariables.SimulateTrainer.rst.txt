@@ -1,6 +1,0 @@
-fortius\_ant.ExplorAntCommand.CommandLineVariables.SimulateTrainer
-==================================================================
-
-.. currentmodule:: fortius_ant.ExplorAntCommand
-
-.. autoattribute:: CommandLineVariables.SimulateTrainer

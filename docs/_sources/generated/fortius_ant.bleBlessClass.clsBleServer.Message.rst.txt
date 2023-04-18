@@ -1,6 +1,0 @@
-fortius\_ant.bleBlessClass.clsBleServer.Message
-===============================================
-
-.. currentmodule:: fortius_ant.bleBlessClass
-
-.. autoattribute:: clsBleServer.Message

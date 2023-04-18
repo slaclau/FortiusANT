@@ -1,6 +1,0 @@
-fortius\_ant.bleDongle.clsBleCTP.RollingResistance
-==================================================
-
-.. currentmodule:: fortius_ant.bleDongle
-
-.. autoattribute:: clsBleCTP.RollingResistance

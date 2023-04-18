@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.clsAntDongle.HRM\_ChannelConfig
-======================================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. automethod:: clsAntDongle.HRM_ChannelConfig

@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.msgUnpage48\_BasicResistance
-===================================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: msgUnpage48_BasicResistance

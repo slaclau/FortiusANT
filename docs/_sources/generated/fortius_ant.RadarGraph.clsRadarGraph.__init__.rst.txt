@@ -1,6 +1,0 @@
-fortius\_ant.RadarGraph.clsRadarGraph.\_\_init\_\_
-==================================================
-
-.. currentmodule:: fortius_ant.RadarGraph
-
-.. automethod:: clsRadarGraph.__init__

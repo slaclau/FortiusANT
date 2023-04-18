@@ -1,6 +1,0 @@
-fortius\_ant.bleBlessClass.clsBleServer.logfileTraceback
-========================================================
-
-.. currentmodule:: fortius_ant.bleBlessClass
-
-.. automethod:: clsBleServer.logfileTraceback

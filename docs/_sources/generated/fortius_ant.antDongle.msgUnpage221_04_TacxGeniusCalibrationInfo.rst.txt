@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.msgUnpage221\_04\_TacxGeniusCalibrationInfo
-==================================================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: msgUnpage221_04_TacxGeniusCalibrationInfo

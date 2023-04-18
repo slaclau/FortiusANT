@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.clsAntDongle.PowerDisplay\_unused
-========================================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. automethod:: clsAntDongle.PowerDisplay_unused

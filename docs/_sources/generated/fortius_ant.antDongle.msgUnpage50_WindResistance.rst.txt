@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.msgUnpage50\_WindResistance
-==================================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: msgUnpage50_WindResistance

@@ -20,7 +20,8 @@ help:
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 github:
-	@make graphs
+	@make graphs	
+	pytest --cov-report html:source/_static/cov --cov=../src ../tests
 	@make html
 	@cp -a build/html/. ../docs
 

@@ -1,6 +1,0 @@
-fortius\_ant.logfile.Write
-==========================
-
-.. currentmodule:: fortius_ant.logfile
-
-.. autofunction:: Write

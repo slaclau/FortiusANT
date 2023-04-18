@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.msgPage2\_CTRL
-=====================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: msgPage2_CTRL

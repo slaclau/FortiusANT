@@ -1,6 +1,0 @@
-fortius\_ant.bleBleak.findBLEdevices
-====================================
-
-.. currentmodule:: fortius_ant.bleBleak
-
-.. autofunction:: findBLEdevices

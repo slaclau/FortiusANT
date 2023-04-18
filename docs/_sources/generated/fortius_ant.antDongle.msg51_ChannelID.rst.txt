@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.msg51\_ChannelID
-=======================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: msg51_ChannelID

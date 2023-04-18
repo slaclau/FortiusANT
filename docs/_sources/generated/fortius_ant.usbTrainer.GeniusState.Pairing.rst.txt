@@ -1,6 +1,0 @@
-fortius\_ant.usbTrainer.GeniusState.Pairing
-===========================================
-
-.. currentmodule:: fortius_ant.usbTrainer
-
-.. autoattribute:: GeniusState.Pairing

@@ -1,6 +1,0 @@
-fortius\_ant.antCTRL.Initialize
-===============================
-
-.. currentmodule:: fortius_ant.antCTRL
-
-.. autofunction:: Initialize
