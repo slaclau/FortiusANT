@@ -36,7 +36,9 @@ jobs:
           cache: 'pip'
           python-version: 3.9
       - name: Install requirements
-        run: pip install -r dev-requirements.txt
+        run: |
+          python wxPython-source.oh
+          pip install -r dev-requirements.txt requirements.txt
       - name: Install fortius-ant
         run: pip install . 
       - name: Build pages
