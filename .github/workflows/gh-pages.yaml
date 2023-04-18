@@ -39,7 +39,7 @@ jobs:
         run: |
           pip install distro
           python wxPython-source.py
-          pip install -r dev-requirements.txt requirements.txt
+          pip install -r dev-requirements.txt -r requirements.txt
       - name: Install fortius-ant
         run: pip install . 
       - name: Build pages
