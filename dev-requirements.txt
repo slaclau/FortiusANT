@@ -13,6 +13,7 @@ mypy-json-report
 docformatter
 
 sphinx
+sphinx-pyreverse
 sphinx_rtd_theme
 pydata_sphinx_theme
 
