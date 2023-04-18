@@ -34,19 +34,25 @@ jobs:
         uses: actions/setup-python@v4
         with:
           cache: 'pip'
+          python-version: 3.9
       - name: Install requirements
-        run: pip install -r dev-requirements.txt
+        run: |
+          pip install distro
+          python wxPython-source.py
+          pip install -r dev-requirements.txt -r requirements.txt
       - name: Install fortius-ant
         run: pip install . 
       - name: Build pages
         run: |
           sudo apt install make
           cd sphinx
-          make html
+          make github
+      - name: Generate coverage report
+        run: pytest --cov-report html:docs/cov --cov=src
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: sphinx/build/html
+          path: docs
   # Deployment job
   deploy:
     environment:
