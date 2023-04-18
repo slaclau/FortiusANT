@@ -20,12 +20,15 @@ jobs:
         with:
           python-version: '3.9'
           cache: 'pip'
+      - name: Install pytest
+        run: pip install pytest pytest-cov pytest-md-report pytest-mock .
+      - name: Install dependencies 
+        run: pip install pyusb lib-programname
       - name: Test
-        run: |
-          pip install pytest pytest-cov pytest-md-report pytest-mock .
-          pip install pyusb lib-programname
-          pytest --md-report --md-report-color never --md-report-output=pytest.md tests/
-          cat pytest.md >> $GITHUB_STEP_SUMMARY
+        run: pytest --md-report --md-report-color never --verbose --md-report-output=pytest.md
+      - name: Report
+        if: always()
+        run: cat pytest.md >> $GITHUB_STEP_SUMMARY
       - name: Test & publish code coverage
         if: always()
         uses: paambaati/codeclimate-action@v3.2.0
