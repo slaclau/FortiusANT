@@ -1,6 +1,0 @@
-fortius\_ant.bleBlessClass.clsBleServer.ReadRequest
-===================================================
-
-.. currentmodule:: fortius_ant.bleBlessClass
-
-.. automethod:: clsBleServer.ReadRequest

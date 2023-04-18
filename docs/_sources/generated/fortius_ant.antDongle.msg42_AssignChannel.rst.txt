@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.msg42\_AssignChannel
-===========================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: msg42_AssignChannel

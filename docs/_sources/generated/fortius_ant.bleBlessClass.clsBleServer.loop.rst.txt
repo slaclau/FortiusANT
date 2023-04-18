@@ -1,6 +1,0 @@
-fortius\_ant.bleBlessClass.clsBleServer.loop
-============================================
-
-.. currentmodule:: fortius_ant.bleBlessClass
-
-.. autoattribute:: clsBleServer.loop

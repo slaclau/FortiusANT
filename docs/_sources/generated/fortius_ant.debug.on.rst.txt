@@ -1,6 +1,0 @@
-fortius\_ant.debug.on
-=====================
-
-.. currentmodule:: fortius_ant.debug
-
-.. autofunction:: on

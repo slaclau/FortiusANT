@@ -1,6 +1,0 @@
-fortius\_ant.logfile.Traceback
-==============================
-
-.. currentmodule:: fortius_ant.logfile
-
-.. autofunction:: Traceback

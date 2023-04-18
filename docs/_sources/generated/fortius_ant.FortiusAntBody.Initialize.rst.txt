@@ -1,6 +1,0 @@
-fortius\_ant.FortiusAntBody.Initialize
-======================================
-
-.. currentmodule:: fortius_ant.FortiusAntBody
-
-.. autofunction:: Initialize

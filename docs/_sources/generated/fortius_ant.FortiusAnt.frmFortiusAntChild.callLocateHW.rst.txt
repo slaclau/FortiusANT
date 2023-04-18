@@ -1,6 +1,0 @@
-fortius\_ant.FortiusAnt.frmFortiusAntChild.callLocateHW
-=======================================================
-
-.. currentmodule:: fortius_ant.FortiusAnt
-
-.. automethod:: frmFortiusAntChild.callLocateHW

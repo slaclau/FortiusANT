@@ -1,6 +1,0 @@
-fortius\_ant.FortiusAntCommand.CommandLineVariables.manualGrade
-===============================================================
-
-.. currentmodule:: fortius_ant.FortiusAntCommand
-
-.. autoattribute:: CommandLineVariables.manualGrade

@@ -1,6 +1,0 @@
-fortius\_ant.FortiusAntCommand.Get
-==================================
-
-.. currentmodule:: fortius_ant.FortiusAntCommand
-
-.. autofunction:: Get

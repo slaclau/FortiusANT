@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.unmsg64\_ChannelResponse
-===============================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: unmsg64_ChannelResponse

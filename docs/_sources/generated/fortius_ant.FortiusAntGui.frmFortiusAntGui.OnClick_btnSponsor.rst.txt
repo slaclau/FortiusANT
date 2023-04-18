@@ -1,6 +1,0 @@
-fortius\_ant.FortiusAntGui.frmFortiusAntGui.OnClick\_btnSponsor
-===============================================================
-
-.. currentmodule:: fortius_ant.FortiusAntGui
-
-.. automethod:: frmFortiusAntGui.OnClick_btnSponsor

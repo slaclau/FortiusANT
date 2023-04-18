@@ -1,6 +1,0 @@
-fortius\_ant.settings.dlgFortiusAntSettings.EVT\_BUTTON\_btnHelp
-================================================================
-
-.. currentmodule:: fortius_ant.settings
-
-.. automethod:: dlgFortiusAntSettings.EVT_BUTTON_btnHelp

@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.msgUnpage01\_TacxVortexDataSerial
-========================================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: msgUnpage01_TacxVortexDataSerial

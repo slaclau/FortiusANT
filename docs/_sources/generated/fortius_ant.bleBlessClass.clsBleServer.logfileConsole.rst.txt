@@ -1,6 +1,0 @@
-fortius\_ant.bleBlessClass.clsBleServer.logfileConsole
-======================================================
-
-.. currentmodule:: fortius_ant.bleBlessClass
-
-.. automethod:: clsBleServer.logfileConsole

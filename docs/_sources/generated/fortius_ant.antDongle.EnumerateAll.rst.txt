@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.EnumerateAll
-===================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: EnumerateAll

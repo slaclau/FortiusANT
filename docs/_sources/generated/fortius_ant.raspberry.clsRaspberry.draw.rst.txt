@@ -1,6 +1,0 @@
-fortius\_ant.raspberry.clsRaspberry.draw
-========================================
-
-.. currentmodule:: fortius_ant.raspberry
-
-.. autoattribute:: clsRaspberry.draw

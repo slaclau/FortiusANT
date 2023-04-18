@@ -1,6 +1,0 @@
-fortius\_ant.ExplorAntCommand.CommandLineVariables.print
-========================================================
-
-.. currentmodule:: fortius_ant.ExplorAntCommand
-
-.. automethod:: CommandLineVariables.print

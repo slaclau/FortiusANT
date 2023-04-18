@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.ComposeMessage
-=====================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autofunction:: ComposeMessage

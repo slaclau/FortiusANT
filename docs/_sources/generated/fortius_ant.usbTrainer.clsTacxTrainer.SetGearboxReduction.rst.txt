@@ -1,6 +1,0 @@
-fortius\_ant.usbTrainer.clsTacxTrainer.SetGearboxReduction
-==========================================================
-
-.. currentmodule:: fortius_ant.usbTrainer
-
-.. automethod:: clsTacxTrainer.SetGearboxReduction

@@ -1,6 +1,0 @@
-fortius\_ant.antDongle.clsAntDongle.DeviceID
-============================================
-
-.. currentmodule:: fortius_ant.antDongle
-
-.. autoattribute:: clsAntDongle.DeviceID

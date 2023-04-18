@@ -1,6 +1,0 @@
-fortius\_ant.FortiusAntCommand.CommandLineVariables.GradeFactor
-===============================================================
-
-.. currentmodule:: fortius_ant.FortiusAntCommand
-
-.. autoattribute:: CommandLineVariables.GradeFactor

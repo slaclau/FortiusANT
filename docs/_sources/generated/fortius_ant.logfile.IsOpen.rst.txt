@@ -1,6 +1,0 @@
-fortius\_ant.logfile.IsOpen
-===========================
-
-.. currentmodule:: fortius_ant.logfile
-
-.. autofunction:: IsOpen

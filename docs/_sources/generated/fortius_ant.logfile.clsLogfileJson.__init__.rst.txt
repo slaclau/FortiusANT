@@ -1,6 +1,0 @@
-fortius\_ant.logfile.clsLogfileJson.\_\_init\_\_
-================================================
-
-.. currentmodule:: fortius_ant.logfile
-
-.. automethod:: clsLogfileJson.__init__

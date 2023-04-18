@@ -1,6 +1,0 @@
-fortius\_ant.usbTrainer.clsTacxTrainer.SetWind
-==============================================
-
-.. currentmodule:: fortius_ant.usbTrainer
-
-.. automethod:: clsTacxTrainer.SetWind

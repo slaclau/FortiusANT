@@ -1,6 +1,0 @@
-fortius\_ant.FortiusAntGui.frmFortiusAntGui.Navigate\_Up
-========================================================
-
-.. currentmodule:: fortius_ant.FortiusAntGui
-
-.. automethod:: frmFortiusAntGui.Navigate_Up

@@ -1,6 +1,0 @@
-fortius\_ant.TCXexport.clsTcxExport.Trackpoint
-==============================================
-
-.. currentmodule:: fortius_ant.TCXexport
-
-.. automethod:: clsTcxExport.Trackpoint

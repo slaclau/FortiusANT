@@ -1,6 +1,0 @@
-fortius\_ant.FortiusAnt.main
-============================
-
-.. currentmodule:: fortius_ant.FortiusAnt
-
-.. autofunction:: main
