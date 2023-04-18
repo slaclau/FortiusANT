@@ -27,6 +27,8 @@ jobs:
       - name: Report
         if: always()
         run: cat pytest.md >> $GITHUB_STEP_SUMMARY
+      - name: Coverage
+        run: pytest --cov=src
       - name: Test & publish code coverage
         if: always()
         uses: paambaati/codeclimate-action@v3.2.0
