@@ -21,9 +21,9 @@ jobs:
           python-version: '3.9'
           cache: 'pip'
       - name: Install pytest
-        run: pip install pytest pytest-cov pytest-md-report pytest-mock
-      - name: Install fortius-ant
-        run: pip install -e .
+        run: pip install -r pytest-requirements.txt -e .
+      - name: Install dependencies 
+        run: pip install pyusb lib-programname
       - name: Test
         run: pytest --md-report --md-report-color never --md-report-output=pytest.md
       - name: Report
