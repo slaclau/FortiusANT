@@ -21,8 +21,8 @@ help:
 
 github:
 	@make graphs	
-	@make html
 	pytest --cov-report html:source/cov --cov=../src ../tests
+	@make html
 	@cp -a build/html/. ../docs
 
 
