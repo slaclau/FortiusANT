@@ -22,8 +22,6 @@ jobs:
           cache: 'pip'
       - name: Install pytest
         run: pip install -r pytest-requirements.txt -e .
-      - name: Install dependencies 
-        run: pip install pyusb lib-programname
       - name: Test
         run: pytest --md-report --md-report-color never --md-report-output=pytest.md
       - name: Report
