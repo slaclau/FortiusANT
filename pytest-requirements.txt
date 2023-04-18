@@ -1,0 +1,4 @@
+pytest
+pytest-cov
+pytest-md-report
+pytest-mock
