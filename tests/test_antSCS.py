@@ -1,18 +1,18 @@
 from fortius_ant import antSCS
 
-from random import randint, seed
+import random
 
-seed(0)
+random.seed(0)
 
 def test_full_cycle(mocker):
     antSCS.Initialize()
     out = ()
     for i in range(0,500):
         mocker.patch("time.time", return_value=i)
-        a = randint(0,100)
-        b = randint(0,100)
-        c = randint(0,100)
-        d = randint(0,100)
+        a = random.randint(0,100)
+        b = random.randint(0,100)
+        c = random.randint(0,100)
+        d = random.randint(0,100)
         message = antSCS.BroadcastMessage(a,b,c,d)
         out = out + (message,)
         print(a)
