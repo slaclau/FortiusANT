@@ -22,7 +22,7 @@ help:
 github:
 	@make graphs	
 	@make html
-	pytest --cov-report html: src/cov --cov=../src ../tests
+	pytest --cov-report html:source/cov --cov=../src ../tests
 	@cp -a build/html/. ../docs
 
 
