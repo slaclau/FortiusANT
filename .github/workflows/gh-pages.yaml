@@ -41,7 +41,7 @@ jobs:
           python wxPython-source.py
           pip install -r dev-requirements.txt -r pytest-requirements.txt -r requirements.txt
       - name: Install fortius-ant
-        run: pip install . 
+        run: pip install -e .
       - name: Build pages
         run: |
           sudo apt install make
