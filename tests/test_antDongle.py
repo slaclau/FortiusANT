@@ -14,4 +14,5 @@ def test_get_devices(mocker):
     mocker.patch("usb.core.find",return_value=fake_device)
     ant_dongle = antDongle.clsAntDongle()
     print(vars(ant_dongle))
+    assert False
     assert ant_dongle.devAntDongle == None
