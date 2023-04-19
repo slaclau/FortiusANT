@@ -46,6 +46,7 @@ jobs:
         run: pip install -e .
       - name: Write to jsons
         run: |
+          mkdir docs
           mkdir docs/api
           mkdir docs/api/version
           python scripts/json-apis/version.py >> docs/api/version.json
