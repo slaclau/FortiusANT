@@ -8,5 +8,5 @@ schema = {
     "color": "blue"
 }
 
-response = json.dumps(x)
+response = json.dumps(schema)
 print(response)
