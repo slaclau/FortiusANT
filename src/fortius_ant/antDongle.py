@@ -41,7 +41,7 @@ __version__ = "2023-03-15"
 # 2020-06-09    Added: SpeedAndCadenceSensor
 # 2020-05-26    Added: msgPage71_CommandStatus
 # 2020-05-25    Changed: DongleDebugMessage() adjusted with some more info
-# 2020-05-20    Changed: AntMessage.deAntMessage.compose() made foolproof against wrong data
+# 2020-05-20    Changed: AntMessage.decompose() made foolproof against wrong data
 #                        msgPage172_TacxVortexHU_ChangeHeadunitMode wrong page
 #                        DongleDebugMessage; VHU pages added
 #               Added:  Headunit mode constants
@@ -564,7 +564,7 @@ class clsAntDongle:
                                     _rest,
                                     _c,
                                     _d,
-                                ) = AntMessage.deAntMessage.compose(s)
+                                ) = AntMessage.decompose(s)
                                 if synch == 0xA4 and length == 0x01 and id == 0x6F:
                                     found_available_ant_stick = True
                                     self.Message = (
@@ -1469,7 +1469,7 @@ def DongleDebugMessage(text, d):
             _rest,
             Channel,
             p,
-        ) = AntMessage.deAntMessage.compose(d)
+        ) = AntMessage.decompose(d)
 
         # -----------------------------------------------------------------------
         # info_ is the payload of the message
