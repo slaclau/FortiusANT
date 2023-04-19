@@ -10,7 +10,8 @@ def test_get_devices(mocker):
     print(vars(ant_dongle))
     assert ant_dongle.devAntDongle == None
     
-    mocker.patch("usb.core.find",return_value=Device("dev",Backend()))
+    fake_device = mocker.Magic_Mock()
+    mocker.patch("usb.core.find",return_value=fake_device)
     ant_dongle = antDongle.clsAntDongle()
     print(vars(ant_dongle))
     assert ant_dongle.devAntDongle == None
