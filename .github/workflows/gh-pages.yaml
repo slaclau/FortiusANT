@@ -42,6 +42,11 @@ jobs:
           pip install -r dev-requirements.txt -r pytest-requirements.txt -r requirements.txt
       - name: Install fortius-ant
         run: pip install -e .
+      - name: Write to jsons
+        run: |
+          mkdir docs/api
+          mkdir docs/api/version
+          python scripts/json-apis/version.py >> docs/api/version.json
       - name: Build pages
         run: |
           sudo apt install make graphviz
