@@ -4,7 +4,7 @@ from fortius_ant import __version__
 schema = {
     "schemaVersion": 1,
     "label": "Version",
-    "message": __version__
+    "message": __version__,
     "color": "blue"
 }
 
