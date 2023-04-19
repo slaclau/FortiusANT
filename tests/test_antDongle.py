@@ -1,6 +1,8 @@
-import fortius_ant.antDongle
+from fortius_ant import antDongle
 
 def test_get_devices(mocker):
     mocker.patch("usb.core.find",return_value=[])
     ant_dongle = antDongle.clsAntDongle()
-    assert True
+    ant_dongle.__GetDongle()
+    print(ant_dongle.getmembers())
+    assert False
