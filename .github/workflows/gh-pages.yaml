@@ -44,7 +44,7 @@ jobs:
         run: pip install -e .
       - name: Build pages
         run: |
-          sudo apt install make
+          sudo apt install make graphviz
           cd sphinx
           make github
       - name: Upload artifact

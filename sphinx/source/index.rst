@@ -11,7 +11,7 @@ Table of Contents
 
    generated/fortius_ant
    graphs
-   `Coverage </coverage/index.html>`_
+   `Coverage <coverage/index.html>`_
 
 Indices and tables
 ==================
