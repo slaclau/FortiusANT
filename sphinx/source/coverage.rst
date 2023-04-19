@@ -1,0 +1,1 @@
+.. include:: cov/index.html
