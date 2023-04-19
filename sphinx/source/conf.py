@@ -64,6 +64,7 @@ sys.path.insert(0, os.path.abspath("../"))
 html_theme = "pydata_sphinx_theme"
 # html_theme = 'sphinx_rtd_theme'
 html_static_path = ["_static"]
+html_extra_path = ["coverage"]
 
 html_theme_options = {
     "logo": {
