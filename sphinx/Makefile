@@ -21,7 +21,7 @@ help:
 
 github:
 	@make graphs	
-	pytest --cov-report html:source/coverage --cov=../src ../tests
+	pytest --cov-report html:source/prebuilt/coverage --cov=../src ../tests
 	@make html
 	@cp -a build/html/. ../docs
 
