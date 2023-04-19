@@ -49,7 +49,7 @@ jobs:
           mkdir docs
           mkdir docs/api
           mkdir docs/api/version
-          python scripts/json-apis/version.py >> docs/api/version.json
+          python scripts/json-apis/version.py >> docs/api/version/index.json
       - name: Build pages
         run: |
           sudo apt install make graphviz
