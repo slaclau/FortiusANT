@@ -20,8 +20,13 @@ jobs:
         with:
           python-version: '3.9'
           cache: 'pip'
-      - name: Install pytest
-        run: pip install -r pytest-requirements.txt -e . pyusb
+      - name: Install requirements
+        run: |
+          pip install distro
+          python wxPython-source.py
+          pip install -r dev-requirements.txt -r pytest-requirements.txt -r requirements.txt
+      - name: Install fortius-ant
+        run: pip install -e .
       - name: Test
         run: pytest --md-report --md-report-color never --md-report-output=pytest.md
       - name: Report
