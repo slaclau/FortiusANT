@@ -7,6 +7,10 @@
 | [![Build debian packages](https://github.com/slaclau/FortiusANT/actions/workflows/build-debian.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/build-debian.yaml) |
 | [![Build snap](https://github.com/slaclau/FortiusANT/actions/workflows/build-snap.yaml/badge.svg)](https://github.com/slaclau/FortiusANT/actions/workflows/build-snap.yaml) |
 
+| Code quality |
+| ------------ |
+| <a href="https://slaclau.github.io/FortiusANT/coverage/"><img src="https://api.codeclimate.com/v1/badges/7f4bf90311079edc43aa/test_coverage" /></a> |
+
 | Available versions |
 | ------------------ |
 | ![Upstream version](https://img.shields.io/github/v/release/slaclau/FortiusANT?label=Upstream%20version) |
