@@ -21,7 +21,7 @@ jobs:
           python-version: '3.9'
           cache: 'pip'
       - name: Install pytest
-        run: pip install -r pytest-requirements.txt -e . usb
+        run: pip install -r pytest-requirements.txt -e . pyusb
       - name: Test
         run: pytest --md-report --md-report-color never --md-report-output=pytest.md
       - name: Report
