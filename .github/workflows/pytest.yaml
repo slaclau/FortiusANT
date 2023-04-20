@@ -28,7 +28,7 @@ jobs:
       - name: Install fortius-ant
         run: pip install -e .
       - name: Test
-        run: pytest --md-report --md-report-color never --md-report-output=pytest.md
+        run: pytest --md-report --md-report-color never --md-report-output=pytest.md --cov=src
       - name: Report
         if: always()
         run: cat pytest.md >> $GITHUB_STEP_SUMMARY
