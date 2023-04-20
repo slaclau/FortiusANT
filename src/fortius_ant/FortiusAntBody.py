@@ -255,6 +255,7 @@ import fortius_ant.raspberry as raspberry
 import fortius_ant.steering as steering
 import fortius_ant.TCXexport as TCXexport
 import fortius_ant.usbTrainer as usbTrainer
+from fortius_ant.antMessage import AntMessage
 
 PrintWarnings = False  # Print warnings even when logging = off
 CycleTimeFast = 0.02  # TRAINER- SHOULD WRITE THEN READ 70MS LATER REALLY
@@ -1671,7 +1672,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
                     _rest,
                     Channel,
                     DataPageNumber,
-                ) = ant.DecomposeMessage(d)
+                ) = AntMessage.decompose(d)
                 error = False
 
                 if clv.Tacx_Vortex or clv.Tacx_Genius or clv.Tacx_Bushido:
@@ -1912,7 +1913,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
 
                             if info != False:
                                 data = []
-                                d = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+                                d = AntMessage.compose(ant.msgID_BroadcastData, info)
                                 while NrTimes:
                                     data.append(d)
                                     NrTimes -= 1
@@ -2010,7 +2011,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
 
                             if info != False:
                                 data = []
-                                d = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+                                d = AntMessage.compose(ant.msgID_BroadcastData, info)
                                 while NrTimes:
                                     data.append(d)
                                     NrTimes -= 1

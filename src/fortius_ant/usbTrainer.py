@@ -167,6 +167,7 @@ import fortius_ant.fxload as fxload
 import fortius_ant.logfile as logfile
 import fortius_ant.structConstants as sc
 from fortius_ant.constants import mode_Grade, mode_Power
+from fortius_ant.antMessage import AntMessage
 
 # -------------------------------------------------------------------------------
 # Constants
@@ -1321,7 +1322,7 @@ class clsTacxAntVortexTrainer(clsTacxTrainer):
                     info = ant.msgPage16_TacxVortexSetPower(
                         ant.channel_VTX_s, self.__VortexID, self.TargetResistance
                     )
-                    msg = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+                    msg = AntMessage.compose(ant.msgID_BroadcastData, info)
                     messages.append(msg)
 
                 # ---------------------------------------------------------------
@@ -1334,7 +1335,7 @@ class clsTacxAntVortexTrainer(clsTacxTrainer):
 
                     if TimeElapsed > KeepAliveInterval:
                         info = ant.msgPage000_TacxVortexHU_StayAlive(ant.channel_VHU_s)
-                        msg = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+                        msg = AntMessage.compose(ant.msgID_BroadcastData, info)
                         messages.append(msg)
 
                         if debug.on(debug.Function):
@@ -1350,7 +1351,7 @@ class clsTacxAntVortexTrainer(clsTacxTrainer):
                         info = ant.msgPage172_TacxVortexHU_ChangeHeadunitMode(
                             ant.channel_VHU_s, ant.VHU_PCmode
                         )
-                        msg = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+                        msg = AntMessage.compose(ant.msgID_BroadcastData, info)
                         messages.append(msg)
 
                         if debug.on(debug.Function):
@@ -1368,7 +1369,7 @@ class clsTacxAntVortexTrainer(clsTacxTrainer):
                     info = ant.msgPage172_TacxVortexHU_ChangeHeadunitMode(
                         ant.channel_VHU_s, ant.VHU_Normal
                     )
-                    msg = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+                    msg = AntMessage.compose(ant.msgID_BroadcastData, info)
                     messages.append(msg)
 
                     if debug.on(debug.Function):
@@ -1414,7 +1415,7 @@ class clsTacxAntVortexTrainer(clsTacxTrainer):
             _rest,
             Channel,
             DataPageNumber,
-        ) = ant.DecomposeMessage(msg)
+        ) = AntMessage.decompose(msg)
         SubPageNumber = info[2] if len(info) > 2 else None
         dataHandled = False
         messages = []
@@ -1812,7 +1813,7 @@ class clsTacxAntTrainer(clsTacxTrainer):
                             )
                         self._CommandCounter = 0
 
-                    msg = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+                    msg = AntMessage.compose(ant.msgID_BroadcastData, info)
                     messages.append(msg)
                 else:
                     # ---------------------------------------------------------------
@@ -1827,7 +1828,7 @@ class clsTacxAntTrainer(clsTacxTrainer):
                         self.TargetResistance,
                         flywheelMass,
                     )
-                    msg = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+                    msg = AntMessage.compose(ant.msgID_BroadcastData, info)
                     messages.append(msg)
 
                     if debug.on(debug.Function):
@@ -1878,7 +1879,7 @@ class clsTacxAntTrainer(clsTacxTrainer):
             _rest,
             Channel,
             DataPageNumber,
-        ) = ant.DecomposeMessage(msg)
+        ) = AntMessage.decompose(msg)
         SubPageNumber = info[2] if len(info) > 2 else None
         dataHandled = False
         messages = []
@@ -2097,7 +2098,7 @@ class clsTacxAntGeniusTrainer(clsTacxAntTrainer):
             info = ant.msgPage220_04_TacxGeniusCalibration(
                 self.Channel, ant.GNS_Calibration_Action_Request_Info
             )
-            msg = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+            msg = AntMessage.compose(ant.msgID_BroadcastData, info)
             messages.append(msg)
 
             if debug.on(debug.Function):
@@ -2112,7 +2113,7 @@ class clsTacxAntGeniusTrainer(clsTacxAntTrainer):
             info = ant.msgPage220_04_TacxGeniusCalibration(
                 self.Channel, ant.GNS_Calibration_Action_Start
             )
-            msg = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+            msg = AntMessage.compose(ant.msgID_BroadcastData, info)
             messages.append(msg)
 
             if debug.on(debug.Function):
@@ -2137,7 +2138,7 @@ class clsTacxAntGeniusTrainer(clsTacxAntTrainer):
                 info = ant.msgPage220_04_TacxGeniusCalibration(
                     self.Channel, ant.GNS_Calibration_Action_Request_Info
                 )
-                msg = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+                msg = AntMessage.compose(ant.msgID_BroadcastData, info)
                 messages.append(msg)
 
                 if debug.on(debug.Function):
@@ -2175,7 +2176,7 @@ class clsTacxAntGeniusTrainer(clsTacxAntTrainer):
             _rest,
             Channel,
             DataPageNumber,
-        ) = ant.DecomposeMessage(msg)
+        ) = AntMessage.decompose(msg)
         SubPageNumber = info[2] if len(info) > 2 else None
         dataHandled = False
         messages = []
@@ -2485,7 +2486,7 @@ class clsTacxAntBushidoTrainer(clsTacxAntTrainer):
         TimeElapsed = time.time() - self.__KeepAliveTime
         if TimeElapsed > KeepAliveInterval and QuarterSecond:
             info = ant.msgPage000_TacxVortexHU_StayAlive(self.Channel)
-            msg = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+            msg = AntMessage.compose(ant.msgID_BroadcastData, info)
             messages.append(msg)
 
             if debug.on(debug.Function):
@@ -2501,7 +2502,7 @@ class clsTacxAntBushidoTrainer(clsTacxAntTrainer):
             info = ant.msgPage172_TacxVortexHU_ChangeHeadunitMode(
                 self.Channel, self.__ModeRequested
             )
-            msg = ant.ComposeMessage(ant.msgID_BroadcastData, info)
+            msg = AntMessage.compose(ant.msgID_BroadcastData, info)
             messages.append(msg)
 
             if debug.on(debug.Function):
@@ -2534,7 +2535,7 @@ class clsTacxAntBushidoTrainer(clsTacxAntTrainer):
             _rest,
             Channel,
             DataPageNumber,
-        ) = ant.DecomposeMessage(msg)
+        ) = AntMessage.decompose(msg)
         SubPageNumber = info[2] if len(info) > 2 else None
         dataHandled = False
         messages = []
