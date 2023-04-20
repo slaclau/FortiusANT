@@ -49,6 +49,7 @@ jobs:
           mkdir docs
           mkdir docs/api
           mkdir docs/api/version
+          mkdir docs/api/shortversion
           python scripts/json-apis/version.py >> docs/api/version/index.json
           python scripts/json-apis/shortversion.py >> docs/api/shortversion/index.json 
       - name: Build pages
