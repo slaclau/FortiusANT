@@ -50,6 +50,7 @@ jobs:
           mkdir docs/api
           mkdir docs/api/version
           python scripts/json-apis/version.py >> docs/api/version/index.json
+          python scripts/json-apis/shortversion.py >> docs/api/shortversion/index.json 
       - name: Build pages
         run: |
           sudo apt install make graphviz
