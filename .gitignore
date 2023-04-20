@@ -6,6 +6,7 @@
 *.png
 .pydevproject
 .settings
+**/.coverage
 Thumbs.db
 fortius_ant/build/
 fortius_ant/dist/
@@ -17,6 +18,7 @@ pythoncode/help.txt
 wheels
 build
 dist
+docs
 fortius_ant.egg-info
 debian/fortius-ant
 debian/.debhelper

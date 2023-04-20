@@ -131,7 +131,7 @@ import fortius_ant.FortiusAntCommand as cmd
 import fortius_ant.logfile as logfile
 import fortius_ant.structConstants as sc
 
-from fortius_ant.antMessage import AntMessage
+from fortius_ant.antMessage import AntMessage, calc_checksum
 
 # ---------------------------------------------------------------------------
 # Our own choice what channels are used
@@ -867,7 +867,7 @@ class clsAntDongle:
                         # -------------------------------------------------------
                         d = bytes(trv[start : start + length])
                         checksum = d[-1:]
-                        expected = CalcChecksum(d)
+                        expected = calc_checksum(d)
 
                         if expected != checksum:
                             error = "error: checksum incorrect"

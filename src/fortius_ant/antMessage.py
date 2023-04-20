@@ -62,7 +62,7 @@ class AntMessage(bytes):
         # Add the checksum
         # (antifier added \00\00 after each message for unknown reason)
         # -----------------------------------------------------------------------
-        data += _calc_checksum(data)
+        data += calc_checksum(data)
 
         return cls(data)
 
@@ -109,7 +109,7 @@ class AntMessage(bytes):
         return synch, length, messageID, info, checksum, rest, Channel, DataPageNumber
 
 
-def _calc_checksum(message):
+def calc_checksum(message):
     xor_value = 0
     length = message[1]  # byte 1; length of info
     length += 3  # Add synch, len, id
