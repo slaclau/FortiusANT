@@ -11,7 +11,7 @@ Table of Contents
 
    generated/fortius_ant
    graphs
-   `Coverage <https://slaclau.github.io/FortiusANT/coverage/index.html>`_
+   pytest
 
 Indices and tables
 ==================
