@@ -1,6 +1,6 @@
 Pytest results
 ==============
 
-`Coverage <./coverage>`_
-`Report v1 <./pytest-html/report.html>`_
-`Report v2 <./pytest-html-reporter/report.html>`_
+Test report: `Results <./pytest-html/report.html>`_
+
+Coverage report: `Coverage <./coverage>`_
