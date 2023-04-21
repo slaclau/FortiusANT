@@ -9,8 +9,8 @@ Table of Contents
 .. toctree::
    :maxdepth: 2
 
-   generated/fortius_ant
-   graphs
+   userguide
+   api-reference
    pytest
 
 Indices and tables
