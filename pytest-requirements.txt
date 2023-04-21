@@ -2,3 +2,5 @@ pytest
 pytest-cov
 pytest-md-report
 pytest-mock
+pytest-html
+pytest-html-reporter

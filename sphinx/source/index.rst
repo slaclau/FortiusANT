@@ -9,9 +9,9 @@ Table of Contents
 .. toctree::
    :maxdepth: 2
 
-   generated/fortius_ant
-   graphs
-   `Coverage <coverage/index.html>`_
+   userguide
+   api-reference
+   pytest
 
 Indices and tables
 ==================
