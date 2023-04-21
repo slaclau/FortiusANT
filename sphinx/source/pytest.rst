@@ -1,4 +1,6 @@
 Pytest results
 ==============
 
-`Coverage <https://slaclau.github.io/FortiusANT/coverage/index.html>`_
+`Coverage <./coverage>`_
+`Report v1 <./pytest-html/report.html>`_
+`Report v2 <./pytest-html-reporter/report.html>`_
