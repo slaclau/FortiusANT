@@ -21,6 +21,8 @@ help:
 
 github:
 	@make graphs
+	mkdir source/prebuilt
+	mkdir source/prebuilt/coverage
 	mkdir source/prebuilt/pytest-html
 	mkdir source/prebuilt/pytest-html-reporter
 	pytest --cov-report html:source/prebuilt/coverage --cov=../src ../tests --html=source/prebuilt/pytest-html/report.html --html-report=source/prebuilt/pytest-html-reporter/report.html
