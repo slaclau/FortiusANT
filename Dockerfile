@@ -3,7 +3,7 @@ FROM ubuntu:$DISTRIBUTION
 ADD . ~/fortius-ant
 RUN if [ "$DISTRIBUTION" = "focal" ]; then add-apt-repository ppa:jyrki-pulliainen/dh-virtualenv; fi
 RUN apt-get update; apt-get install -y python3; \
-cd fortius-ant \
+cd ~/fortius-ant \
 export useSystemPython=$(python3 useSystemPython.py); \
 if [ "$useSystemPython" = "yes" ]; \
 then export ver=3; else export ver=3.9; fi; \
