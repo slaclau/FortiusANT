@@ -1,6 +1,8 @@
 ARG DISTRIBUTION=latest
 FROM ubuntu:$DISTRIBUTION
-ADD . fortius-ant
+RUN mkdir /fortius-ant; cd /fortius-ant
+WORKDIR /fortius-ant
+ADD . /fortius-ant
 RUN if [ "$DISTRIBUTION" = "focal" ]; then add-apt-repository ppa:jyrki-pulliainen/dh-virtualenv; fi
 RUN apt-get update; apt-get install -y python3; \
 cd fortius-ant \
