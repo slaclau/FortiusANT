@@ -2,7 +2,10 @@ import distro
 import fileinput
 import subprocess
 
-codename = distro.codename()
+if len(sys.argv) > 0:
+    codename = sys.argv[0]
+else: 
+    codename = distro.codename()
 
 version = (
     subprocess.check_output(

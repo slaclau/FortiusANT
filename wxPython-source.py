@@ -2,7 +2,10 @@ import distro
 
 
 def main():
-    version = int(distro.major_version())
+    if len(sys.argv) > 0
+        version = sys.argv[0]
+    else: 
+        version = int(distro.major_version())
     if version >= 22:
         lts = "22.04"
     elif version >= 20:
