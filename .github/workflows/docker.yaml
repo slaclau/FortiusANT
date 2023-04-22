@@ -13,5 +13,4 @@ jobs:
         with:
           fetch-depth: 0
       - run: |
-          cd docker
           docker build . --build-arg DISTRIBUTION=lunar
