@@ -17,4 +17,4 @@ jobs:
       - name: pbuild
         run: |
           sudo pbuilder create --distribution lunar
-          sudo pdebuild
+          sudo pdebuild --use-pdebuild-internal
