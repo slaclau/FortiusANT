@@ -16,6 +16,6 @@ jobs:
         run: sudo apt install pbuilder
       - name: pbuild
         run: |
-          sudo pbuilder --build \
+          sudo pdebuild \
                 --distribution lunar \
                 --architecture amd64
