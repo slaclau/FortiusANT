@@ -2,7 +2,7 @@ import distro
 
 
 def main():
-    if len(sys.argv) > 0
+    if len(sys.argv) > 0:
         version = sys.argv[0]
     else: 
         version = int(distro.major_version())
