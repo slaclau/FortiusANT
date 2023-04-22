@@ -14,7 +14,9 @@ jobs:
           fetch-depth: 0
       - name: Install pbuilder
         run: sudo apt install pbuilder
-      - name: pbuild
+      - name: pbuilder create
         run: |
-          sudo pbuilder create --distribution lunar
+          sudo pbuilder create --distribution jammy
+      - name: pdebuild
+        run: |
           sudo pdebuild --use-pdebuild-internal
