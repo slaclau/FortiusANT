@@ -1,0 +1,13 @@
+name: build in docker
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - run: |
+          cd docker
+          docker build . --build-arg DISTRIBUTION=lunar
