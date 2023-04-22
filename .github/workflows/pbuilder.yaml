@@ -1,0 +1,21 @@
+name: pbuilder
+
+on:
+  push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Install pbuilder
+        run: sudo apt install pbuilder
+      - name: pbuild
+        run: |
+          sudo pbuilder --build \
+                --distribution lunar \
+                --architecture amd64
