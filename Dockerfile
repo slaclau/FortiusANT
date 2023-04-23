@@ -18,3 +18,4 @@ python$ver setup.py bdist_wheel --dist-dir=pip_local; \
 python$ver -m pip download \
 --destination-directory pip_local \
 -r requirements.txt
+RUN dpkg-buildpackage
