@@ -12,7 +12,7 @@ then export ver=3; else export ver=3.9; \
 echo "deb https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy main" >> /etc/apt/sources.list; \
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys F23C5A6CF475977595C89F51BA6932366A755776; \
 apt-get update; fi; \
-sudo apt-get install -y python$ver python$ver-dev python$ver-distutils python$ver-venv;
+apt-get install -y python$ver python$ver-dev python$ver-distutils python$ver-venv;
 RUN apt-get install -y debhelper dh-virtualenv libgstreamer-plugins-base1.0-0 libnotify4 libsdl2-2.0-0 libwebkit2gtk-4.0-dev libjavascriptcoregtk-4.0-dev libegl-dev
 USER 1000:1000
 RUN if [ "$useSystemPython" = "yes" ]; \
