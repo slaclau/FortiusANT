@@ -9,7 +9,7 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B325B03CAA406734D572BE2
 echo "deb https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy main" >> /etc/apt/sources.list; \
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys F23C5A6CF475977595C89F51BA6932366A755776; \
 apt-get update;
-RUN mk-build-deps -i
+RUN mk-build-deps -i -t "apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends -y"
 USER 1000:1000
 RUN if [ "$useSystemPython" = "yes" ]; \
 then export ver=3; else export ver=3.9; fi; \
