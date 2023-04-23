@@ -14,7 +14,8 @@ Build-Depends: debhelper (>= 9), dh-virtualenv (>= 0.8),
  libsdl2-2.0-0,
  libwebkit2gtk-4.0-dev,
  libjavascriptcoregtk-4.0-dev,
- libegl-dev
+ libegl-dev,
+ libtiff5 | libtiff6
 Standards-Version: 3.9.5
 
 Package: fortius-ant
