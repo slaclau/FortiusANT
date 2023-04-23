@@ -12,7 +12,8 @@ apt-get update;
 RUN mk-build-deps -i -t "apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends -y"
 RUN if [ "$useSystemPython" = "yes" ]; \
 then export ver=3; else export ver=3.9; fi; \
-python$ver -m pip install setuptools; \
+python$ver updateChangelog.py; \
+python$ver wxPython-source.py; \
 python$ver setup.py bdist_wheel --dist-dir=pip_local; \
 python$ver -m pip download \
 --destination-directory pip_local \
