@@ -15,6 +15,7 @@ then export ver=3; else export ver=3.9; fi; \
 python$ver updateChangelog.py; \
 python$ver wxPython-source.py; \
 mkdir pip_local; \
+python$ver -m pip install -U setuptools; \
 python$ver setup.py bdist_wheel --dist-dir=pip_local; \
 python$ver -m pip download \
 --destination-directory pip_local \
