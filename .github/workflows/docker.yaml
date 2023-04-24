@@ -16,5 +16,6 @@ jobs:
           fetch-depth: 0
       - run: |
           mkdir output
-          docker run . --build-arg DISTRIBUTION=${{ matrix.codename }} -v output:/output
+          docker build . --build-arg DISTRIBUTION=${{ matrix.codename }} -t image 
+          docker run image -v output:/output
           
