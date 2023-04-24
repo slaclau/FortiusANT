@@ -21,13 +21,9 @@ jobs:
         run: |
           sudo apt install pbuilder
           sudo pbuilder create --distribution ${{ matrix.distribution }}
-      - name: Add dh-virtualenv repository if needed
-        if: matrix.distribution == 'focal'
-        run: |
-          sudo pbuilder --execute "sudo add-apt-repository ppa:jyrki-pulliainen/dh-virtualenv"
       - name: Check system python version
         run: | 
-          echo "useSystemPython=$(sudo pbuilder execute "python3 useSystemPython.py")" >> $GITHUB_ENV
+          echo "useSystemPython=$(sudo pbuilder execute "useSystemPython.py")" >> $GITHUB_ENV
           echo "${{env.useSystemPython}}"
       - name: Install system python packages
         if: ${{ env.useSystemPython == 'yes' }}

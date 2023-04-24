@@ -1,5 +1,5 @@
+#!/bin/python3
 import distro
-
 
 def main():
     version = int(distro.major_version())

@@ -1,3 +1,4 @@
+#!/bin/python3
 import sys
 
 v = sys.version_info.minor
