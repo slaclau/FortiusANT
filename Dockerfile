@@ -17,7 +17,7 @@ apt-get install -y python$ver; \
 python$ver updateChangelog.py; \
 python$ver wxPython-source.py; \
 mkdir pip_local; \
-python$ver -m pip install -U setuptools; \
+python$ver -m pip install -U setuptools attrdict3; \
 python$ver setup.py bdist_wheel --dist-dir=pip_local; \
 python$ver -m pip download \
 --no-binary=:all: \
