@@ -1,4 +1,3 @@
-attrdict3
 importlib-metadata
 bless
 lib_programname
