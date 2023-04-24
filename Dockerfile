@@ -1,5 +1,8 @@
 ARG DISTRIBUTION=latest
 FROM ubuntu:$DISTRIBUTION
+ENV TZ=Europe/London
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 RUN mkdir /fortius-ant; cd /fortius-ant
 WORKDIR /fortius-ant
 ADD . /fortius-ant
