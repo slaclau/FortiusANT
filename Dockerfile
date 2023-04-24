@@ -6,7 +6,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN mkdir /fortius-ant; cd /fortius-ant
 WORKDIR /fortius-ant
 ADD . /fortius-ant
-RUN apt-get update; apt-get install -y software-properties-common devscripts equivs python3-pip; python3 -m pip install distro --ignore-installed
+RUN apt-get update; apt-get install -y software-properties-common devscripts equivs python3-pip python3-distro
 
 RUN python3 addRepositories.py; apt-get update;
 RUN mk-build-deps -i -t "apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends -y"
