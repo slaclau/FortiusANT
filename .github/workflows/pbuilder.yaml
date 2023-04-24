@@ -1,22 +1,79 @@
-name: pbuilder
+name: "Build debian packages with pbuilder"
 
-on:
-  push
+on: 
+  push:
+  workflow_call:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     
+    strategy:
+      matrix:
+        distribution: [lunar, kinetic, jammy, focal]
+        
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Install pbuilder
-        run: sudo apt install pbuilder
-      - name: pbuilder create
+      - name: Create pbuilder
         run: |
-          sudo pbuilder create --distribution jammy
-      - name: pdebuild
+          pbuilder create ${{ matrix.distribution }}
+      - name: Add dh-virtualenv repository if needed
+        if: matrix.distribution == 'focal'
         run: |
-          sudo pdebuild --use-pdebuild-internal
+          sudo pbuilder --login --save-after-login
+          
+          add-apt-repository ppa:jyrki-pulliainen/dh-virtualenv
+          apt update
+          logout
+      - name: Check system python version
+        run: |
+          echo "useSystemPython=$(python3 useSystemPython.py)" >> $GITHUB_ENV
+          echo "${{env.useSystemPython}}"
+      - name: Install system python packages
+        if: ${{ env.useSystemPython == 'yes' }}
+        run: |
+          sudo pbuilder --login --save-after-login
+          apt install python3 python3-dev python3-distutils python3-venv
+          python3 wxPython-source.py
+          python3 updateChangelog.py
+          python3 setup.py bdist_wheel --dist-dir=pip_local
+          python3 -m pip download \
+          --destination-directory pip_local \
+          -r requirements.txt
+          logout
+      - name: Install python3.9 packages
+        if: ${{ env.useSystemPython != 'yes' }}
+        run: |
+          sudo pbuilder --login --save-after-login
+          add-apt-repository ppa:deadsnakes/ppa
+          sudo apt update
+          sudo apt install python3.9 python3.9-dev python3.9-distutils python3.9-venv
+          python3.9 wxPython-source.py
+          python3.9 updateChangelog.py
+          python3.9 setup.py bdist_wheel --dist-dir=pip_local
+          python3.9 -m pip download \
+          --destination-directory pip_local \
+          -r requirements.txt
+          logout
+      - name: Build package
+        run: |
+          pdebuild --use-pdebuild-internal
+      - name: Install package
+        run: |
+          sudo apt install ./fortius-ant*.deb
+      - name: Check installed versions
+        run: |
+          fortius-ant --version
+          explorant --version
+      - name: Upload debian package
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}
+          path: |
+            fortius-ant*.deb
+            fortius-ant*.dsc
+            fortius-ant*.tar.xz
+            fortius-ant*.changes
