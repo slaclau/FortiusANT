@@ -12,7 +12,7 @@ RUN python3 addRepositories.py; apt-get update;
 RUN mk-build-deps -i -t "apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends -y"
 RUN if [ "$useSystemPython" = "yes" ]; \
 then export ver=3; else export ver=3.9; fi; \
-apt-get install -y python$ver
+apt-get install -y python$ver; \
 python$ver updateChangelog.py; \
 python$ver wxPython-source.py; \
 mkdir pip_local; \
