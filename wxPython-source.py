@@ -21,7 +21,7 @@ def main():
         print("wxPython will be installed from " + wheels_url)
         f = open("wxPython-source.txt", "w+")
         f.write("-f " + wheels_url)
-
+        f.write("wxPython")
 
 if __name__ == "__main__":
     main()
