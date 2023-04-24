@@ -6,7 +6,7 @@ import sys
 codename = distro.codename()
 
 if codename == "focal":
-    subprocess.run("sudo add-apt-repository ppa:jyrki-pulliainen/dh-virtualenv")
+    subprocess.run(["sudo", "add-apt-repository", "ppa:jyrki-pulliainen/dh-virtualenv"])
 
 v = sys.version_info.minor
 
