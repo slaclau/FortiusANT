@@ -20,6 +20,7 @@ mkdir pip_local; \
 python$ver -m pip install -U setuptools; \
 python$ver setup.py bdist_wheel --dist-dir=pip_local; \
 python$ver -m pip download \
+--no-binary:all: \
 --destination-directory pip_local \
 -r requirements.txt
 RUN mkdir /output; 
