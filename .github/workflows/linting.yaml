@@ -25,7 +25,7 @@ jobs:
       - name: Install requirements
         run: |
           pip install distro setuptools
-          pip install attrdict3
+          pip install attrdict3 attrdict
           pip install -r requirements.txt
       - name: Install development requirements
         run: pip install -r dev-requirements.txt

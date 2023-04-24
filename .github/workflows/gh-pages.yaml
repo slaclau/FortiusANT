@@ -41,8 +41,7 @@ jobs:
           python-version: 3.9
       - name: Install requirements
         run: |
-          pip install distro
-          python wxPython-source.py
+          pip install distro attrdict3
           pip install -r dev-requirements.txt -r pytest-requirements.txt -r requirements.txt
       - name: Install fortius-ant
         run: pip install -e .
