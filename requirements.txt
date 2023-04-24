@@ -1,4 +1,4 @@
--r wxPython-source.txt
+attrdict3
 importlib-metadata
 bless
 lib_programname

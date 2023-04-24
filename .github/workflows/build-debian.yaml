@@ -45,10 +45,10 @@ jobs:
           sudo add-apt-repository ppa:deadsnakes/ppa
           sudo apt update
           sudo apt install python3.9 python3.9-dev python3.9-distutils python3.9-venv
-          python3.9 wxPython-source.py
           python3.9 updateChangelog.py
           python3.9 setup.py bdist_wheel --dist-dir=pip_local
           python3.9 -m pip download \
+          --no-binary=:all:
           --destination-directory pip_local \
           -r requirements.txt
       - name: Install needed libraries
