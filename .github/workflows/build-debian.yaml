@@ -37,6 +37,7 @@ jobs:
           python3 updateChangelog.py
           python3 setup.py bdist_wheel --dist-dir=pip_local
           python3 -m pip download \
+          --no-binary=:all: \
           --destination-directory pip_local \
           -r requirements.txt
       - name: Install python3.9 packages
@@ -49,7 +50,7 @@ jobs:
           python3.9 updateChangelog.py
           python3.9 setup.py bdist_wheel --dist-dir=pip_local
           python3.9 -m pip download \
-          --no-binary=:all:
+          --no-binary=:all: \
           --destination-directory pip_local \
           -r requirements.txt
       - name: Install needed libraries
