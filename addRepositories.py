@@ -13,4 +13,4 @@ v = sys.version_info.minor
 if v > 9:
     with open("/etc/apt/sources.list", "a") as file:
         file.write("deb https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy main")
-    subprocess.run("apt-key adv --keyserver keyserver.ubuntu.com --recv-keys F23C5A6CF475977595C89F51BA6932366A755776")
+    subprocess.run(["apt-key", "adv", "--keyserver", "keyserver.ubuntu.com", "--recv-keys",     "F23C5A6CF475977595C89F51BA6932366A755776"])
