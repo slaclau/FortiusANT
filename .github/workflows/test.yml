@@ -1,4 +1,4 @@
-name: "Build python package"
+name: "test"
 
 on: 
   push:
@@ -25,6 +25,9 @@ jobs:
         run: |
           echo "useSystemPython=$(python3 useSystemPython.py)" >> $GITHUB_ENV
           echo "${{env.useSystemPython}}"
+      - name: Install needed libraries
+        run: |
+          sudo apt install libgstreamer-plugins-base1.0-0 libnotify4 libsdl2-2.0-0 libwebkit2gtk-4.0-dev libjavascriptcoregtk-4.0-dev libegl-dev
       - name: Install system python packages
         if: ${{ env.useSystemPython == 'yes' }}
         run: |
@@ -43,9 +46,6 @@ jobs:
           echo " " >> wxPython-source.txt
           python3.9 -m pip install -r requirements.txt
           python3.9 -m pip install .
-      - name: Install needed libraries
-        run: |
-          sudo apt install libgstreamer-plugins-base1.0-0 libnotify4 libsdl2-2.0-0 libwebkit2gtk-4.0-dev libjavascriptcoregtk-4.0-dev libegl-dev
       - name: Get version
         run: |
           fortius-ant --version
