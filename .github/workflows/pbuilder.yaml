@@ -20,7 +20,7 @@ jobs:
       - name: Create pbuilder
         run: |
           sudo apt install pbuilder
-          pbuilder create ${{ matrix.distribution }}
+          pbuilder create --distribution ${{ matrix.distribution }}
       - name: Add dh-virtualenv repository if needed
         if: matrix.distribution == 'focal'
         run: |
