@@ -25,9 +25,8 @@ jobs:
         if: matrix.distribution == 'focal'
         run: |
           sudo pbuilder --login --save-after-login
-          
-          add-apt-repository ppa:jyrki-pulliainen/dh-virtualenv
-          apt update
+          sudo add-apt-repository ppa:jyrki-pulliainen/dh-virtualenv
+          sudo apt update
           logout
       - name: Check system python version
         run: |
@@ -37,7 +36,7 @@ jobs:
         if: ${{ env.useSystemPython == 'yes' }}
         run: |
           sudo pbuilder --login --save-after-login
-          apt install python3 python3-dev python3-distutils python3-venv
+          sudo apt install python3 python3-dev python3-distutils python3-venv
           python3 wxPython-source.py
           python3 updateChangelog.py
           python3 setup.py bdist_wheel --dist-dir=pip_local
@@ -49,9 +48,9 @@ jobs:
         if: ${{ env.useSystemPython != 'yes' }}
         run: |
           sudo pbuilder --login --save-after-login
-          add-apt-repository ppa:deadsnakes/ppa
-          apt update
-          apt install python3.9 python3.9-dev python3.9-distutils python3.9-venv
+          sudo add-apt-repository ppa:deadsnakes/ppa
+          sudo apt update
+          sudo apt install python3.9 python3.9-dev python3.9-distutils python3.9-venv
           python3.9 wxPython-source.py
           python3.9 updateChangelog.py
           python3.9 setup.py bdist_wheel --dist-dir=pip_local
