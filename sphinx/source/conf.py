@@ -48,7 +48,7 @@ exclude_patterns = []
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "wxpython": ("https://wxpython.org/Phoenix/docs/html/", None),
+    "wxpython": ("https://docs.wxpython.org/", None),
 }
 
 inheritance_graph_attrs = dict(rankdir="TB", size='""')
