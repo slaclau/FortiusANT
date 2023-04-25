@@ -16,6 +16,7 @@ override_dh_virtualenv:
 	dh_virtualenv \
 	--python python3 \
 	--builtin-venv \
+	--extra-pip-arg --no-index \
 	--extra-pip-arg --find-links=pip_local \
 	--preinstall attrdict \
 	--skip-install
@@ -27,6 +28,7 @@ override_dh_virtualenv:
 	dh_virtualenv \
 	--python python3.9 \
 	--builtin-venv \
+	--extra-pip-arg --no-index \
 	--extra-pip-arg --find-links=pip_local \
 	--preinstall attrdict \
 	--skip-install
