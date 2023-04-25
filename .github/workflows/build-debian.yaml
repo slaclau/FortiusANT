@@ -40,7 +40,7 @@ jobs:
           python3 -m pip download \
           --no-binary=:all: \
           --destination-directory pip_local \
-          -r requirements.txt attrdict
+          -r requirements.txt -r build-requirements.txt
       - name: Install python3.9 packages
         if: ${{ env.useSystemPython != 'yes' }}
         run: |
@@ -54,7 +54,7 @@ jobs:
           python3.9 -m pip download \
           --no-binary=:all: \
           --destination-directory pip_local \
-          -r requirements.txt attrdict
+          -r requirements.txt -r build-requirements.txt
       - name: Install needed libraries
         run: |
           sudo apt install libgstreamer-plugins-base1.0-0 libnotify4 libsdl2-2.0-0 libwebkit2gtk-4.0-dev libjavascriptcoregtk-4.0-dev libegl-dev
