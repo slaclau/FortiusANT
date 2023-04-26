@@ -22,12 +22,12 @@ jobs:
       - name: Install package
         run: |
           ls ./output
-          sudo apt install ./output/fortius-ant*.deb
       - name: Check installed versions
         run: |
           fortius-ant --version
           explorant --version
       - name: Upload debian package
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}
