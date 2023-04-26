@@ -15,8 +15,7 @@ if [ "$useSystemPython" = "yes" ]; \
 then export ver=3; else export ver=3.9; fi; \
 apt-get install -y python$ver; \
 python$ver updateChangelog.py; \
-echo "" >> wxPython-source.txt \
-mkdir pip_local; \
+echo "" >> wxPython-source.txt; \
 python$ver -m pip install -U setuptools attrdict; \
 python$ver setup.py bdist_wheel --dist-dir=pip_local; \
 python$ver -m pip download \
