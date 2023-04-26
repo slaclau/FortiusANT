@@ -20,6 +20,7 @@ python$ver -m pip install -U setuptools attrdict; \
 python$ver setup.py bdist_wheel --dist-dir=pip_local; \
 python$ver -m pip download \
 --destination-directory pip_local \
--r requirements.txt
+-r requirements.txt \
+-r build-requirements.txt
 RUN mkdir /output; 
 CMD dpkg-buildpackage; cp ../fortius-ant* /output/
