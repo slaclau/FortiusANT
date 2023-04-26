@@ -1,3 +1,9 @@
+fortius-ant (6.7.4-0ubuntu2) replaceme; urgency=medium
+
+  * Correct name
+
+ --  Sebastien Laclau <seb.laclau@gmail.com>  Wed, 26 Apr 2023 21:23:52 +0000
+
 fortius-ant (6.7.4-0ubuntu1) replaceme; urgency=medium
 
   * New upstream
