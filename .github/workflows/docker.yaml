@@ -21,7 +21,7 @@ jobs:
           docker run -v output:/output image
       - name: Install package
         run: |
-          ls ./output
+          sudo apt install ./output/fortius-ant*.deb
       - name: Check installed versions
         run: |
           fortius-ant --version
@@ -30,7 +30,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.os }}
+          name: ${{ matrix.codename }}
           path: |
             output/fortius-ant*.deb
             output/fortius-ant*.dsc
