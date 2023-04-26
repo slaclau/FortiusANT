@@ -21,6 +21,7 @@ jobs:
           docker run -v output:/output image
       - name: Install package
         run: |
+          ls ./output
           sudo apt install ./output/fortius-ant*.deb
       - name: Check installed versions
         run: |
