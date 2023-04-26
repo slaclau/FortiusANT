@@ -19,4 +19,19 @@ jobs:
           mkdir output
           docker build . --build-arg DISTRIBUTION=${{ matrix.codename }} -t image 
           docker run -v output:/output image
-          
+      - name: Install package
+        run: |
+          sudo apt install ./output/fortius-ant*.deb
+      - name: Check installed versions
+        run: |
+          fortius-ant --version
+          explorant --version
+      - name: Upload debian package
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}
+          path: |
+            output/fortius-ant*.deb
+            output/fortius-ant*.dsc
+            output/fortius-ant*.tar.xz
+            output/fortius-ant*.changes
