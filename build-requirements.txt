@@ -1,4 +1,1 @@
 attrdict
-click
-lib_detect_testenv
-cli_exit_tools
