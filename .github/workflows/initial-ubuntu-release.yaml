@@ -16,5 +16,7 @@ jobs:
           token: ${{ secrets.TAG_PAT }}
       - name: Make Ubuntu tag
         run: |
+          sudo apt install devscripts
+          dch -v "${{ github.ref_name }}-0ubuntu1" -D replaceme --force-distribution "New upstream"
           git tag "${{ github.ref_name }}-0ubuntu1"
           git push && git push --tags
