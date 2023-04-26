@@ -18,6 +18,8 @@ jobs:
       - name: Make Ubuntu tag
         run: |
           sudo apt install devscripts
+          export NAME="Sebastien Laclau"
+          export EMAIL="seb.laclau@gmail.com"
           dch -v "${{ github.ref_name }}-0ubuntu1" -D replaceme --force-distribution "New upstream"
           git config --global user.email "seb.laclau@gmail.com"
           git config --global user.name "Auto tag"
