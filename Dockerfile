@@ -23,4 +23,4 @@ python$ver -m pip download \
 -r requirements.txt \
 -r build-requirements.txt
 RUN mkdir /output; 
-CMD dpkg-buildpackage; cp ../fortius-ant* /output/
+CMD dpkg-buildpackage; cp ../fortius-ant_*.* /output/
