@@ -38,7 +38,7 @@ jobs:
           python3 setup.py bdist_wheel --dist-dir=pip_local
           python3 -m pip install attrdict
           python3 -m pip download \
-          --no-binary=:all: \
+          --no-binary=numpy \
           --destination-directory pip_local \
           -r requirements.txt -r build-requirements.txt
       - name: Install python3.9 packages
@@ -52,7 +52,7 @@ jobs:
           python3.9 setup.py bdist_wheel --dist-dir=pip_local
           python3.9 -m pip install attrdict
           python3.9 -m pip download \
-          --no-binary=:all: \
+          --no-binary=numpy \
           --destination-directory pip_local \
           -r requirements.txt -r build-requirements.txt
       - name: Install needed libraries
