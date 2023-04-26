@@ -1,3 +1,9 @@
+fortius-ant (6.7.4-0ubuntu1) replaceme; urgency=medium
+
+  * New upstream
+
+ --  <runner@fv-az395-904.f04nadzq13vercrdnegy2lfzkh.gx.internal.cloudapp.net>  Wed, 26 Apr 2023 19:44:52 +0000
+
 fortius-ant (6.7.3-0ubuntu11) replaceme; urgency=medium
 
   * Update to packaging order to ensure version set correctly
