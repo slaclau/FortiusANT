@@ -19,7 +19,9 @@ jobs:
         run: |
           sudo apt install devscripts
           dch -v "${{ github.ref_name }}-0ubuntu1" -D replaceme --force-distribution "New upstream"
-          git add debian/changelog
-          git commit -m "Update changelog"
+          git config --global user.email "seb.laclau@gmail.com"
+          git config --global user.name "Auto tag"
+          git add debian/changelog 
+          git commit -m "Update changelog" 
           git tag "${{ github.ref_name }}-0ubuntu1"
           git push origin HEAD:master && git push --tags
