@@ -1,0 +1,22 @@
+name: build in docker
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        codename: [lunar, kinetic, jammy, focal]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Build 
+        run: |
+          mkdir output
+          docker build . --build-arg DISTRIBUTION=${{ matrix.codename }} -t image 
+          docker run -v output:/output image
+          
