@@ -1,6 +1,6 @@
-fortius-ant (6.7.4-0ubuntu3) replaceme; urgency=medium
+python-fortius-ant (6.7.4-0) replaceme; urgency=medium
 
-  * Use pybuild. 
+  * Use pybuild and rename source. 
 
  --  Sebastien Laclau <seb.laclau@gmail.com>  Thu, 27 Apr 2023 21:18:52 +0000
 
