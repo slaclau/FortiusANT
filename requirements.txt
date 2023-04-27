@@ -1,11 +1,7 @@
--r wxPython-source.txt
-importlib-metadata
+bleak
 bless
 lib_programname
 numpy >= 1.22
 pyusb
 requests
-service_identity
-wheel
-dbus_next
 wxPython
