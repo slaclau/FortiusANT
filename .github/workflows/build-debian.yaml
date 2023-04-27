@@ -34,7 +34,7 @@ jobs:
           mv ../*fortius-ant_*.* .
       - name: Install package
         run: |
-          sudo apt install ./fortius-ant*.deb
+          sudo apt install ./*fortius-ant*.deb
       - name: Check installed versions
         run: |
           fortius-ant --version
@@ -61,7 +61,7 @@ jobs:
       - name: Update main release
         uses: softprops/action-gh-release@v1
         with:
-          files: fortius-ant*.deb
+          files: python3-fortius-ant*.deb
           tag_name: ${{ env.SHORT_TAG }}
           body: "Updated to include ${{ github.ref_name }}"
           append_body: true
@@ -69,17 +69,17 @@ jobs:
       - name: Publish package to prerelease PPA
         run: |
           sudo apt install dput
-          dput ppa:slaclau/ppa-pre fortius-ant*source.changes
+          dput ppa:slaclau/ppa-pre *fortius-ant*source.changes
         if: github.ref == 'refs/heads/master'
       - name: Publish package to develop PPA
         run: |
           sudo apt install dput
-          dput ppa:slaclau/ppa-develop fortius-ant*source.changes
+          dput ppa:slaclau/ppa-develop *fortius-ant*source.changes
         if: github.ref == 'refs/heads/develop'
       - name: Publish package to PPA
         run: |
           sudo apt install dput
-          dput ppa:slaclau/ppa-pre fortius-ant*source.changes
+          dput ppa:slaclau/ppa-pre *fortius-ant*source.changes
         if: contains(github.ref_name,'ubuntu') && github.ref_type == 'tag'
 
 permissions:
