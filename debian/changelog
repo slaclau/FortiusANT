@@ -1,4 +1,4 @@
-python-fortius-ant (6.7.4-0) replaceme; urgency=medium
+python-fortius-ant (6.7.4-1) replaceme; urgency=medium
 
   * Use pybuild and rename source. 
 

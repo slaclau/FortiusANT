@@ -31,7 +31,7 @@ jobs:
           echo "${{ secrets.PPA_GPG_PRIVATE_KEY }}" | gpg --batch --import
           dpkg-buildpackage -S -sa --compression=xz --compression-level=1
           dpkg-buildpackage -b
-          mv ../fortius-ant_*.* .
+          mv ../*fortius-ant_*.* .
       - name: Install package
         run: |
           sudo apt install ./fortius-ant*.deb
