@@ -15,8 +15,8 @@
 | ------------------ |
 | ![Upstream version](https://img.shields.io/github/v/release/slaclau/FortiusANT?label=Upstream%20version) |
 | ![Ubuntu package version](https://img.shields.io/github/v/tag/slaclau/FortiusANT?label=Ubuntu%20Package) |
-| ![Snap edge version](https://badgen.net/snapcraft/v/fortius-ant/amd64/edge?label=Snap%20Edge%20Channel) |
-| ![Snap beta version](https://badgen.net/snapcraft/v/fortius-ant/amd64/beta?label=Snap%20Beta%20Channel) |
+| ![Snap edge version](https://img.shields.io/endpoint?url=https%3A%2F%2Fslaclau.pythonanywhere.com%2Fsnap%2Fedge) |
+| ![Snap beta version](https://img.shields.io/endpoint?url=https%3A%2F%2Fslaclau.pythonanywhere.com%2Fsnap%2Fbeta) |
 
 # FortiusANT
 FortiusANT enables a pre-smart Tacx trainer (usb- or ANT-connected) to communicate with TrainerRoad, Rouvy or Zwift through ANT.
