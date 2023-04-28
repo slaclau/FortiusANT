@@ -1,0 +1,29 @@
+name: "Create initial ubuntu release"
+
+on:
+  push:
+    tags:
+      - "*.*"
+      - "!*.*-*ubuntu*"
+      
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.TAG_PAT }}
+          fetch-depth: 0
+      - name: Make Ubuntu tag
+        run: |
+          sudo apt install devscripts
+          export NAME="Sebastien Laclau"
+          export EMAIL="seb.laclau@gmail.com"
+          dch -v "${{ github.ref_name }}-0ubuntu1" -D replaceme --force-distribution "New upstream"
+          git config --global user.email "seb.laclau@gmail.com"
+          git config --global user.name "Auto tag"
+          git add debian/changelog 
+          git commit -m "Update changelog" 
+          git tag "${{ github.ref_name }}-0ubuntu1"
+          git push origin HEAD:master && git push --tags

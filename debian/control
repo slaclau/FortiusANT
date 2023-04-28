@@ -2,11 +2,26 @@ Source: fortius-ant
 Section: python
 Priority: extra
 Maintainer: Sebastien Laclau <seb.laclau@gmail.com>
-Build-Depends: debhelper (>= 9), python, dh-virtualenv (>= 0.8)
+Build-Depends: debhelper (>= 9), dh-virtualenv (>= 0.8),
+ python3 (<= 3.9) | python3.9,
+ python3-dev (<= 3.9) | python3.9-dev,
+ python3-distutils (<= 3.9) | python3.9-distutils,
+ python3-venv (<= 3.9) | python3.9-venv,
+ python3-distro,
+ libffi-dev,
+ libgstreamer-plugins-base1.0-0,
+ libnotify4,
+ libsdl2-2.0-0,
+ libwebkit2gtk-4.0-dev,
+ libjavascriptcoregtk-4.0-dev,
+ libegl-dev
 Standards-Version: 3.9.5
 
 Package: fortius-ant
 Architecture: any
-Pre-Depends: dpkg (>= 1.16.1), python2.7 | python2.6, ${misc:Pre-Depends}
-Depends: ${misc:Depends}
+Pre-Depends: dpkg (>= 1.16.1), python3 (<= 3.9) | python3.9, ${misc:Pre-Depends}
+Depends: ${misc:Depends}, ${shlibs:Depends},
+ freeglut3,
+ libglu1-mesa,
 Description: FortiusANT by WouterJD
+

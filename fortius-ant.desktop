@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Exec=fortius-ant
+Name=FortiusANT
+Icon=FortiusAntIcon
+Actions=Terminal;Settings;
+
+[Desktop Action Terminal]
+Exec=gnome-terminal -e "bash -c 'fortius-ant;$SHELL'"
+Name=Open with terminal window
+
+[Desktop Action Settings]
+Exec=fortius-ant --settings
+Name=Open settings window

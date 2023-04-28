@@ -1,0 +1,75 @@
+name: "lint"
+
+on:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "*"
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+      - name: Install requirements
+        run: |
+          pip install distro setuptools
+          python wxPython-source.py
+          pip install -r requirements.txt
+      - name: Install development requirements
+        run: pip install -r dev-requirements.txt
+      - name: flake8
+        continue-on-error: true
+        if: always()
+        run: |
+          flake8 src --format=json >> flake8.json
+      - name: mypy
+        if: always()
+        run: |
+          mypy --strict src | mypy-json-report parse --output-file mypy.json
+      - name: black
+        if: always()
+        run: |
+          echo "# black report" >> black.md
+          echo "These files have not been formatted" >> black.md
+          black --check src &>> black.md
+      - name: isort
+        if: always()
+        run: |
+          echo "# isort report" >> isort.md
+          echo "These files have not been formatted" >> isort.md
+          isort -c src &>> isort.md
+      - name: Convert reports
+        if: always()
+        run: |
+          sed -i "s/would reformat \/home\/runner\/work\/FortiusANT\/FortiusANT\///g" black.md
+          sed -i "s/__/\\_\\_/g" black.md
+          cat black.md >> $GITHUB_STEP_SUMMARY
+          sed -i "s/\/home\/runner\/work\/FortiusANT\/FortiusANT\///g" isort.md
+          cat isort.md >> $GITHUB_STEP_SUMMARY
+          python scripts/mypy2md.py mypy.json "mypy report" >> mypy.md
+          cat mypy.md >> $GITHUB_STEP_SUMMARY
+          python scripts/flake82md.py flake8.json "flake8 report" >> flake8.md
+          cat flake8.md >> $GITHUB_STEP_SUMMARY
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: reports
+          path: |
+            flake8.json
+            flake8.md
+            black.md
+            mypy.json
+            mypy.md
