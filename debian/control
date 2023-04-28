@@ -7,7 +7,6 @@ Build-Depends:
  debhelper-compat (= 12),
  python3-all,
  python3-setuptools,
- python3.8,
 
 Package: python3-fortius-ant
 Architecture: any
