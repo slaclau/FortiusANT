@@ -22,7 +22,7 @@ jobs:
           python3 wxPython-source.py
           python3 -m pip install attrdict
           python3 -m pip install -r requirements.txt -r wxPython-source.txt
-          sudo python3 -m pip install -e .
+          python3 -m pip install .
       - name: Install pytest
         run: pip install -r pytest-requirements.txt
       - name: Test
