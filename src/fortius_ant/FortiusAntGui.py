@@ -268,6 +268,38 @@ class frmFortiusAntGui(wx.Frame):
         self.btnHelp = wx.Button(self.panel, wx.ID_ANY, "Help")
         buttons_sizer.Add(self.btnHelp, 0, wx.ALL | wx.EXPAND, Margin)
 
+        self.btnSettings.SetToolTip(
+            "Modify settings and optionally save for next session"
+        )
+        self.btnSettings.SetFocus()
+        self.Bind(wx.EVT_BUTTON, self.OnClick_btnSettings, self.btnSettings)
+
+        self.btnLocateHW.SetToolTip(
+            "Connect to USB-devices (Tacx trainer and/or ANTdongle)"
+        )
+        self.btnLocateHW.SetFocus()
+        self.Bind(wx.EVT_BUTTON, self.OnClick_btnLocateHW, self.btnLocateHW)
+
+        self.btnRunoff.SetToolTip(
+            "Execute runoff-procedure (recommended for magnetic brake trainers)"
+        )
+        self.btnRunoff.Disable()
+        self.Bind(wx.EVT_BUTTON, self.OnClick_btnRunoff, self.btnRunoff)
+
+        self.btnStart.SetToolTip("Start communication with Cycle Training Program")
+        self.btnStart.Disable()
+        self.Bind(wx.EVT_BUTTON, self.OnClick_btnStart, self.btnStart)
+
+        self.btnStop.SetToolTip("Stop FortiusAnt bridge")
+        self.btnStop.Disable()
+        self.Bind(wx.EVT_BUTTON, self.OnClick_btnStop, self.btnStop)
+
+        self.btnSponsor.SetToolTip("Become a sponsor for FortiusAnt")
+        self.Bind(wx.EVT_BUTTON, self.OnClick_btnSponsor, self.btnSponsor)
+
+        self.btnHelp.SetToolTip("Open the manual on github")
+        self.Bind(wx.EVT_BUTTON, self.OnClick_btnHelp, self.btnHelp)
+
         self.speed_panel = wx.Panel(self.panel, wx.ID_ANY)
         self.speed_panel.SetBackgroundColour(bg)
         top_sizer.Add(self.speed_panel, 1, wx.ALL | wx.EXPAND, Margin)
