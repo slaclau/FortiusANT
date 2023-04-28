@@ -40,13 +40,11 @@ class clsRadarGraph:
         self.title = title  # Horizontal axis title
         self.maxval = 100  # The wattage at 100% outer circle
         self.polypoints = []  # The polygon points to be drawn
-        self.x = x  # Horizontal position of graph
-        self.y = y  # Vertical position
         self.wh = wh  # width and height
         self.data = []  # There is no data yet
         # List of tuples (angle, power)
-        self.cx = x + int(wh / 2)  # Center of the polygon (circles)
-        self.cy = y + int(wh / 2)
+        self.cx = x + int(self.wh / 2)  # Center of the polygon (circles)
+        self.cy = y + int(self.wh / 2)
         self.radius100 = self.wh / 2 / 1.1  # 10% space around the 100% circle
 
         self.StartTime = 0  # Time at PedelEcho
