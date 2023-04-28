@@ -37,8 +37,7 @@ jobs:
       - name: Install python packages
         run: |
           python3 wxPython-source.py
-          python3 -m pip install attrdict
-          python3 -m pip install -r requirements.txt -r wxPython-source.txt
+          python3 -m pip install -r requirements.txt -r wxPython-source.txt dev-requirements.txt
           python3 -m pip install .
       - name: Write to jsons
         run: |
