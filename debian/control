@@ -19,3 +19,9 @@ Depends:
 Recommends: ${python3:Recommends},
 Suggests: ${python3:Suggests},
 Description: FortiusANT by WouterJD
+
+Package: fortius-ant
+Architecture: any
+Multi-Arch: allowed
+Depends: python3-fortius-ant
+Description: Dependency package for fortius-ant

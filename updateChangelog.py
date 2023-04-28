@@ -14,7 +14,7 @@ version = (
             "--match",
             f"[[:digit:]]*",
             "--exclude",
-            "*ubuntu*",
+            "*.*-*",
         ]
     )
     .strip()
