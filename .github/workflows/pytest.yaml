@@ -20,7 +20,8 @@ jobs:
       - name: Install python packages
         run: |
           python3 wxPython-source.py
-          python3 -m pip install -r requirements.txt -r wxPython-source.txt attrdict
+          python3 -m pip install attrdict
+          python3 -m pip install -r requirements.txt -r wxPython-source.txt
           sudo python3 -m pip install -e .
       - name: Install pytest
         run: pip install -r pytest-requirements.txt
