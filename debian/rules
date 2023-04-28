@@ -1,43 +1,9 @@
 #!/usr/bin/make -f
 
-SHELL := /bin/bash
+export DH_VERBOSE=1
+export PYBUILD_DISABLE=test
+export PYBUILD_NAME=fortius-ant
+export PYBUILD_VERSIONS=3 3.8
 
 %:
-	dh $@ --with python-virtualenv
-
-override_dh_clean:
-	rm -r doc ||:
-	rm -r docs ||:
-	dh_clean
-
-SYSPY := $(shell python3 useSystemPython.py)
-ifdef SYSPY
-override_dh_virtualenv:
-	dh_virtualenv \
-	--python python3 \
-	--builtin-venv \
-	--extra-pip-arg --no-index \
-	--extra-pip-arg --find-links=pip_local \
-	--skip-install
-	debian/fortius-ant/opt/venvs/fortius-ant/bin/python -m pip install --force-reinstall pip_local/fortius_ant*.whl
-	sed -i "s/^.*\/opt/\#\!\/opt/" debian/fortius-ant/opt/venvs/fortius-ant/bin/fortius-ant
-	sed -i "s/^.*\/opt/\#\!\/opt/" debian/fortius-ant/opt/venvs/fortius-ant/bin/explorant
-else
-override_dh_virtualenv:
-	dh_virtualenv \
-	--python python3.9 \
-	--builtin-venv \
-	--extra-pip-arg --no-index \
-	--extra-pip-arg --find-links=pip_local \
-	--skip-install
-	debian/fortius-ant/opt/venvs/fortius-ant/bin/python -m pip install --force-reinstall pip_local/fortius_ant*.whl
-	sed -i "s/^.*\/opt/\#\!\/opt/" debian/fortius-ant/opt/venvs/fortius-ant/bin/fortius-ant
-	sed -i "s/^.*\/opt/\#\!\/opt/" debian/fortius-ant/opt/venvs/fortius-ant/bin/explorant
-endif
-
-override_dh_strip:
-	dh_strip --exclude=/site-packages/Pillow.libs
-
-override_dh_shlibdeps:
-	dh_shlibdeps --exclude=/site-packages/Pillow.libs --exclude=/site-packages/numpy
-
+	dh $@ --with python3 --buildsystem=pybuild
