@@ -18,7 +18,6 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install python packages
-        if: ${{ env.useSystemPython == 'yes' }}
         run: |
           python3 wxPython-source.py
           python3 -m pip install -r requirements.txt -r wxPython-source.txt
