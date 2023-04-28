@@ -19,6 +19,7 @@ jobs:
           fetch-depth: 0
       - name: Get build dependencies
         run: |
+          sudo apt-add-repository ppa:deadsnakes/ppa
           sudo apt-add-repository ppa:slaclau/ppa-pre
           sudo apt update
           sudo apt install devscripts equivs
