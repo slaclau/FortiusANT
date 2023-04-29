@@ -4,84 +4,83 @@ on:
   push:
   workflow_call:
 
+
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     
     strategy:
       matrix:
-        os: [ubuntu-22.04, ubuntu-20.04]
-        
+        codename: [focal, jammy, kinetic, lunar]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - name: Get build dependencies
         run: |
-          sudo apt-add-repository ppa:deadsnakes/ppa
-          sudo apt-add-repository ppa:slaclau/ppa-pre
-          sudo apt update
-          sudo apt install devscripts equivs
+          sudo apt install pbuilder devscripts equivs
           sudo mk-build-deps -i -t "apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends -y"
-      - name: Build and sign source and binary
+      - name: Make source
         run: |
-          python3 updateChangelog.py
+          python3 updateChangelog.py ${{ matrix.codename }}
+          dpkg-buildpackage -S -sa
+          mkdir source
+          mv ../python*.* source/
+      - name: Import key
+        run: |
           GPG_KEY_ID=$(echo "${{ secrets.PPA_GPG_PRIVATE_KEY }}" | gpg --import-options show-only --import | sed -n '2s/^\s*//p')
           echo $GPG_KEY_ID
           echo "${{ secrets.PPA_GPG_PRIVATE_KEY }}" | gpg --batch --import
-          dpkg-buildpackage -S -sa --compression=xz --compression-level=1
-          dpkg-buildpackage -b
-          mv ../*fortius-ant_*.* .
-      - name: Install package
+          debsign source/*.changes
+      - name: Build
         run: |
-          sudo apt install ./*fortius-ant*.deb
-      - name: Check installed versions
-        run: |
-          fortius-ant --version
-          explorant --version
+          sudo pbuilder create \
+            --distribution ${{ matrix.codename }}
+          sudo pbuilder build \
+            --distribution ${{ matrix.codename }} \
+            --buildresult .. \
+            source/*dsc
+          mkdir binary
+          mv ../python*.* binary/
       - name: Upload debian package
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.os }}
+          name: ${{ matrix.codename }}
           path: |
-            *fortius-ant*.deb
-            *fortius-ant*.dsc
-            *fortius-ant*.tar.xz
-            *fortius-ant*.changes
+            source
+            binary
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: python3-fortius-ant*.deb
+          files: binary/*.deb
           prerelease: true
         if: contains(github.ref_name,'ubuntu') && github.ref_type == 'tag'
       - name: Get root release
         run: |
-          echo "SHORT_TAG=$(echo ${{ github.ref_name }} | sed -re 's/-[0-9]+ubuntu[0-9]+//g')" >> $GITHUB_ENV
+          echo "SHORT_TAG=$(echo ${{ github.ref_name }} | sed -re 's/-[0-9]+//g')" >> $GITHUB_ENV
           echo ${{ env.SHORT_TAG }}
       - name: Update main release
         uses: softprops/action-gh-release@v1
         with:
-          files: python3-fortius-ant*.deb
+          files: binary/*.deb
           tag_name: ${{ env.SHORT_TAG }}
           body: "Updated to include ${{ github.ref_name }}"
           append_body: true
-        if: contains(github.ref_name,'ubuntu') && github.ref_type == 'tag'
+        if: contains(github.ref_name,'-') && github.ref_type == 'tag'
       - name: Publish package to prerelease PPA
         run: |
           sudo apt install dput
-          dput ppa:slaclau/ppa-pre *fortius-ant*source.changes
+          dput ppa:slaclau/ppa-pre source/*source.changes
         if: github.ref == 'refs/heads/master'
       - name: Publish package to develop PPA
         run: |
           sudo apt install dput
-          dput ppa:slaclau/ppa-develop *fortius-ant*source.changes
+          dput ppa:slaclau/ppa-develop source/*source.changes
         if: github.ref == 'refs/heads/develop'
       - name: Publish package to PPA
         run: |
           sudo apt install dput
-          dput ppa:slaclau/ppa-pre *fortius-ant*source.changes
-        if: contains(github.ref_name,'ubuntu') && github.ref_type == 'tag'
+          dput ppa:slaclau/ppa-pre source/*source.changes
+        if: contains(github.ref_name,'-') && github.ref_type == 'tag'
 
 permissions:
   contents: write
