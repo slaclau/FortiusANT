@@ -42,7 +42,10 @@ jobs:
           mkdir binary
           mv ../python*.* binary/
       - name: Install
-        run: sudo apt install ./binary/python3-fortius-ant*.deb
+        run: |
+          sudo add-apt-repository ppa:slaclau/ppa-pre
+          sudo apt update
+          sudo apt install ./binary/python3-fortius-ant*.deb
       - name: Check installed versions
         run: |
           fortius-ant --version
