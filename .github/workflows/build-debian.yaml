@@ -41,6 +41,12 @@ jobs:
             source/*dsc
           mkdir binary
           mv ../python*.* binary/
+      - name: Install
+        run: sudo apt install binary/python3-fortius-ant*.deb
+      - name: Check installed versions
+        run: |
+          fortius-ant --version
+          explorant --version
       - name: Upload debian package
         uses: actions/upload-artifact@v3
         with:
