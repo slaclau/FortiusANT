@@ -1,3 +1,9 @@
+python-fortius-ant (6.7.4-2) replaceme; urgency=medium
+
+  * Dependency updates. 
+
+ --  Sebastien Laclau <seb.laclau@gmail.com>  Sat, 29 Apr 2023 11:48:52 +0100
+
 python-fortius-ant (6.7.4-1) replaceme; urgency=medium
 
   * Use pybuild and rename source. 
