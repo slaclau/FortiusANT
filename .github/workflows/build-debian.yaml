@@ -42,7 +42,7 @@ jobs:
           mkdir binary
           mv ../python*.* binary/
       - name: Install
-        run: sudo apt install binary/python3-fortius-ant*.deb
+        run: sudo apt install ./binary/python3-fortius-ant*.deb
       - name: Check installed versions
         run: |
           fortius-ant --version
