@@ -15,18 +15,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup python
-        uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
-          cache: 'pip'
-      - name: Install requirements
+          fetch-depth: 0
+      - name: Install python packages
         run: |
-          pip install distro
-          python wxPython-source.py
-          pip install -r dev-requirements.txt -r pytest-requirements.txt -r requirements.txt
-      - name: Install fortius-ant
-        run: pip install -e .
+          python3 wxPython-source.py
+          python3 -m pip install attrdict
+          python3 -m pip install -r requirements.txt -r wxPython-source.txt
+          python3 -m pip install .
+      - name: Install pytest
+        run: pip install -r pytest-requirements.txt
       - name: Test
         run: pytest --md-report --md-report-color never --md-report-output=pytest.md --cov=src
       - name: Report
