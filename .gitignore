@@ -21,10 +21,12 @@ dist
 docs
 fortius_ant.egg-info
 debian/fortius-ant
+debian/python3-fortius-ant
 debian/.debhelper
 debian/*debhelper
 debian/*substvars
 debian/files
+.pybuild
 wxPython-source.txt
 sphinx/source/generated/
 flake8heavened
