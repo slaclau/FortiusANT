@@ -108,28 +108,22 @@ __version__ = "2023-03-15"
 # 2020-01-15    hexlify/unhexlify removed, buffers are all of type 'bytes' now
 # 2019-12-30    strings[] replaced by messages[]
 # ---------------------------------------------------------------------------
-import binascii
-import glob
 import os
 import platform
-import re
-
-from pyexpat.errors import messages
-
-if platform.system() == "False":
-    import serial  # pylint: disable=import-error
-
 import queue
 import struct
 import threading
 import time
-
 import usb.core
 
-import fortius_ant.debug as debug
-import fortius_ant.FortiusAntCommand as cmd
-import fortius_ant.logfile as logfile
-import fortius_ant.structConstants as sc
+if platform.system() == "False":
+    import serial  # noqa PLW611
+
+
+from fortius_ant import debug
+from fortius_ant import FortiusAntCommand as cmd
+from fortius_ant import logfile
+from fortius_ant import structConstants as sc
 
 from fortius_ant.antMessage import AntMessage, calc_checksum
 
@@ -291,11 +285,6 @@ SerialNumber_PWR = 19570702  # int   1957-7-2
 HWrevision_PWR = 1  # char
 SWrevisionMain_PWR = 1  # char
 SWrevisionSupp_PWR = 1  # char
-
-if False:  # Tacx Neo Erik OT; perhaps relevant for Tacx Desktop App
-    # because TDA does not want to pair with FortiusAnt...
-    DeviceNumber_FE = 48365
-    SerialNumber_FE = 48365
 
 # ---------------------------------------------------------------------------
 # D00000652_ANT_Message_Protocol_and_Usage_Rev_5.1.pdf

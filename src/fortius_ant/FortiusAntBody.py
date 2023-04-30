@@ -767,8 +767,6 @@ def Tacx2Dongle(FortiusAntGui):
 
 
 def Tacx2DongleSub(FortiusAntGui, Restart):
-    global clv, AntDongle, TacxTrainer, tcx, bleCTP, manualMsg
-
     assert AntDongle  # The class must be created
     assert TacxTrainer  # The class must be created
     assert bleCTP  # The class must be created
@@ -836,7 +834,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
     AntDongle.Calibrate()  # calibrate ANT+ dongle
     AntDongle.Trainer_ChannelConfig()  # Create ANT+ master channel for FE-C
 
-    if clv.hrm == None:
+    if clv.hrm is None:
         AntDongle.HRM_ChannelConfig()  # Create ANT+ master channel for HRM
     elif clv.hrm < 0:
         pass  # No Heartrate at all
@@ -888,13 +886,12 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
         # -------------------------------------------------------------------
         AntDongle.SlaveBHU_ChannelConfig(0)
 
-    if True:
-        # -------------------------------------------------------------------
-        # Create ANT+ master channel for PWR
-        # -------------------------------------------------------------------
-        AntDongle.PWR_ChannelConfig(ant.channel_PWR)
+    # -------------------------------------------------------------------
+    # Create ANT+ master channel for PWR
+    # -------------------------------------------------------------------
+    AntDongle.PWR_ChannelConfig(ant.channel_PWR)
 
-    if clv.scs == None:
+    if clv.scs is None:
         # -------------------------------------------------------------------
         # Create ANT+ master channel for SCS
         # -------------------------------------------------------------------
@@ -905,13 +902,11 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
         # 0: auto pair, nnn: defined SCS
         # -------------------------------------------------------------------
         AntDongle.SlaveSCS_ChannelConfig(clv.scs)
-        pass
 
-    if True:
-        # -------------------------------------------------------------------
-        # Create ANT+ master channel for ANT Control
-        # -------------------------------------------------------------------
-        AntDongle.CTRL_ChannelConfig(ant.DeviceNumber_CTRL)
+    # -------------------------------------------------------------------
+    # Create ANT+ master channel for ANT Control
+    # -------------------------------------------------------------------
+    AntDongle.CTRL_ChannelConfig(ant.DeviceNumber_CTRL)
 
     BlackTrack = None
     if clv.Steering == "Blacktrack":
