@@ -313,8 +313,10 @@ class frmFortiusAntGui(wx.Frame):
             | SM.SM_DRAW_MIDDLE_TEXT
             | SM.SM_DRAW_SECONDARY_TICKS,
         )
-        self.Speed.DisableFocusFromKeyboard()
-
+        try:
+            self.Speed.DisableFocusFromKeyboard()
+        except AttributeError:
+            pass
         self.Speed.SetSpeedBackground(bg)
         self.Speed.DrawExternalArc(True)  # Do (Not) Draw The External (Container) Arc.
         self.Speed.SetArcColour(wx.BLACK)
@@ -385,8 +387,10 @@ class frmFortiusAntGui(wx.Frame):
             | SM.SM_DRAW_MIDDLE_TEXT
             | SM.SM_DRAW_SECONDARY_TICKS,
         )
-        self.Revs.DisableFocusFromKeyboard()
-
+        try:
+            self.Revs.DisableFocusFromKeyboard()
+        except AttributeError:
+            pass
         self.Revs.SetSpeedBackground(bg)
         self.Revs.DrawExternalArc(True)  # Do (Not) Draw The External (Container) Arc.
         self.Revs.SetArcColour(wx.BLACK)
@@ -470,8 +474,10 @@ class frmFortiusAntGui(wx.Frame):
             | SM.SM_DRAW_MIDDLE_TEXT
             | SM.SM_DRAW_SECONDARY_TICKS,
         )
-        self.Power.DisableFocusFromKeyboard()
-
+        try:
+            self.Power.DisableFocusFromKeyboard()
+        except AttributeError:
+            pass
         self.Power.SetSpeedBackground(bg)
         self.Power.DrawExternalArc(True)  # Do (Not) Draw The External (Container) Arc.
         self.Power.SetArcColour(wx.BLACK)
