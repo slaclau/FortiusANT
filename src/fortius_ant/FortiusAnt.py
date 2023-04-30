@@ -442,9 +442,9 @@ class clsFortiusAntConsole:
                 setLed(self.StatusLeds[4], "a")
 
             msg = (
-                f"Target={sTarget} {s1:4.1f}{s2} {h} "
+                f"Target={sTarget} {s1}{s2} {h} "
                 f"Current={iPower:3.0f}W Cad={iRevs:3.0f} "
-                f"r={iTacx:4.0f} {int(fReduction * 100):3s}% {self.leds}"
+                f"r={iTacx:4.0f} {int(fReduction * 100)}% {self.leds}"
             )
             logfile.Console(msg)
 

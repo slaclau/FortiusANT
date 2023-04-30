@@ -1,3 +1,34 @@
+python-fortius-ant (6.7.4-3) replaceme; urgency=medium
+
+  * Fix versioning.
+
+ --  Sebastien Laclau <seb.laclau@gmail.com>  Sat, 29 Apr 2023 13:35:52 +0100
+
+
+python-fortius-ant (6.7.4-2) replaceme; urgency=medium
+
+  * Dependency updates. 
+
+ --  Sebastien Laclau <seb.laclau@gmail.com>  Sat, 29 Apr 2023 11:48:52 +0100
+
+python-fortius-ant (6.7.4-1) replaceme; urgency=medium
+
+  * Use pybuild and rename source. 
+
+ --  Sebastien Laclau <seb.laclau@gmail.com>  Thu, 27 Apr 2023 21:18:52 +0000
+
+fortius-ant (6.7.4-0ubuntu2) replaceme; urgency=medium
+
+  * Correct name
+
+ --  Sebastien Laclau <seb.laclau@gmail.com>  Wed, 26 Apr 2023 21:23:52 +0000
+
+fortius-ant (6.7.4-0ubuntu1) replaceme; urgency=medium
+
+  * New upstream
+
+ --  <runner@fv-az395-904.f04nadzq13vercrdnegy2lfzkh.gx.internal.cloudapp.net>  Wed, 26 Apr 2023 19:44:52 +0000
+
 fortius-ant (6.7.3-0ubuntu11) replaceme; urgency=medium
 
   * Update to packaging order to ensure version set correctly
