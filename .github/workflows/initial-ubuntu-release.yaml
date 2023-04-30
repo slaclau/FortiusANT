@@ -5,7 +5,7 @@ on:
     tags:
       - "*.*"
       - "!*.*-*ubuntu*"
-  workflow_call:
+  workflow_dispatch:
 
 jobs:
   tag:
