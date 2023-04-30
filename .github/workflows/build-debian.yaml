@@ -4,50 +4,69 @@ on:
   push:
   workflow_call:
 
-
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     
     strategy:
       matrix:
-        codename: [focal, jammy, kinetic, lunar]
+        os: [ubuntu-22.04, ubuntu-20.04]
+        
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Get build dependencies
+      - name: Add dh-virtualenv repository if needed
+        if: matrix.os == 'ubuntu-20.04'
         run: |
-          sudo apt install pbuilder devscripts equivs
-          sudo mk-build-deps -i -t "apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends -y"
-      - name: Make source
+          sudo add-apt-repository ppa:jyrki-pulliainen/dh-virtualenv
+          sudo apt update
+      - name: Install build dependencies
         run: |
-          python3 updateChangelog.py ${{ matrix.codename }}
-          dpkg-buildpackage -S -sa
-          mkdir source
-          mv ../python*.* source/
-      - name: Import key
+          sudo apt install debhelper dh-virtualenv
+      - name: Check system python version
+        run: |
+          echo "useSystemPython=$(python3 useSystemPython.py)" >> $GITHUB_ENV
+          echo "${{env.useSystemPython}}"
+      - name: Install system python packages
+        if: ${{ env.useSystemPython == 'yes' }}
+        run: |
+          sudo apt install python3 python3-dev python3-distutils python3-venv
+          python3 wxPython-source.py
+          python3 updateChangelog.py
+          python3 setup.py bdist_wheel --dist-dir=pip_local
+          python3 -m pip download \
+          --destination-directory pip_local \
+          -r requirements.txt
+      - name: Install python3.9 packages
+        if: ${{ env.useSystemPython != 'yes' }}
+        run: |
+          sudo add-apt-repository ppa:deadsnakes/ppa
+          sudo apt update
+          sudo apt install python3.9 python3.9-dev python3.9-distutils python3.9-venv
+          python3.9 wxPython-source.py
+          python3.9 updateChangelog.py
+          python3.9 setup.py bdist_wheel --dist-dir=pip_local
+          python3.9 -m pip download \
+          --destination-directory pip_local \
+          -r requirements.txt
+      - name: Install needed libraries
+        run: |
+          sudo apt install libgstreamer-plugins-base1.0-0 libnotify4 libsdl2-2.0-0 libwebkit2gtk-4.0-dev libjavascriptcoregtk-4.0-dev libegl-dev
+
+      - name: Build and sign source and binary
         run: |
           GPG_KEY_ID=$(echo "${{ secrets.PPA_GPG_PRIVATE_KEY }}" | gpg --import-options show-only --import | sed -n '2s/^\s*//p')
           echo $GPG_KEY_ID
           echo "${{ secrets.PPA_GPG_PRIVATE_KEY }}" | gpg --batch --import
-          debsign source/*.changes
-      - name: Build
+          sed -i '1d' requirements.txt
+          dpkg-buildpackage -S -sa --compression=xz --compression-level=1
+          dpkg-buildpackage -b
+          mv ../fortius-ant_*.* .
+      - name: Install package
         run: |
-          sudo pbuilder create \
-            --distribution ${{ matrix.codename }}
-          sudo pbuilder build \
-            --distribution ${{ matrix.codename }} \
-            --buildresult .. \
-            source/*dsc
-          mkdir binary
-          mv ../python*.* binary/
-      - name: Install
-        run: |
-          sudo add-apt-repository ppa:slaclau/ppa-pre
-          sudo apt update
-          sudo apt install ./binary/python3-fortius-ant*.deb
+          sudo apt install ./fortius-ant*.deb
       - name: Check installed versions
         run: |
           fortius-ant --version
@@ -55,43 +74,45 @@ jobs:
       - name: Upload debian package
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.codename }}
+          name: ${{ matrix.os }}
           path: |
-            source
-            binary
+            fortius-ant*.deb
+            fortius-ant*.dsc
+            fortius-ant*.tar.xz
+            fortius-ant*.changes
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: binary/*.deb
+          files: fortius-ant*.deb
           prerelease: true
         if: contains(github.ref_name,'ubuntu') && github.ref_type == 'tag'
       - name: Get root release
         run: |
-          echo "SHORT_TAG=$(echo ${{ github.ref_name }} | sed -re 's/-[0-9]+//g')" >> $GITHUB_ENV
+          echo "SHORT_TAG=$(echo ${{ github.ref_name }} | sed -re 's/-[0-9]+ubuntu[0-9]+//g')" >> $GITHUB_ENV
           echo ${{ env.SHORT_TAG }}
       - name: Update main release
         uses: softprops/action-gh-release@v1
         with:
-          files: binary/*.deb
+          files: fortius-ant*.deb
           tag_name: ${{ env.SHORT_TAG }}
           body: "Updated to include ${{ github.ref_name }}"
           append_body: true
-        if: contains(github.ref_name,'-') && github.ref_type == 'tag'
+        if: contains(github.ref_name,'ubuntu') && github.ref_type == 'tag'
       - name: Publish package to prerelease PPA
         run: |
           sudo apt install dput
-          dput ppa:slaclau/ppa-pre source/*source.changes
+          dput ppa:slaclau/ppa-pre fortius-ant*source.changes
         if: github.ref == 'refs/heads/master'
       - name: Publish package to develop PPA
         run: |
           sudo apt install dput
-          dput ppa:slaclau/ppa-develop source/*source.changes
+          dput ppa:slaclau/ppa-develop fortius-ant*source.changes
         if: github.ref == 'refs/heads/develop'
       - name: Publish package to PPA
         run: |
           sudo apt install dput
-          dput ppa:slaclau/ppa-pre source/*source.changes
-        if: contains(github.ref_name,'-') && github.ref_type == 'tag'
+          dput ppa:slaclau/ppa-pre fortius-ant*source.changes
+        if: contains(github.ref_name,'ubuntu') && github.ref_type == 'tag'
 
 permissions:
   contents: write

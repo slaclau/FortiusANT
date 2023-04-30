@@ -17,11 +17,16 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Install python packages
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+      - name: Install requirements
         run: |
-          python3 wxPython-source.py
-          python3 -m pip install -r requirements.txt -r wxPython-source.txt
-          python3 -m pip install .
+          pip install distro setuptools
+          python wxPython-source.py
+          pip install -r requirements.txt
       - name: Install development requirements
         run: pip install -r dev-requirements.txt
       - name: flake8

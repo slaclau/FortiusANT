@@ -15,16 +15,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup python
+        uses: actions/setup-python@v4
         with:
-          fetch-depth: 0
-      - name: Install python packages
-        run: |
-          python3 wxPython-source.py
-          python3 -m pip install attrdict
-          python3 -m pip install -r requirements.txt -r wxPython-source.txt
-          python3 -m pip install .
+          python-version: '3.9'
+          cache: 'pip'
       - name: Install pytest
-        run: pip install -r pytest-requirements.txt
+        run: pip install -r pytest-requirements.txt -e .
+      - name: Install dependencies 
+        run: pip install pyusb lib-programname
       - name: Test
         run: pytest --md-report --md-report-color never --verbose --md-report-output=pytest.md
       - name: Report

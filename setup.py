@@ -20,13 +20,4 @@ setup(
         ],
     },
     data_files=[("/share/applications", ["fortius-ant.desktop"])],
-    install_requires=[
-        "bleak",
-        "bless",
-        "lib_programname",
-        "numpy >= 1.22",
-        "pyusb",
-        "requests", 
-        "wxPython",
-    ] 
 )

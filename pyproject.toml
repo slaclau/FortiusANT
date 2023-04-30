@@ -9,9 +9,6 @@ disable = [
     "invalid-name",
     "global-statement",
 ]
-extension-pkg-allow-list = [
-	"wx",
-]
 [tool.flake8]
 max-line-length = 88
 max-doc-length = 88
