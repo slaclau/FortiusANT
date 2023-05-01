@@ -181,7 +181,6 @@ class frmFortiusAntGui(wx.Frame):  # noqa PLR201 PLR202 PLR204
         self._create_fonts()
         self.clv = pclv
         self.power: list[float] = []  # Array with power-tuples
-        self.PowerArray
 
         if getattr(sys, "frozen", False):
             dirname = sys._MEIPASS
