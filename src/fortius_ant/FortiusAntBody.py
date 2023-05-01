@@ -2,17 +2,6 @@
 # Version info
 # -------------------------------------------------------------------------------
 __version__ = "2022-08-22"
-import argparse
-import binascii
-import glob
-import math
-import os
-import pickle
-import platform
-import random
-import struct
-import sys
-import threading
 import time
 
 import numpy
@@ -233,10 +222,7 @@ import usb.core
 #               - test with Zwift; done 2019-12-24
 #               - calibration test; done 2020-01-07
 # -------------------------------------------------------------------------------
-from fortius_ant.constants import UseBluetooth, UseGui, mode_Grade, mode_Power
-
-if UseGui:
-    import wx
+from fortius_ant.constants import UseGui, mode_Grade, mode_Power
 
 from datetime import datetime
 
