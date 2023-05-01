@@ -822,7 +822,8 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
     pdaInfo = []  # Collection of (time, power)
     LastPedalEcho = 0  # Flag that cadence sensor was seen
 
-    AntDongle.initialize(clv)
+    AntDongle.initialize(clv, TacxTrainer)
+    Steering = AntDongle.Steering
     # ---------------------------------------------------------------------------
     # Loop control
     # ---------------------------------------------------------------------------
