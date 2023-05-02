@@ -33,6 +33,7 @@ __version__ = "2023-04-16"
 from fortius_ant.antInterface import AntInterface
 from fortius_ant.antMessage import AntMessage, Manufacturer_garmin, msgID_BroadcastData
 from fortius_ant.antPage import Page80, Page81, Page82, PWRPage16
+from fortius_ant.usbTrainer import clsTacxTrainer
 
 ModelNumber_PWR = 2161  # Garmin Vector 2 (profile.xlsx, garmin_product)
 SerialNumber_PWR = 19570702  # int   1957-7-2
