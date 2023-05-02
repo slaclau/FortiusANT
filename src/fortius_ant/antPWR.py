@@ -58,8 +58,11 @@ class AntPWR(AntInterface):
         self.interleave = 0
         self.accumulated_power = 0
         self.event_count = 0
+        
+    def broadcast_message_from_trainer(self, TacxTrainer: clsTacxTrainer):
+        return broadcast_message(TacxTrainer.CurrentPower, TacxTrainer.Cadence)
 
-    def _broadcast_message(self, interleave: int, CurrentPower, Cadence):
+    def _broadcast_message(self, interleave: int, CurrentPower: float, Cadence: float):
         Cadence = int(min(0xFF, Cadence))
         CurrentPower = int(max(0, min(0x0FFF, CurrentPower)))  # 2021-02-19
         if interleave == 61:  # Transmit page 0x52 = 82
