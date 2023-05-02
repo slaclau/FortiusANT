@@ -27,7 +27,9 @@ jobs:
       - name: Install pytest
         run: pip install -r pytest-requirements.txt
       - name: Test
-        run: pytest --md-report --md-report-color never --verbose --md-report-output=pytest.md
+        run: |
+          source venv/bin/activate
+          pytest --md-report --md-report-color never --verbose --md-report-output=pytest.md
       - name: Report
         if: always()
         run: cat pytest.md >> $GITHUB_STEP_SUMMARY
@@ -37,4 +39,4 @@ jobs:
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE }}
         with:
-          coverageCommand: pytest --cov=src tests --cov-report=xml
+          coverageCommand: source venv/bin/activate && pytest --cov=src tests --cov-report=xml
