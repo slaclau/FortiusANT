@@ -810,6 +810,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
 
     AntDongle.initialize(clv, TacxTrainer)
     Steering = AntDongle.Steering
+    BlackTrack = AntDongle.BlackTrack
     # ---------------------------------------------------------------------------
     # Loop control
     # ---------------------------------------------------------------------------
