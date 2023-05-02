@@ -816,7 +816,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
     # ---------------------------------------------------------------------------
     EventCounter = 0
 
-    calibrate_if_possible(clv, TacxTrainer, FortiusAntGui, rpi)
+    calibrate_if_possible(clv, TacxTrainer, FortiusAntGui, rpi, Restart)
 
     # ---------------------------------------------------------------------------
     # Initialize variables
@@ -1922,7 +1922,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
 
     return True
 
-def calibrate_if_possible(clv, TacxTrainer, FortiusAntGui, rpi):
+def calibrate_if_possible(clv, TacxTrainer, FortiusAntGui, rpi, Restart):
     # ---------------------------------------------------------------------------
     # During calibration, save powerfactor to avoid undesired correction.
     # ---------------------------------------------------------------------------
