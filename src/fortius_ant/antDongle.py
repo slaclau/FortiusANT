@@ -130,6 +130,7 @@ import fortius_ant.debug as debug
 import fortius_ant.FortiusAntCommand as cmd
 import fortius_ant.logfile as logfile
 import fortius_ant.structConstants as sc
+from fortius_ant import steering
 
 from fortius_ant.antMessage import AntMessage, calc_checksum
 
@@ -434,11 +435,123 @@ class clsAntDongle:
         self._MessageQueue = queue.Queue()  # Here messages are stored
         self._MessageLock = threading.Lock()  # This lock protects the queue
         self.OK = True  # Otherwise we're disabled!!
+        self.Steering = None
         if self.DeviceID == -1:
             self.OK = False  # No ANT dongle wanted
             self.Message = "No ANT"
         else:
             self.OK = self.__GetDongle()
+            
+    def initialize(self, clv, TacxTrainer):
+        # ---------------------------------------------------------------------------
+        # Initialize Dongle
+        # Open channels:
+        #    one to transmit the trainer info (Fitness Equipment)
+        #    one to transmit heartrate info   (HRM monitor)
+        #    one to interface with Tacx Vortex (VTX)
+        #    one to interface with Tacx Vortex headunit (VHU)
+        #
+        # And if you want a dedicated Speed Cadence Sensor, implement like this...
+        # ---------------------------------------------------------------------------
+        self.ResetDongle()  # reset dongle
+        self.Calibrate()  # calibrate ANT+ dongle
+        self.Trainer_ChannelConfig()  # Create ANT+ master channel for FE-C
+    
+        if clv.hrm == None:
+            self.HRM_ChannelConfig()  # Create ANT+ master channel for HRM
+        elif clv.hrm < 0:
+            pass  # No Heartrate at all
+        else:
+            # -------------------------------------------------------------------
+            # Create ANT+ slave channel for HRM;   0: auto pair, nnn: defined HRM
+            # -------------------------------------------------------------------
+            self.SlaveHRM_ChannelConfig(clv.hrm)
+    
+            # -------------------------------------------------------------------
+            # Request what DeviceID is paired to the HRM-channel
+            # No pairing-loop: HRM perhaps not yet active and avoid delay
+            # -------------------------------------------------------------------
+            # msg = ant.msg4D_RequestMessage(ant.channel_HRM_s, ant.msgID_ChannelID)
+            # AntDongle.Write([msg], False)
+    
+        if clv.Tacx_Vortex:
+            # -------------------------------------------------------------------
+            # Create ANT slave channel for VTX
+            # No pairing-loop: VTX perhaps not yet active and avoid delay
+            # -------------------------------------------------------------------
+            self.SlaveVTX_ChannelConfig(0)
+    
+            # msg = ant.msg4D_RequestMessage(ant.channel_VTX_s, ant.msgID_ChannelID)
+            # AntDongle.Write([msg], False)
+    
+            # -------------------------------------------------------------------
+            # Create ANT slave channel for VHU
+            #
+            # We create this channel right away. At some stage the VTX-channel
+            # sends the Page03_TacxVortexDataCalibration which provides the
+            # VortexID. This VortexID is the DeviceID that could be provided
+            # to SlaveVHU_ChannelConfig() to restrict pairing to that headunit
+            # only. Not relevant in private environments, so left as is here.
+            # -------------------------------------------------------------------
+            self.SlaveVHU_ChannelConfig(0)
+    
+        if clv.Tacx_Genius:
+            # -------------------------------------------------------------------
+            # Create ANT slave channel for GNS
+            # No pairing-loop: GNS perhaps not yet active and avoid delay
+            # -------------------------------------------------------------------
+            self.SlaveGNS_ChannelConfig(0)
+    
+        if clv.Tacx_Bushido:
+            # -------------------------------------------------------------------
+            # Create ANT slave channel for BHU
+            # No pairing-loop: GNS perhaps not yet active and avoid delay
+            # -------------------------------------------------------------------
+            self.SlaveBHU_ChannelConfig(0)
+    
+        if True:
+            # -------------------------------------------------------------------
+            # Create ANT+ master channel for PWR
+            # -------------------------------------------------------------------
+            self.PWR_ChannelConfig(channel_PWR)
+    
+        if clv.scs == None:
+            # -------------------------------------------------------------------
+            # Create ANT+ master channel for SCS
+            # -------------------------------------------------------------------
+            self.SCS_ChannelConfig(channel_SCS)
+        else:
+            # -------------------------------------------------------------------
+            # Create ANT+ slave channel for SCS
+            # 0: auto pair, nnn: defined SCS
+            # -------------------------------------------------------------------
+            self.SlaveSCS_ChannelConfig(clv.scs)
+            pass
+    
+        if True:
+            # -------------------------------------------------------------------
+            # Create ANT+ master channel for ANT Control
+            # -------------------------------------------------------------------
+            self.CTRL_ChannelConfig(ant.DeviceNumber_CTRL)
+    
+        BlackTrack = None
+        if clv.Steering == "Blacktrack":
+            # -------------------------------------------------------------------
+            # Create ANT slave channel for BLTR (Tacx BlackTrack)
+            # -------------------------------------------------------------------
+            self.SlaveBLTR_ChannelConfig(0)
+            BlackTrack = steering.clsBlackTrack(AntDongle)
+            self.Steering = BlackTrack.Steering
+        elif clv.Steering == "wired":
+            self.Steering = TacxTrainer.SteeringFrame
+        else:
+            self.Steering = None
+    
+        self.ConfigMsg = False  # Displayed only once
+    
+        if not clv.gui:
+            logfile.Console("Ctrl-C to exit")
+    
 
     # -----------------------------------------------------------------------
     # G e t D o n g l e
