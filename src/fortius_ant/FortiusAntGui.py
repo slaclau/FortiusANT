@@ -181,6 +181,7 @@ class frmFortiusAntGui(wx.Frame):  # noqa PLR201 PLR202 PLR204
         self._create_fonts()
         self.clv = pclv
         self.power: list[float] = []  # Array with power-tuples
+        self.PowerArray = numpy.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
         if getattr(sys, "frozen", False):
             dirname = sys._MEIPASS
@@ -618,7 +619,6 @@ class frmFortiusAntGui(wx.Frame):  # noqa PLR201 PLR202 PLR204
         Step = 40
         Max = Min + Step * NrIntervals
         self.PowerMax = Max
-        self.PowerArray = numpy.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
         intervals = range(
             Min, Max + 1, Step
         )  # Create The Intervals That Will Divide Our self.SpeedMeter In Sectors
