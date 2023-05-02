@@ -29,7 +29,8 @@ jobs:
       - name: Test
         run: |
           source venv/bin/activate
-          pytest --md-report --md-report-color never --verbose --md-report-output=pytest.md
+          pytest --md-report --md-report-color never --verbose --md-report-output=pytest.md --cov=src tests --cov-report=xml
+
       - name: Report
         if: always()
         run: cat pytest.md >> $GITHUB_STEP_SUMMARY
@@ -38,5 +39,3 @@ jobs:
         uses: paambaati/codeclimate-action@v3.2.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE }}
-        with:
-          coverageCommand: source venv/bin/activate && pytest --cov=src tests --cov-report=xml
