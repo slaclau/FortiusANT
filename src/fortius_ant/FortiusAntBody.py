@@ -816,200 +816,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
     # ---------------------------------------------------------------------------
     EventCounter = 0
 
-    # ---------------------------------------------------------------------------
-    # During calibration, save powerfactor to avoid undesired correction.
-    # ---------------------------------------------------------------------------
-    SavePowerFactor = clv.PowerFactor
-    clv.PowerFactor = 1
-
-    # ---------------------------------------------------------------------------
-    # Calibrate trainer
-    #
-    # Note, that there is no ANT+ loop active here!
-    # - Calibration is currently implemented for Tacx Fortius (motorbrake) only.
-    # - ANT+ Controller cannot be used here
-    # ---------------------------------------------------------------------------
-    CountDownX = 1  # If calibration takes more than two minutes
-    # Extend countdown: 2 ==> 4 minutes, 4 ==> 8 minutes
-    # This will not cause the countdown to take longer,
-    # it only extends the maximum time untill a stable reading.
-    CountDown = 120 * CountDownX  # 2 minutes; 120 is the max on the cadence meter
-    ResistanceArray = numpy.array(
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    )  # Array for calculating running average
-    AvgResistanceArray = numpy.array(
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    )  # Array for collating running averages
-    TacxTrainer.Calibrate = 0
-    StartPedaling = True
-    Counter = 0
-
-    bleEvent = False
-    antEvent = False
-    pedalEvent = False
-    TacxTrainer.tacxEvent = False
-
-    if clv.calibrate and TacxTrainer.CalibrateSupported():
-        FortiusAntGui.SetMessages(
-            Tacx="* * * * G I V E   A   P E D A L   K I C K   T O   S T A R T   C A L I B R A T I O N * * * *"
-        )
-        if debug.on(debug.Function):
-            logfile.Write("Tacx2Dongle; start pedaling for calibration")
-        rpi.DisplayState(constants.faWait2Calibrate, TacxTrainer)
-    try:
-        # if True:
-        while (
-            FortiusAntGui.RunningSwitch
-            and clv.calibrate
-            and not TacxTrainer.Buttons == usbTrainer.CancelButton
-            and TacxTrainer.Calibrate == 0
-            and TacxTrainer.CalibrateSupported()
-            and not Restart
-        ):
-            StartTime = time.time()
-            # -------------------------------------------------------------------
-            # Receive / Send trainer
-            # -------------------------------------------------------------------
-            TacxTrainer.tacxEvent = False
-            TacxTrainer.Refresh(True, usbTrainer.modeCalibrate)
-
-            FortiusAntGui.SetLeds(
-                antEvent, bleEvent, pedalEvent, None, TacxTrainer.tacxEvent
-            )
-            rpi.SetLeds(antEvent, bleEvent, pedalEvent, None, TacxTrainer.tacxEvent)
-            if rpi.CheckShutdown(FortiusAntGui):
-                FortiusAntGui.RunningSwitch = False
-
-            if rpi.buttonUp and rpi.buttonDown:
-                TacxTrainer.Buttons = usbTrainer.CancelButton
-            rpi.buttonUp = False
-            rpi.buttonDown = False
-
-            # -------------------------------------------------------------------
-            # When calibration IS supported, the following condition will NOT occur.
-            # iFlow 1932 is expected to support calibration but does not.
-            # This check is to stop calibration-loop because it will never end.
-            #
-            # First reading on 'my' Fortius shows a positive number, then goes negative
-            # so ignore the first x readings before deciding it will not work.
-            # -------------------------------------------------------------------
-            # print("StartPedaling=%s SpeedKmh=%s CurrentResistance=%s (negative expected)" % (StartPedaling, TacxTrainer.SpeedKmh, TacxTrainer.CurrentResistance))
-            if TacxTrainer.CurrentResistance > 0:
-                Counter += 1
-                if Counter == 10:
-                    logfile.Console(
-                        "Calibration stopped because of unexpected resistance value"
-                    )
-                    logfile.Console(
-                        "A reason may be that the tyre pressure is incorrect"
-                    )
-                    break
-
-            if TacxTrainer.CurrentResistance < 0 and TacxTrainer.SpeedKmh > 0:
-                # Calibration is started (with pedal kick)
-                # ---------------------------------------------------------------
-                # Show progress (when calibrating is started)
-                # This changes the message from "Start Pedaling" to "Calibrating"
-                # The message must be given once for the console-mode (no GUI)
-                # ---------------------------------------------------------------
-                if StartPedaling:
-                    FortiusAntGui.SetMessages(
-                        Tacx="* * * * C A L I B R A T I N G   (Do not pedal) * * * *"
-                    )
-                    rpi.DisplayState(constants.faCalibrating, TacxTrainer)
-                    if debug.on(debug.Function):
-                        logfile.Write("Tacx2Dongle; start calibration")
-                    StartPedaling = False
-
-                FortiusAntGui.SetValues(
-                    TacxTrainer.SpeedKmh,
-                    int(CountDown / CountDownX),
-                    round(TacxTrainer.CurrentPower * -1, 0),
-                    mode_Power,
-                    0,
-                    0,
-                    TacxTrainer.CurrentResistance * -1,
-                    0,
-                    0,
-                    0,
-                    0,
-                )
-
-                # --------------------------------------------------------------
-                # Average power over the last 20 readings
-                # Stop if difference between min/max running average is below threshold (2)
-                # At least 30 seconds but not longer than the countdown time (8 minutes)
-                # Note that the limits are empiracally established.
-                # --------------------------------------------------------------
-                ResistanceArray = numpy.append(
-                    ResistanceArray, TacxTrainer.CurrentResistance * -1
-                )  # Add new instantaneous value to array
-                ResistanceArray = numpy.delete(
-                    ResistanceArray, 0
-                )  # Remove oldest from array
-
-                AvgResistanceArray = numpy.append(
-                    AvgResistanceArray, numpy.average(ResistanceArray)
-                )  # Add new running average value to array
-                AvgResistanceArray = numpy.delete(
-                    AvgResistanceArray, 0
-                )  # Remove oldest from array
-
-                if (
-                    CountDown < (120 * CountDownX - 30)
-                    and numpy.min(ResistanceArray) > 0
-                ):
-                    if (
-                        numpy.max(AvgResistanceArray) - numpy.min(AvgResistanceArray)
-                    ) < 2 or CountDown <= 0:
-                        TacxTrainer.Calibrate = int(numpy.average(AvgResistanceArray))
-                        if debug.on(debug.Function):
-                            logfile.Write(
-                                "Calibration stopped with resistance=%s after %s seconds"
-                                % (
-                                    TacxTrainer.Calibrate,
-                                    int(120 * CountDownX - CountDown),
-                                )
-                            )
-
-                CountDown -= 0.25  # If not started, no count down!
-                # ---------------------------------------------------------------
-                # While calibrating: blink ANT/BLE
-                # ---------------------------------------------------------------
-                antEvent = True
-                bleEvent = True
-                pedalEvent = False
-            else:
-                # ---------------------------------------------------------------
-                # While waiting for pedal-kick: blink ANT/BLE/Cadence
-                # ---------------------------------------------------------------
-                antEvent = True
-                bleEvent = True
-                pedalEvent = True
-
-            # -------------------------------------------------------------------
-            # WAIT        So we do not cycle faster than 4 x per second
-            # -------------------------------------------------------------------
-            SleepTime = 0.25 - (time.time() - StartTime)
-            if SleepTime > 0:
-                time.sleep(SleepTime)
-    except KeyboardInterrupt:
-        logfile.Console("Stopped")
-    except Exception as e:
-        logfile.Console("Calibration stopped with exception: %s" % e)
-    # ---------------------------------------------------------------------------
-    # Stop trainer
-    # ---------------------------------------------------------------------------
-    if TacxTrainer.OK:
-        if debug.on(debug.Function):
-            logfile.Write("Tacx2Dongle; stop trainer")
-        TacxTrainer.SendToTrainer(True, usbTrainer.modeStop)
-    FortiusAntGui.SetMessages(Tacx=TacxTrainer.Message)
-
-    # ---------------------------------------------------------------------------
-    # Restore powerfactor after calibration
-    # ---------------------------------------------------------------------------
-    clv.PowerFactor = SavePowerFactor
+    calibrate_if_possible(clv, TacxTrainer, FortiusAntGui, rpi)
 
     # ---------------------------------------------------------------------------
     # Initialize variables
@@ -2114,3 +1921,199 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
     AntDongle.ResetDongle()
 
     return True
+
+def calibrate_if_possible(clv, TacxTrainer, FortiusAntGui, rpi):
+    # ---------------------------------------------------------------------------
+    # During calibration, save powerfactor to avoid undesired correction.
+    # ---------------------------------------------------------------------------
+    SavePowerFactor = clv.PowerFactor
+    clv.PowerFactor = 1
+
+    # ---------------------------------------------------------------------------
+    # Calibrate trainer
+    #
+    # Note, that there is no ANT+ loop active here!
+    # - Calibration is currently implemented for Tacx Fortius (motorbrake) only.
+    # - ANT+ Controller cannot be used here
+    # ---------------------------------------------------------------------------
+    CountDownX = 1  # If calibration takes more than two minutes
+    # Extend countdown: 2 ==> 4 minutes, 4 ==> 8 minutes
+    # This will not cause the countdown to take longer,
+    # it only extends the maximum time untill a stable reading.
+    CountDown = 120 * CountDownX  # 2 minutes; 120 is the max on the cadence meter
+    ResistanceArray = numpy.array(
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    )  # Array for calculating running average
+    AvgResistanceArray = numpy.array(
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    )  # Array for collating running averages
+    TacxTrainer.Calibrate = 0
+    StartPedaling = True
+    Counter = 0
+
+    bleEvent = False
+    antEvent = False
+    pedalEvent = False
+    TacxTrainer.tacxEvent = False
+
+    if clv.calibrate and TacxTrainer.CalibrateSupported():
+        FortiusAntGui.SetMessages(
+            Tacx="* * * * G I V E   A   P E D A L   K I C K   T O   S T A R T   C A L I B R A T I O N * * * *"
+        )
+        if debug.on(debug.Function):
+            logfile.Write("Tacx2Dongle; start pedaling for calibration")
+        rpi.DisplayState(constants.faWait2Calibrate, TacxTrainer)
+    try:
+        # if True:
+        while (
+            FortiusAntGui.RunningSwitch
+            and clv.calibrate
+            and not TacxTrainer.Buttons == usbTrainer.CancelButton
+            and TacxTrainer.Calibrate == 0
+            and TacxTrainer.CalibrateSupported()
+            and not Restart
+        ):
+            StartTime = time.time()
+            # -------------------------------------------------------------------
+            # Receive / Send trainer
+            # -------------------------------------------------------------------
+            TacxTrainer.tacxEvent = False
+            TacxTrainer.Refresh(True, usbTrainer.modeCalibrate)
+
+            FortiusAntGui.SetLeds(
+                antEvent, bleEvent, pedalEvent, None, TacxTrainer.tacxEvent
+            )
+            rpi.SetLeds(antEvent, bleEvent, pedalEvent, None, TacxTrainer.tacxEvent)
+            if rpi.CheckShutdown(FortiusAntGui):
+                FortiusAntGui.RunningSwitch = False
+
+            if rpi.buttonUp and rpi.buttonDown:
+                TacxTrainer.Buttons = usbTrainer.CancelButton
+            rpi.buttonUp = False
+            rpi.buttonDown = False
+
+            # -------------------------------------------------------------------
+            # When calibration IS supported, the following condition will NOT occur.
+            # iFlow 1932 is expected to support calibration but does not.
+            # This check is to stop calibration-loop because it will never end.
+            #
+            # First reading on 'my' Fortius shows a positive number, then goes negative
+            # so ignore the first x readings before deciding it will not work.
+            # -------------------------------------------------------------------
+            # print("StartPedaling=%s SpeedKmh=%s CurrentResistance=%s (negative expected)" % (StartPedaling, TacxTrainer.SpeedKmh, TacxTrainer.CurrentResistance))
+            if TacxTrainer.CurrentResistance > 0:
+                Counter += 1
+                if Counter == 10:
+                    logfile.Console(
+                        "Calibration stopped because of unexpected resistance value"
+                    )
+                    logfile.Console(
+                        "A reason may be that the tyre pressure is incorrect"
+                    )
+                    break
+
+            if TacxTrainer.CurrentResistance < 0 and TacxTrainer.SpeedKmh > 0:
+                # Calibration is started (with pedal kick)
+                # ---------------------------------------------------------------
+                # Show progress (when calibrating is started)
+                # This changes the message from "Start Pedaling" to "Calibrating"
+                # The message must be given once for the console-mode (no GUI)
+                # ---------------------------------------------------------------
+                if StartPedaling:
+                    FortiusAntGui.SetMessages(
+                        Tacx="* * * * C A L I B R A T I N G   (Do not pedal) * * * *"
+                    )
+                    rpi.DisplayState(constants.faCalibrating, TacxTrainer)
+                    if debug.on(debug.Function):
+                        logfile.Write("Tacx2Dongle; start calibration")
+                    StartPedaling = False
+
+                FortiusAntGui.SetValues(
+                    TacxTrainer.SpeedKmh,
+                    int(CountDown / CountDownX),
+                    round(TacxTrainer.CurrentPower * -1, 0),
+                    mode_Power,
+                    0,
+                    0,
+                    TacxTrainer.CurrentResistance * -1,
+                    0,
+                    0,
+                    0,
+                    0,
+                )
+
+                # --------------------------------------------------------------
+                # Average power over the last 20 readings
+                # Stop if difference between min/max running average is below threshold (2)
+                # At least 30 seconds but not longer than the countdown time (8 minutes)
+                # Note that the limits are empiracally established.
+                # --------------------------------------------------------------
+                ResistanceArray = numpy.append(
+                    ResistanceArray, TacxTrainer.CurrentResistance * -1
+                )  # Add new instantaneous value to array
+                ResistanceArray = numpy.delete(
+                    ResistanceArray, 0
+                )  # Remove oldest from array
+
+                AvgResistanceArray = numpy.append(
+                    AvgResistanceArray, numpy.average(ResistanceArray)
+                )  # Add new running average value to array
+                AvgResistanceArray = numpy.delete(
+                    AvgResistanceArray, 0
+                )  # Remove oldest from array
+
+                if (
+                    CountDown < (120 * CountDownX - 30)
+                    and numpy.min(ResistanceArray) > 0
+                ):
+                    if (
+                        numpy.max(AvgResistanceArray) - numpy.min(AvgResistanceArray)
+                    ) < 2 or CountDown <= 0:
+                        TacxTrainer.Calibrate = int(numpy.average(AvgResistanceArray))
+                        if debug.on(debug.Function):
+                            logfile.Write(
+                                "Calibration stopped with resistance=%s after %s seconds"
+                                % (
+                                    TacxTrainer.Calibrate,
+                                    int(120 * CountDownX - CountDown),
+                                )
+                            )
+
+                CountDown -= 0.25  # If not started, no count down!
+                # ---------------------------------------------------------------
+                # While calibrating: blink ANT/BLE
+                # ---------------------------------------------------------------
+                antEvent = True
+                bleEvent = True
+                pedalEvent = False
+            else:
+                # ---------------------------------------------------------------
+                # While waiting for pedal-kick: blink ANT/BLE/Cadence
+                # ---------------------------------------------------------------
+                antEvent = True
+                bleEvent = True
+                pedalEvent = True
+
+            # -------------------------------------------------------------------
+            # WAIT        So we do not cycle faster than 4 x per second
+            # -------------------------------------------------------------------
+            SleepTime = 0.25 - (time.time() - StartTime)
+            if SleepTime > 0:
+                time.sleep(SleepTime)
+    except KeyboardInterrupt:
+        logfile.Console("Stopped")
+    except Exception as e:
+        logfile.Console("Calibration stopped with exception: %s" % e)
+    # ---------------------------------------------------------------------------
+    # Stop trainer
+    # ---------------------------------------------------------------------------
+    if TacxTrainer.OK:
+        if debug.on(debug.Function):
+            logfile.Write("Tacx2Dongle; stop trainer")
+        TacxTrainer.SendToTrainer(True, usbTrainer.modeStop)
+    FortiusAntGui.SetMessages(Tacx=TacxTrainer.Message)
+
+    # ---------------------------------------------------------------------------
+    # Restore powerfactor after calibration
+    # ---------------------------------------------------------------------------
+    clv.PowerFactor = SavePowerFactor
