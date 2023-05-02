@@ -60,7 +60,7 @@ class antFE(AntInterface):
         return message
         
     def broadcast_message_from_trainer(self, TacxTrainer: clsTacxTrainer):
-        return broadcast_message(TacxTrainer.Cadence, TacxTrainer.Power, TacxTrainer.SpeedKmh, TacxTrainer.HeartRate)
+        return broadcast_message(TacxTrainer.Cadence, TacxTrainer.CurrentPower, TacxTrainer.SpeedKmh, TacxTrainer.HeartRate)
 
     def _broadcast_message(
         self, interleave: int, Cadence, CurrentPower, SpeedKmh, HeartRate
