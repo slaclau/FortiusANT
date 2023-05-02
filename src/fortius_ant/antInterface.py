@@ -3,7 +3,7 @@
 __version__ = "2023-04-16"
 # 2023-04-16    Rewritten in class based fashion
 
-from fortius_ant.usbTrainer import clsAntTrainer
+from fortius_ant.usbTrainer import clsTacxTrainer
 
 class AntInterface:
     """Interface for communicating as an ANT+ device."""
