@@ -522,16 +522,16 @@ class clsAntDongle:
             # -------------------------------------------------------------------
             # Create ANT+ master channel for ANT Control
             # -------------------------------------------------------------------
-            self.CTRL_ChannelConfig(ant.DeviceNumber_CTRL)
+            self.CTRL_ChannelConfig(DeviceNumber_CTRL)
     
-        BlackTrack = None
+        self.BlackTrack = None
         if clv.Steering == "Blacktrack":
             # -------------------------------------------------------------------
             # Create ANT slave channel for BLTR (Tacx BlackTrack)
             # -------------------------------------------------------------------
             self.SlaveBLTR_ChannelConfig(0)
-            BlackTrack = steering.clsBlackTrack(AntDongle)
-            self.Steering = BlackTrack.Steering
+            self.BlackTrack = steering.clsBlackTrack(AntDongle)
+            self.Steering = self.BlackTrack.Steering
         elif clv.Steering == "wired":
             self.Steering = TacxTrainer.SteeringFrame
         else:
