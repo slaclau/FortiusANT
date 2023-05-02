@@ -2,6 +2,10 @@ name: "Build debian packages"
 
 on: 
   push:
+    branches:
+      - "**"
+    tags:
+      - "*"
   workflow_call:
 
 
@@ -90,7 +94,7 @@ jobs:
       - name: Publish package to PPA
         run: |
           sudo apt install dput
-          dput ppa:slaclau/ppa-pre source/*source.changes
+          dput ppa:slaclau/ppa source/*source.changes
         if: contains(github.ref_name,'-') && github.ref_type == 'tag'
 
 permissions:

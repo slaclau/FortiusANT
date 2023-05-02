@@ -2,17 +2,6 @@
 # Version info
 # -------------------------------------------------------------------------------
 __version__ = "2022-08-22"
-import argparse
-import binascii
-import glob
-import math
-import os
-import pickle
-import platform
-import random
-import struct
-import sys
-import threading
 import time
 
 import numpy
@@ -233,10 +222,7 @@ import usb.core
 #               - test with Zwift; done 2019-12-24
 #               - calibration test; done 2020-01-07
 # -------------------------------------------------------------------------------
-from fortius_ant.constants import UseBluetooth, UseGui, mode_Grade, mode_Power
-
-if UseGui:
-    import wx
+from fortius_ant.constants import UseGui, mode_Grade, mode_Power
 
 from datetime import datetime
 
@@ -820,112 +806,8 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
     pdaInfo = []  # Collection of (time, power)
     LastPedalEcho = 0  # Flag that cadence sensor was seen
 
-    # ---------------------------------------------------------------------------
-    # Initialize Dongle
-    # Open channels:
-    #    one to transmit the trainer info (Fitness Equipment)
-    #    one to transmit heartrate info   (HRM monitor)
-    #    one to interface with Tacx Vortex (VTX)
-    #    one to interface with Tacx Vortex headunit (VHU)
-    #
-    # And if you want a dedicated Speed Cadence Sensor, implement like this...
-    # ---------------------------------------------------------------------------
-    AntDongle.ResetDongle()  # reset dongle
-    AntDongle.Calibrate()  # calibrate ANT+ dongle
-    AntDongle.Trainer_ChannelConfig()  # Create ANT+ master channel for FE-C
-
-    if clv.hrm is None:
-        AntDongle.HRM_ChannelConfig()  # Create ANT+ master channel for HRM
-    elif clv.hrm < 0:
-        pass  # No Heartrate at all
-    else:
-        # -------------------------------------------------------------------
-        # Create ANT+ slave channel for HRM;   0: auto pair, nnn: defined HRM
-        # -------------------------------------------------------------------
-        AntDongle.SlaveHRM_ChannelConfig(clv.hrm)
-
-        # -------------------------------------------------------------------
-        # Request what DeviceID is paired to the HRM-channel
-        # No pairing-loop: HRM perhaps not yet active and avoid delay
-        # -------------------------------------------------------------------
-        # msg = ant.msg4D_RequestMessage(ant.channel_HRM_s, ant.msgID_ChannelID)
-        # AntDongle.Write([msg], False)
-
-    if clv.Tacx_Vortex:
-        # -------------------------------------------------------------------
-        # Create ANT slave channel for VTX
-        # No pairing-loop: VTX perhaps not yet active and avoid delay
-        # -------------------------------------------------------------------
-        AntDongle.SlaveVTX_ChannelConfig(0)
-
-        # msg = ant.msg4D_RequestMessage(ant.channel_VTX_s, ant.msgID_ChannelID)
-        # AntDongle.Write([msg], False)
-
-        # -------------------------------------------------------------------
-        # Create ANT slave channel for VHU
-        #
-        # We create this channel right away. At some stage the VTX-channel
-        # sends the Page03_TacxVortexDataCalibration which provides the
-        # VortexID. This VortexID is the DeviceID that could be provided
-        # to SlaveVHU_ChannelConfig() to restrict pairing to that headunit
-        # only. Not relevant in private environments, so left as is here.
-        # -------------------------------------------------------------------
-        AntDongle.SlaveVHU_ChannelConfig(0)
-
-    if clv.Tacx_Genius:
-        # -------------------------------------------------------------------
-        # Create ANT slave channel for GNS
-        # No pairing-loop: GNS perhaps not yet active and avoid delay
-        # -------------------------------------------------------------------
-        AntDongle.SlaveGNS_ChannelConfig(0)
-
-    if clv.Tacx_Bushido:
-        # -------------------------------------------------------------------
-        # Create ANT slave channel for BHU
-        # No pairing-loop: GNS perhaps not yet active and avoid delay
-        # -------------------------------------------------------------------
-        AntDongle.SlaveBHU_ChannelConfig(0)
-
-    # -------------------------------------------------------------------
-    # Create ANT+ master channel for PWR
-    # -------------------------------------------------------------------
-    AntDongle.PWR_ChannelConfig(ant.channel_PWR)
-
-    if clv.scs is None:
-        # -------------------------------------------------------------------
-        # Create ANT+ master channel for SCS
-        # -------------------------------------------------------------------
-        AntDongle.SCS_ChannelConfig(ant.channel_SCS)
-    else:
-        # -------------------------------------------------------------------
-        # Create ANT+ slave channel for SCS
-        # 0: auto pair, nnn: defined SCS
-        # -------------------------------------------------------------------
-        AntDongle.SlaveSCS_ChannelConfig(clv.scs)
-
-    # -------------------------------------------------------------------
-    # Create ANT+ master channel for ANT Control
-    # -------------------------------------------------------------------
-    AntDongle.CTRL_ChannelConfig(ant.DeviceNumber_CTRL)
-
-    BlackTrack = None
-    if clv.Steering == "Blacktrack":
-        # -------------------------------------------------------------------
-        # Create ANT slave channel for BLTR (Tacx BlackTrack)
-        # -------------------------------------------------------------------
-        AntDongle.SlaveBLTR_ChannelConfig(0)
-        BlackTrack = steering.clsBlackTrack(AntDongle)
-        Steering = BlackTrack.Steering
-    elif clv.Steering == "wired":
-        Steering = TacxTrainer.SteeringFrame
-    else:
-        Steering = None
-
-    AntDongle.ConfigMsg = False  # Displayed only once
-
-    if not clv.gui:
-        logfile.Console("Ctrl-C to exit")
-
+    AntDongle.initialize(clv, TacxTrainer)
+    Steering = AntDongle.Steering
     # ---------------------------------------------------------------------------
     # Loop control
     # ---------------------------------------------------------------------------

@@ -742,7 +742,7 @@ def git_pieces_from_vcs(tag_prefix, root, verbose, runner=run_command):
     # if there isn't one, this yields HEX[-dirty] (no NUM)
     describe_out, rc = runner(GITS, [
         "describe", "--tags", "--dirty", "--always", "--long",
-        "--match", f"{tag_prefix}[[:digit:]]*", "--exclude", "*ubuntu*"
+        "--match", f"{tag_prefix}[[:digit:]]*", "--exclude", "*.*-*"
     ], cwd=root)
     # --long was added in git-1.5.5
     if describe_out is None:
@@ -1279,7 +1279,7 @@ def git_pieces_from_vcs(tag_prefix, root, verbose, runner=run_command):
             "--match",
             f"{tag_prefix}[[:digit:]]*",
             "--exclude",
-            "*ubuntu*",
+            "*.*-*",
         ],
         cwd=root,
     )
