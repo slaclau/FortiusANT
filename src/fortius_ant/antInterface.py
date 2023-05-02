@@ -3,6 +3,7 @@
 __version__ = "2023-04-16"
 # 2023-04-16    Rewritten in class based fashion
 
+from fortius_ant.usbTrainer import clsAntTrainer
 
 class AntInterface:
     """Interface for communicating as an ANT+ device."""
@@ -21,6 +22,9 @@ class AntInterface:
             self.interleave = 0
         self.interleave += 1
         return message
+        
+    def broadcast_message_from_trainer(self, TacxTrainer: clsTacxTrainer):
+        raise NotImplementedError
 
     def _broadcast_message(self, interleave: int, *args):
         raise NotImplementedError
