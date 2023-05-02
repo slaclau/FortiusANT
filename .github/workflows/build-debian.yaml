@@ -68,7 +68,7 @@ jobs:
         with:
           files: binary/*.deb
           prerelease: true
-        if: contains(github.ref_name,'ubuntu') && github.ref_type == 'tag'
+        if: contains(github.ref_name,'-') && github.ref_type == 'tag'
       - name: Get root release
         run: |
           echo "SHORT_TAG=$(echo ${{ github.ref_name }} | sed -re 's/-[0-9]+//g')" >> $GITHUB_ENV
