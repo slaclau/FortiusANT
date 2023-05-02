@@ -12,6 +12,7 @@ __version__ = "2023-04-16"
 from fortius_ant.antInterface import AntInterface
 from fortius_ant.antMessage import AntMessage, msgID_BroadcastData
 from fortius_ant.antPage import SCSPage
+from fortius_ant.usbTrainer import clsTacxTrainer
 
 channel_SCS = 3  # ANT+ Channel for Speed Cadence Sensor
 
@@ -35,6 +36,9 @@ class AntSCS(AntInterface):
         self.cadence_event_count = 0
         self.speed_event_time = 0
         self.speed_event_count = 0
+        
+    def broadcast_message_from_trainer(self, TacxTrainer: clsTacxTrainer):
+        return broadcast_message(TacxTrainer.PedalEchoTime, TacxTrainer.PedalEchoCount, TacxTrainer.SpeedKmh, TacxTrainer.Cadence)
 
     def _broadcast_message(
         self, interleave: int, _PedalEchoTime, PedalEchoCount, SpeedKmh, Cadence
