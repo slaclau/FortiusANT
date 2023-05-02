@@ -17,6 +17,7 @@ import time
 from fortius_ant.antInterface import AntInterface
 from fortius_ant.antMessage import AntMessage, Manufacturer_tacx, msgID_BroadcastData
 from fortius_ant.antPage import Page80, Page81, FEPage16, FEPage25
+from fortius_ant.usbTrainer import clsTacxTrainer
 
 ModelNumber_FE = 2875  # short antifier-value=0x8385, Tacx Neo=2875
 SerialNumber_FE = 19590705  # int   1959-7-5
@@ -57,6 +58,9 @@ class antFE(AntInterface):
         if self.interleave == self.interleave_reset:
             self.interleave = 0
         return message
+        
+    def broadcast_message_from_trainer(self, TacxTrainer: clsTacxTrainer):
+        return broadcast_message(TacxTrainer.Cadence, TacxTrainer.Power, TacxTrainer.SpeedKmh, TacxTrainer.HeartRate)
 
     def _broadcast_message(
         self, interleave: int, Cadence, CurrentPower, SpeedKmh, HeartRate
