@@ -284,7 +284,7 @@ def git_pieces_from_vcs(tag_prefix, root, verbose, runner=run_command):
             "--match",
             f"{tag_prefix}[[:digit:]]*",
             "--exclude",
-            "*ubuntu*",
+            "*.*-*",
         ],
         cwd=root,
     )
