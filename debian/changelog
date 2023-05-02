@@ -1,3 +1,9 @@
+python-fortius-ant (6.7.5-2) replaceme; urgency=medium
+
+  * Small patch to upstream
+
+ -- Sebastien Laclau <seb.laclau@gmail.com>  Tue, 02 May 2023 08:20:51 +0100
+
 python-fortius-ant (6.7.5-1) replaceme; urgency=medium
 
   * Fixes to build system.
