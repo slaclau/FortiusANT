@@ -16,6 +16,7 @@ from fortius_ant.antInterface import AntInterface
 from fortius_ant.antMessage import AntMessage, Manufacturer_garmin, msgID_BroadcastData
 from fortius_ant.antPage import HRMPage
 from fortius_ant.usbTrainer import clsTacxTrainer
+
 ModelNumber_HRM = 0x33  # char  antifier-value
 SerialNumber_HRM = 5975  # short 1959-7-5
 HWrevision_HRM = 1  # char
