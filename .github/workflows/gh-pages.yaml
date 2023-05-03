@@ -52,6 +52,7 @@ jobs:
           python scripts/json-apis/shortversion.py >> docs/api/shortversion/index.json 
       - name: Build pages
         run: |
+          source ../venv/bin/activate
           sudo apt install make graphviz
           cd sphinx
           make github
