@@ -37,7 +37,7 @@ jobs:
       - name: Install python packages
         run: |
           python3 wxPython-source.py
-          python3 -m ../venv
+          python3 -m venv ../venv
           source ../venv/bin/activate
           pip install -r requirements.txt -r wxPython-source.txt -r dev-requirements.txt -r pytest-requirements.txt
           pip install -e .
