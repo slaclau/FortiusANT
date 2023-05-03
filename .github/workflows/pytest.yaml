@@ -20,13 +20,19 @@ jobs:
       - name: Install python packages
         run: |
           python3 wxPython-source.py
-          python3 -m pip install attrdict
-          python3 -m pip install -r requirements.txt -r wxPython-source.txt
-          python3 -m pip install .
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt -r wxPython-source.txt
+          pip install -e .
       - name: Install pytest
-        run: pip install -r pytest-requirements.txt
+        run: |
+          source venv/bin/activate
+          pip install -r pytest-requirements.txt
       - name: Test
-        run: pytest --md-report --md-report-color never --verbose --md-report-output=pytest.md
+        run: |
+          source venv/bin/activate
+          python -m pytest --md-report --md-report-color never --verbose --md-report-output=pytest.md --cov=src tests --cov-report=xml
+
       - name: Report
         if: always()
         run: cat pytest.md >> $GITHUB_STEP_SUMMARY
@@ -35,5 +41,3 @@ jobs:
         uses: paambaati/codeclimate-action@v3.2.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE }}
-        with:
-          coverageCommand: pytest --cov=src tests --cov-report=xml
