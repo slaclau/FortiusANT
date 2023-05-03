@@ -12,6 +12,7 @@ __version__ = "2023-04-16"
 from fortius_ant.antInterface import AntInterface
 from fortius_ant.antMessage import AntMessage, Manufacturer_dev, msgID_BroadcastData
 from fortius_ant.antPage import Page2, Page80, Page81
+from fortius_ant.usbTrainer import clsTacxTrainer
 
 ModelNumber_CTRL = 1234  # short
 SerialNumber_CTRL = 19590709  # int   1959-7-9
@@ -57,6 +58,9 @@ class antCTRL(AntInterface):
     """Interface for communicating as an ANT+ control."""
 
     interleave_reset = 129
+    
+    def broadcast_message_from_trainer(self, TacxTrainer: clsTacxTrainer):
+        return broadcast_message()
 
     def _broadcast_message(self, interleave: int, *args):
         if interleave == 64:

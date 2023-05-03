@@ -33,6 +33,7 @@ __version__ = "2023-04-16"
 from fortius_ant.antInterface import AntInterface
 from fortius_ant.antMessage import AntMessage, Manufacturer_garmin, msgID_BroadcastData
 from fortius_ant.antPage import Page80, Page81, Page82, PWRPage16
+from fortius_ant.usbTrainer import clsTacxTrainer
 
 ModelNumber_PWR = 2161  # Garmin Vector 2 (profile.xlsx, garmin_product)
 SerialNumber_PWR = 19570702  # int   1957-7-2
@@ -58,8 +59,11 @@ class AntPWR(AntInterface):
         self.interleave = 0
         self.accumulated_power = 0
         self.event_count = 0
+        
+    def broadcast_message_from_trainer(self, TacxTrainer: clsTacxTrainer):
+        return broadcast_message(TacxTrainer.CurrentPower, TacxTrainer.Cadence)
 
-    def _broadcast_message(self, interleave: int, CurrentPower, Cadence):
+    def _broadcast_message(self, interleave: int, CurrentPower: float, Cadence: float):
         Cadence = int(min(0xFF, Cadence))
         CurrentPower = int(max(0, min(0x0FFF, CurrentPower)))  # 2021-02-19
         if interleave == 61:  # Transmit page 0x52 = 82
