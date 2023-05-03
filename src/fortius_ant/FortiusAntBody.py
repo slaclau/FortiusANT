@@ -760,7 +760,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
     assert bleCTP  # The class must be created
 
     AntHRMpaired = False
-    
+
     gearbox = Gearbox(clv, TacxTrainer)
 
     # ---------------------------------------------------------------------------
@@ -1774,6 +1774,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
 
     return True
 
+
 def calibrate_if_possible(clv, TacxTrainer, FortiusAntGui, rpi, Restart):
     # ---------------------------------------------------------------------------
     # During calibration, save powerfactor to avoid undesired correction.
@@ -1969,8 +1970,9 @@ def calibrate_if_possible(clv, TacxTrainer, FortiusAntGui, rpi, Restart):
     # Restore powerfactor after calibration
     # ---------------------------------------------------------------------------
     clv.PowerFactor = SavePowerFactor
-    
-class Gearbox():
+
+
+class Gearbox:
     def __init__(self):
         # ---------------------------------------------------------------------------
         # Front/rear shifting
@@ -1982,13 +1984,12 @@ class Gearbox():
         self.CassetteIndex = clv.CassetteStart
 
     def respond_to_control_input(self, FortiusAntGui, CTPcommandTime):
-                
         ReductionCrankset = self.ReductionCrankset
         ReductionCassette = self.ReductionCassette
         ReductionCassetteX = self.ReductionCassetteX
         CranksetIndex = self.CranksetIndex
         CassetteIndex = self.CassetteIndex
-        
+
         # -------------------------------------------------------------------
         # In manual-mode, power can be incremented or decremented
         #   and operation can be stopped. Manual mode is intended for test-purpose.
@@ -2086,13 +2087,13 @@ class Gearbox():
 
             else:
                 pass
-                
+
         self.ReductionCrankset = ReductionCrankset
         self.ReductionCassette = ReductionCassette
         self.ReductionCassetteX = ReductionCassetteX
         self.CranksetIndex = CranksetIndex
         self.CassetteIndex = CassetteIndex
-        
+
         self.set_reduction(ReductionChanged)
 
     def set_reduction(self, ReductionChanged):
@@ -2145,7 +2146,7 @@ class Gearbox():
 
             TacxTrainer.SetGearboxReduction(
                 ReductionCrankset * ReductionCassette * ReductionCassetteX
-                    )
+            )
 
         self.ReductionCrankset = ReductionCrankset
         self.ReductionCassette = ReductionCassette

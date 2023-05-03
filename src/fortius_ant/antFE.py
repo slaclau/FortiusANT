@@ -50,7 +50,7 @@ class antFE(AntInterface):
         self.accumulated_time = 0
         self.distance_travelled = 0
         self.accumulated_last_time = time.time()
-        
+
     def broadcast_message(self, *args):
         """Assemble the message to be sent."""
         message = self._broadcast_message(self.interleave, *args)
@@ -58,9 +58,14 @@ class antFE(AntInterface):
         if self.interleave == self.interleave_reset:
             self.interleave = 0
         return message
-        
+
     def broadcast_message_from_trainer(self, TacxTrainer: clsTacxTrainer):
-        return broadcast_message(TacxTrainer.Cadence, TacxTrainer.CurrentPower, TacxTrainer.SpeedKmh, TacxTrainer.HeartRate)
+        return broadcast_message(
+            TacxTrainer.Cadence,
+            TacxTrainer.CurrentPower,
+            TacxTrainer.SpeedKmh,
+            TacxTrainer.HeartRate,
+        )
 
     def _broadcast_message(
         self, interleave: int, Cadence, CurrentPower, SpeedKmh, HeartRate

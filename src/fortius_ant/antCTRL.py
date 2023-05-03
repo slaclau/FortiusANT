@@ -58,7 +58,7 @@ class antCTRL(AntInterface):
     """Interface for communicating as an ANT+ control."""
 
     interleave_reset = 129
-    
+
     def broadcast_message_from_trainer(self, TacxTrainer: clsTacxTrainer):
         return broadcast_message()
 

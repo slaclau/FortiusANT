@@ -36,9 +36,14 @@ class AntSCS(AntInterface):
         self.cadence_event_count = 0
         self.speed_event_time = 0
         self.speed_event_count = 0
-        
+
     def broadcast_message_from_trainer(self, TacxTrainer: clsTacxTrainer):
-        return broadcast_message(TacxTrainer.PedalEchoTime, TacxTrainer.PedalEchoCount, TacxTrainer.SpeedKmh, TacxTrainer.Cadence)
+        return broadcast_message(
+            TacxTrainer.PedalEchoTime,
+            TacxTrainer.PedalEchoCount,
+            TacxTrainer.SpeedKmh,
+            TacxTrainer.Cadence,
+        )
 
     def _broadcast_message(
         self, interleave: int, _PedalEchoTime, PedalEchoCount, SpeedKmh, Cadence

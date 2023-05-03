@@ -59,7 +59,7 @@ class AntPWR(AntInterface):
         self.interleave = 0
         self.accumulated_power = 0
         self.event_count = 0
-        
+
     def broadcast_message_from_trainer(self, TacxTrainer: clsTacxTrainer):
         return broadcast_message(TacxTrainer.CurrentPower, TacxTrainer.Cadence)
 

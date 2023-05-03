@@ -45,10 +45,9 @@ class AntHRM(AntInterface):
         self.heart_beat_event_time = 0
         self.heart_beat_time = 0
         self.page_change_toggle = 0
-        
+
     def broadcast_message_from_trainer(self, TacxTrainer: clsTacxTrainer):
         return broadcast_message(TacxTrainer.HeartRate)
-
 
     def _broadcast_message(self, interleave: int, HeartRate):
         if (time.time() - self.heart_beat_time) >= (60 / float(HeartRate)):

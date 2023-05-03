@@ -441,7 +441,7 @@ class clsAntDongle:
             self.Message = "No ANT"
         else:
             self.OK = self.__GetDongle()
-            
+
     def initialize(self, clv, TacxTrainer):
         # ---------------------------------------------------------------------------
         # Initialize Dongle
@@ -456,7 +456,7 @@ class clsAntDongle:
         self.ResetDongle()  # reset dongle
         self.Calibrate()  # calibrate ANT+ dongle
         self.Trainer_ChannelConfig()  # Create ANT+ master channel for FE-C
-    
+
         if clv.hrm == None:
             self.HRM_ChannelConfig()  # Create ANT+ master channel for HRM
         elif clv.hrm < 0:
@@ -466,24 +466,24 @@ class clsAntDongle:
             # Create ANT+ slave channel for HRM;   0: auto pair, nnn: defined HRM
             # -------------------------------------------------------------------
             self.SlaveHRM_ChannelConfig(clv.hrm)
-    
+
             # -------------------------------------------------------------------
             # Request what DeviceID is paired to the HRM-channel
             # No pairing-loop: HRM perhaps not yet active and avoid delay
             # -------------------------------------------------------------------
             # msg = ant.msg4D_RequestMessage(ant.channel_HRM_s, ant.msgID_ChannelID)
             # AntDongle.Write([msg], False)
-    
+
         if clv.Tacx_Vortex:
             # -------------------------------------------------------------------
             # Create ANT slave channel for VTX
             # No pairing-loop: VTX perhaps not yet active and avoid delay
             # -------------------------------------------------------------------
             self.SlaveVTX_ChannelConfig(0)
-    
+
             # msg = ant.msg4D_RequestMessage(ant.channel_VTX_s, ant.msgID_ChannelID)
             # AntDongle.Write([msg], False)
-    
+
             # -------------------------------------------------------------------
             # Create ANT slave channel for VHU
             #
@@ -494,27 +494,27 @@ class clsAntDongle:
             # only. Not relevant in private environments, so left as is here.
             # -------------------------------------------------------------------
             self.SlaveVHU_ChannelConfig(0)
-    
+
         if clv.Tacx_Genius:
             # -------------------------------------------------------------------
             # Create ANT slave channel for GNS
             # No pairing-loop: GNS perhaps not yet active and avoid delay
             # -------------------------------------------------------------------
             self.SlaveGNS_ChannelConfig(0)
-    
+
         if clv.Tacx_Bushido:
             # -------------------------------------------------------------------
             # Create ANT slave channel for BHU
             # No pairing-loop: GNS perhaps not yet active and avoid delay
             # -------------------------------------------------------------------
             self.SlaveBHU_ChannelConfig(0)
-    
+
         if True:
             # -------------------------------------------------------------------
             # Create ANT+ master channel for PWR
             # -------------------------------------------------------------------
             self.PWR_ChannelConfig(channel_PWR)
-    
+
         if clv.scs == None:
             # -------------------------------------------------------------------
             # Create ANT+ master channel for SCS
@@ -527,13 +527,13 @@ class clsAntDongle:
             # -------------------------------------------------------------------
             self.SlaveSCS_ChannelConfig(clv.scs)
             pass
-    
+
         if True:
             # -------------------------------------------------------------------
             # Create ANT+ master channel for ANT Control
             # -------------------------------------------------------------------
             self.CTRL_ChannelConfig(DeviceNumber_CTRL)
-    
+
         self.BlackTrack = None
         if clv.Steering == "Blacktrack":
             # -------------------------------------------------------------------
@@ -546,12 +546,11 @@ class clsAntDongle:
             self.Steering = TacxTrainer.SteeringFrame
         else:
             self.Steering = None
-    
+
         self.ConfigMsg = False  # Displayed only once
-    
+
         if not clv.gui:
             logfile.Console("Ctrl-C to exit")
-    
 
     # -----------------------------------------------------------------------
     # G e t D o n g l e
