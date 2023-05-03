@@ -760,15 +760,8 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
     assert bleCTP  # The class must be created
 
     AntHRMpaired = False
-
-    # ---------------------------------------------------------------------------
-    # Front/rear shifting
-    # ---------------------------------------------------------------------------
-    ReductionCrankset = 1  # ratio between selected/start (front)
-    ReductionCassette = 1  # same, rear
-    ReductionCassetteX = 1  # same, beyond cassette range
-    CranksetIndex = clv.CranksetStart
-    CassetteIndex = clv.CassetteStart
+    
+    gearbox = Gearbox(clv, TacxTrainer)
 
     # ---------------------------------------------------------------------------
     # Command status data
@@ -1075,148 +1068,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
                 # -------------------------------------------------------------------
                 ctrl_Commands.pop(0)
 
-            # -------------------------------------------------------------------
-            # In manual-mode, power can be incremented or decremented
-            #   and operation can be stopped. Manual mode is intended for test-purpose.
-            # homeTrainer mode is intended for stand-alone use.
-            #
-            # TargetMode  is set here (manual mode) or received from ANT+ (Zwift)
-            # TargetPower and TargetGrade are set in this section only!
-            # -------------------------------------------------------------------
-            ReductionChanged = False
-            if clv.homeTrainer and not (time.time() - CTPcommandTime) < 30:
-                # In homeTrainer mode, buttons are only valid when no CTP active
-                if TacxTrainer.Buttons == usbTrainer.EnterButton:
-                    pass
-                elif TacxTrainer.Buttons == usbTrainer.DownButton:
-                    TacxTrainer.MultiplyPower(1 / 1.1)
-                elif TacxTrainer.Buttons == usbTrainer.OKButton:
-                    TacxTrainer.SetPower(100)
-                elif TacxTrainer.Buttons == usbTrainer.UpButton:
-                    TacxTrainer.MultiplyPower(1.1)
-                elif TacxTrainer.Buttons == usbTrainer.CancelButton:
-                    FortiusAntGui.RunningSwitch = False
-                else:
-                    pass
-            elif clv.manual:
-                if TacxTrainer.Buttons == usbTrainer.EnterButton:
-                    pass
-                elif TacxTrainer.Buttons == usbTrainer.DownButton:
-                    TacxTrainer.AddPower(-10)
-                elif TacxTrainer.Buttons == usbTrainer.OKButton:
-                    TacxTrainer.SetPower(100)
-                elif TacxTrainer.Buttons == usbTrainer.UpButton:
-                    TacxTrainer.AddPower(10)
-                elif TacxTrainer.Buttons == usbTrainer.CancelButton:
-                    FortiusAntGui.RunningSwitch = False
-                else:
-                    pass
-            elif clv.manualGrade:
-                if TacxTrainer.Buttons == usbTrainer.EnterButton:
-                    pass
-                elif TacxTrainer.Buttons == usbTrainer.DownButton:
-                    TacxTrainer.AddGrade(-1)
-                elif TacxTrainer.Buttons == usbTrainer.OKButton:
-                    TacxTrainer.SetGrade(0)
-                elif TacxTrainer.Buttons == usbTrainer.UpButton:
-                    TacxTrainer.AddGrade(1)
-                elif TacxTrainer.Buttons == usbTrainer.CancelButton:
-                    FortiusAntGui.RunningSwitch = False
-                else:
-                    pass
-            else:
-                if (
-                    TacxTrainer.Buttons == usbTrainer.EnterButton
-                    or TacxTrainer.Buttons == usbTrainer.OKButton
-                ):
-                    ReductionChanged = True
-                    CranksetIndex = clv.CranksetStart  # Reset both front
-                    CassetteIndex = clv.CassetteStart  # and rear
-
-                elif (
-                    TacxTrainer.Buttons == usbTrainer.UpButton
-                ):  # Switch rear right (smaller) = higher index
-                    ReductionChanged = True
-                    if CassetteIndex < 0:
-                        CassetteIndex += 1
-                        ReductionCassetteX *= 1.1
-                    elif CassetteIndex < len(clv.Cassette) - 1:
-                        CassetteIndex += 1
-                    elif ReductionCassetteX < 2:
-                        # Plus 7 extra steps beyond the end of the cassette
-                        CassetteIndex += 1
-                        ReductionCassetteX *= 1.1
-
-                elif (
-                    TacxTrainer.Buttons == usbTrainer.DownButton
-                ):  # Switch rear left (bigger) = lower index
-                    ReductionChanged = True
-                    if CassetteIndex >= len(clv.Cassette):
-                        CassetteIndex -= 1
-                        ReductionCassetteX /= 1.1
-                    elif CassetteIndex > 0:
-                        CassetteIndex -= 1
-                    elif ReductionCassetteX > 0.6:
-                        # Plus 8 extra steps beyond the end of the cassette
-                        CassetteIndex -= 1
-                        ReductionCassetteX /= 1.1
-
-                elif (
-                    TacxTrainer.Buttons == usbTrainer.CancelButton
-                ):  # Switch front up (round robin)
-                    ReductionChanged = True
-                    # FortiusAntGui.RunningSwitch = False
-                    CranksetIndex += 1
-                    if CranksetIndex == len(clv.Crankset):
-                        CranksetIndex = 0
-
-                else:
-                    pass
-
-            # -------------------------------------------------------------------
-            # Calculate Reduction
-            #
-            # Note that, the VIRTUAL gearbox has Reduction = 1 when the indexes
-            #      are in the initial position (not when front = rear!).
-            #
-            # ReductionCrankset: >1 when chainring > start-value
-            # ReductionCassette:  >1 when sprocket  < start-value
-            # ReductionCassetteX: is a factor when index outside the cassette!
-            # -------------------------------------------------------------------
-            if ReductionChanged:
-                if 0 <= CranksetIndex < len(clv.Crankset):
-                    ReductionCrankset = (
-                        clv.Crankset[CranksetIndex] / clv.Crankset[clv.CranksetStart]
-                    )
-
-                if 0 <= CassetteIndex < len(clv.Cassette):
-                    ReductionCassetteX = 1
-                    ReductionCassette = (
-                        clv.Cassette[clv.CassetteStart] / clv.Cassette[CassetteIndex]
-                    )
-
-                if debug.on(debug.Function):
-                    if CassetteIndex >= len(clv.Cassette):
-                        i = len(clv.Cassette) - 1
-                    else:
-                        i = CassetteIndex
-                    logfile.Print(
-                        "gearbox changed: index=%ix%2i ratio=%ix%i R=%3.1f*%3.1f*%3.1f=%3.1f"
-                        % (
-                            CranksetIndex,
-                            CassetteIndex,
-                            clv.Crankset[CranksetIndex],
-                            clv.Cassette[i],
-                            ReductionCrankset,
-                            ReductionCassette,
-                            ReductionCassetteX,
-                            ReductionCrankset * ReductionCassette * ReductionCassetteX,
-                        )
-                    )
-
-                TacxTrainer.SetGearboxReduction(
-                    ReductionCrankset * ReductionCassette * ReductionCassetteX
-                )
+            gearbox.respond_to_control_input(FortiusAntGui, CTPcommandTime)
 
             # -------------------------------------------------------------------
             # Do ANT/BLE work every 1/4 second
@@ -2117,3 +1969,186 @@ def calibrate_if_possible(clv, TacxTrainer, FortiusAntGui, rpi, Restart):
     # Restore powerfactor after calibration
     # ---------------------------------------------------------------------------
     clv.PowerFactor = SavePowerFactor
+    
+class Gearbox():
+    def __init__(self):
+        # ---------------------------------------------------------------------------
+        # Front/rear shifting
+        # ---------------------------------------------------------------------------
+        self.ReductionCrankset = 1  # ratio between selected/start (front)
+        self.ReductionCassette = 1  # same, rear
+        self.ReductionCassetteX = 1  # same, beyond cassette range
+        self.CranksetIndex = clv.CranksetStart
+        self.CassetteIndex = clv.CassetteStart
+
+    def respond_to_control_input(self, FortiusAntGui, CTPcommandTime):
+                
+        ReductionCrankset = self.ReductionCrankset
+        ReductionCassette = self.ReductionCassette
+        ReductionCassetteX = self.ReductionCassetteX
+        CranksetIndex = self.CranksetIndex
+        CassetteIndex = self.CassetteIndex
+        
+        # -------------------------------------------------------------------
+        # In manual-mode, power can be incremented or decremented
+        #   and operation can be stopped. Manual mode is intended for test-purpose.
+        # homeTrainer mode is intended for stand-alone use.
+        #
+        # TargetMode  is set here (manual mode) or received from ANT+ (Zwift)
+        # TargetPower and TargetGrade are set in this section only!
+        # -------------------------------------------------------------------
+        ReductionChanged = False
+        if clv.homeTrainer and not (time.time() - CTPcommandTime) < 30:
+            # In homeTrainer mode, buttons are only valid when no CTP active
+            if TacxTrainer.Buttons == usbTrainer.EnterButton:
+                pass
+            elif TacxTrainer.Buttons == usbTrainer.DownButton:
+                TacxTrainer.MultiplyPower(1 / 1.1)
+            elif TacxTrainer.Buttons == usbTrainer.OKButton:
+                TacxTrainer.SetPower(100)
+            elif TacxTrainer.Buttons == usbTrainer.UpButton:
+                TacxTrainer.MultiplyPower(1.1)
+            elif TacxTrainer.Buttons == usbTrainer.CancelButton:
+                FortiusAntGui.RunningSwitch = False
+            else:
+                pass
+        elif clv.manual:
+            if TacxTrainer.Buttons == usbTrainer.EnterButton:
+                pass
+            elif TacxTrainer.Buttons == usbTrainer.DownButton:
+                TacxTrainer.AddPower(-10)
+            elif TacxTrainer.Buttons == usbTrainer.OKButton:
+                TacxTrainer.SetPower(100)
+            elif TacxTrainer.Buttons == usbTrainer.UpButton:
+                TacxTrainer.AddPower(10)
+            elif TacxTrainer.Buttons == usbTrainer.CancelButton:
+                FortiusAntGui.RunningSwitch = False
+            else:
+                pass
+        elif clv.manualGrade:
+            if TacxTrainer.Buttons == usbTrainer.EnterButton:
+                pass
+            elif TacxTrainer.Buttons == usbTrainer.DownButton:
+                TacxTrainer.AddGrade(-1)
+            elif TacxTrainer.Buttons == usbTrainer.OKButton:
+                TacxTrainer.SetGrade(0)
+            elif TacxTrainer.Buttons == usbTrainer.UpButton:
+                TacxTrainer.AddGrade(1)
+            elif TacxTrainer.Buttons == usbTrainer.CancelButton:
+                FortiusAntGui.RunningSwitch = False
+            else:
+                pass
+        else:
+            if (
+                TacxTrainer.Buttons == usbTrainer.EnterButton
+                or TacxTrainer.Buttons == usbTrainer.OKButton
+            ):
+                ReductionChanged = True
+                CranksetIndex = clv.CranksetStart  # Reset both front
+                CassetteIndex = clv.CassetteStart  # and rear
+
+            elif (
+                TacxTrainer.Buttons == usbTrainer.UpButton
+            ):  # Switch rear right (smaller) = higher index
+                ReductionChanged = True
+                if CassetteIndex < 0:
+                    CassetteIndex += 1
+                    ReductionCassetteX *= 1.1
+                elif CassetteIndex < len(clv.Cassette) - 1:
+                    CassetteIndex += 1
+                elif ReductionCassetteX < 2:
+                    # Plus 7 extra steps beyond the end of the cassette
+                    CassetteIndex += 1
+                    ReductionCassetteX *= 1.1
+
+            elif (
+                TacxTrainer.Buttons == usbTrainer.DownButton
+            ):  # Switch rear left (bigger) = lower index
+                ReductionChanged = True
+                if CassetteIndex >= len(clv.Cassette):
+                    CassetteIndex -= 1
+                    ReductionCassetteX /= 1.1
+                elif CassetteIndex > 0:
+                    CassetteIndex -= 1
+                elif ReductionCassetteX > 0.6:
+                    # Plus 8 extra steps beyond the end of the cassette
+                    CassetteIndex -= 1
+                    ReductionCassetteX /= 1.1
+
+            elif (
+                TacxTrainer.Buttons == usbTrainer.CancelButton
+            ):  # Switch front up (round robin)
+                ReductionChanged = True
+                # FortiusAntGui.RunningSwitch = False
+                CranksetIndex += 1
+                if CranksetIndex == len(clv.Crankset):
+                    CranksetIndex = 0
+
+            else:
+                pass
+                
+        self.ReductionCrankset = ReductionCrankset
+        self.ReductionCassette = ReductionCassette
+        self.ReductionCassetteX = ReductionCassetteX
+        self.CranksetIndex = CranksetIndex
+        self.CassetteIndex = CassetteIndex
+        
+        self.set_reduction(ReductionChanged)
+
+    def set_reduction(self, ReductionChanged):
+        ReductionCrankset = self.ReductionCrankset
+        ReductionCassette = self.ReductionCassette
+        ReductionCassetteX = self.ReductionCassetteX
+        CranksetIndex = self.CranksetIndex
+        CassetteIndex = self.CassetteIndex
+
+        # -------------------------------------------------------------------
+        # Calculate Reduction
+        #
+        # Note that, the VIRTUAL gearbox has Reduction = 1 when the indexes
+        #      are in the initial position (not when front = rear!).
+        #
+        # ReductionCrankset: >1 when chainring > start-value
+        # ReductionCassette:  >1 when sprocket  < start-value
+        # ReductionCassetteX: is a factor when index outside the cassette!
+        # -------------------------------------------------------------------
+        if ReductionChanged:
+            if 0 <= CranksetIndex < len(clv.Crankset):
+                ReductionCrankset = (
+                    clv.Crankset[CranksetIndex] / clv.Crankset[clv.CranksetStart]
+                )
+
+            if 0 <= CassetteIndex < len(clv.Cassette):
+                ReductionCassetteX = 1
+                ReductionCassette = (
+                    clv.Cassette[clv.CassetteStart] / clv.Cassette[CassetteIndex]
+                )
+
+            if debug.on(debug.Function):
+                if CassetteIndex >= len(clv.Cassette):
+                    i = len(clv.Cassette) - 1
+                else:
+                    i = CassetteIndex
+                logfile.Print(
+                    "gearbox changed: index=%ix%2i ratio=%ix%i R=%3.1f*%3.1f*%3.1f=%3.1f"
+                    % (
+                        CranksetIndex,
+                        CassetteIndex,
+                        clv.Crankset[CranksetIndex],
+                        clv.Cassette[i],
+                        ReductionCrankset,
+                        ReductionCassette,
+                        ReductionCassetteX,
+                        ReductionCrankset * ReductionCassette * ReductionCassetteX,
+                    )
+                )
+
+            TacxTrainer.SetGearboxReduction(
+                ReductionCrankset * ReductionCassette * ReductionCassetteX
+                    )
+
+        self.ReductionCrankset = ReductionCrankset
+        self.ReductionCassette = ReductionCassette
+        self.ReductionCassetteX = ReductionCassetteX
+        self.CranksetIndex = CranksetIndex
+        self.CassetteIndex = CassetteIndex
