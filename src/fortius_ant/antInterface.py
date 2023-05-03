@@ -4,7 +4,7 @@ __version__ = "2023-04-16"
 # 2023-04-16    Rewritten in class based fashion
 
 from fortius_ant.usbTrainer import clsTacxTrainer
-from fortius_any.antDongle import clsAntDongle, msgID_AcknowledgedData, msgID_BroadcastData, msgID_ChannelID
+from fortius_ant.antDongle import clsAntDongle, msgID_AcknowledgedData, msgID_BroadcastData, msgID_ChannelID
 
 class AntInterface:
     """Interface for communicating as an ANT+ device."""
@@ -15,10 +15,10 @@ class AntInterface:
     device_type_id: int
     ant_dongle: clsAntDongle
     master: bool
-    paired = false
+    paired = False
     FortiusAntGui = None
     
-    def __init__(self, master=true):
+    def __init__(self, master=True):
         self.master = master
         
     def set_gui(self, FortiusAntGui):
@@ -72,7 +72,6 @@ class AntInterface:
             and DeviceTypeID == self.device_type_id
         ):
             self.paired = True
-            )
 
     def _handle_broadcast_message(self, data_page_number: int, info: bytes):
         raise NotImplementedError
@@ -83,5 +82,5 @@ class AntInterface:
 class WrongChannel(Exception):
     pass
     
-class UnknownMessageID(Exception)
+class UnknownMessageID(Exception):
     pass 

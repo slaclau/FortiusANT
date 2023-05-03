@@ -758,7 +758,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
 
     AntHRMpaired = False
 
-    gearbox = Gearbox(clv, TacxTrainer)
+    gearbox = Gearbox()
     received_data = ReceivedData()
 
     # ---------------------------------------------------------------------------

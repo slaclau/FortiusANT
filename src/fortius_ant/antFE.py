@@ -35,7 +35,7 @@ class antFE(AntInterface):
     channel = channel_FE
     device_type_id = DeviceTypeID_fitness_equipment
 
-    def __init__(self, master=true):
+    def __init__(self, master=True):
         super().__init__(master)
         self.interleave = None
         self.event_count = None

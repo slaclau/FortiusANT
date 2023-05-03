@@ -32,7 +32,7 @@ class AntHRM(AntInterface):
     channel = channel_HRM
     device_type_id = DeviceTypeID_heart_rate
 
-    def __init__(self, master=true):
+    def __init__(self, master=True):
         super().__init__(master)
         self.interleave = None
         self.heart_beat_counter = None
@@ -114,6 +114,7 @@ class AntHRM(AntInterface):
         if self.paired == True:
             self.FortiusAntGui.SetMessages(
                 HRM="Heart Rate Monitor paired: %s" % DeviceNumber
+            )
 
 
 hrm = AntHRM()

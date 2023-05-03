@@ -24,7 +24,7 @@ class AntSCS(AntInterface):
     channel = channel_SCS
     device_type_id = DeviceTypeID_bike_speed_cadence
 
-    def __init__(self, master=true):
+    def __init__(self, master=True):
         super().__init__(master)
         self.pedal_echo_previous_count = None  # There is no previous
         self.cadence_event_time = None  # Initiate the even variables

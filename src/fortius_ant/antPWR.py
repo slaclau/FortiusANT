@@ -52,7 +52,7 @@ class AntPWR(AntInterface):
     channel = channel_PWR
     device_type_id = DeviceTypeID_bike_power
 
-    def __init__(self, master=true):
+    def __init__(self, master=True):
         super().__init__(master)
         self.interleave = None
         self.accumulated_power = None
