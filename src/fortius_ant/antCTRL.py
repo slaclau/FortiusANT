@@ -21,6 +21,7 @@ SWrevisionMain_CTRL = 1  # char
 SWrevisionSupp_CTRL = 1  # char
 
 channel_CTRL = 6  # ANT+ Channel for Remote Control
+DeviceTypeID_control = 16
 
 # ---------------------------------------------------------------------------
 # ANT+ Control command codes
@@ -58,6 +59,8 @@ class antCTRL(AntInterface):
     """Interface for communicating as an ANT+ control."""
 
     interleave_reset = 129
+    channel = channel_CTRL
+    device_type_id = DeviceTypeID_control
 
     def broadcast_message_from_trainer(self, TacxTrainer: clsTacxTrainer):
         return broadcast_message()

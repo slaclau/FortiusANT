@@ -2,8 +2,8 @@
 # Version info
 # -------------------------------------------------------------------------------
 __version__ = "2022-08-22"
+from dataclasses import dataclass
 import time
-
 import numpy
 import usb.core
 
@@ -223,9 +223,6 @@ import usb.core
 #               - calibration test; done 2020-01-07
 # -------------------------------------------------------------------------------
 from fortius_ant.constants import UseGui, mode_Grade, mode_Power
-
-from datetime import datetime
-
 import fortius_ant.antCTRL as ctrl
 import fortius_ant.antDongle as ant
 import fortius_ant.antFE as fe
@@ -762,6 +759,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
     AntHRMpaired = False
 
     gearbox = Gearbox(clv, TacxTrainer)
+    received_data = ReceivedData()
 
     # ---------------------------------------------------------------------------
     # Command status data
@@ -846,11 +844,8 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
 
     if debug.on(debug.Function):
         logfile.Write("Tacx2Dongle; initialize ANT")
-    fe.Initialize()
-    hrm.Initialize()
-    pwr.Initialize()
-    scs.Initialize()
-    ctrl.Initialize()
+    master_interfaces = [fe.antFE(), hrm.antHRM(), pwr.antPWR(), scs.antSCS(), ctrl.antCTRL()]
+    slave_interfaces = []
 
     # ---------------------------------------------------------------------------
     # Initialize CycleTime: fast for PedalStrokeAnalysis
@@ -1081,54 +1076,8 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
                 # Sending i-Vortex messages is done by Refesh() not here
                 # ---------------------------------------------------------------
 
-                # ---------------------------------------------------------------
-                # Broadcast Heartrate message
-                # ---------------------------------------------------------------
-                if clv.hrm == None and TacxTrainer.HeartRate > 0:
-                    messages.append(hrm.BroadcastHeartrateMessage(HeartRate))
-
-                # ---------------------------------------------------------------
-                # Broadcast Bike Power message
-                # ---------------------------------------------------------------
-                if True:
-                    messages.append(
-                        pwr.BroadcastMessage(
-                            TacxTrainer.CurrentPower, TacxTrainer.Cadence
-                        )
-                    )
-
-                # ---------------------------------------------------------------
-                # Broadcast Speed and Cadence Sensor message
-                # ---------------------------------------------------------------
-                if clv.scs == None:
-                    messages.append(
-                        scs.BroadcastMessage(
-                            TacxTrainer.PedalEchoTime,
-                            TacxTrainer.PedalEchoCount,
-                            TacxTrainer.VirtualSpeedKmh,
-                            TacxTrainer.Cadence,
-                        )
-                    )
-
-                # ---------------------------------------------------------------
-                # Broadcast Controllable message
-                # ---------------------------------------------------------------
-                if True:
-                    messages.append(ctrl.BroadcastControlMessage())
-
-                # ---------------------------------------------------------------
-                # Broadcast TrainerData message to the CTP (Trainer Road, ...)
-                # ---------------------------------------------------------------
-                # print('fe.BroadcastTrainerDataMessage', Cadence, CurrentPower, SpeedKmh, HeartRate)
-                messages.append(
-                    fe.BroadcastTrainerDataMessage(
-                        TacxTrainer.Cadence,
-                        TacxTrainer.CurrentPower,
-                        TacxTrainer.SpeedKmh,
-                        TacxTrainer.HeartRate,
-                    )
-                )
-
+                for ant_interface in master_interfaces:
+                    messages.append(ant_interface.broadcast_message_from_trainer(TacxTrainer))
                 # ---------------------------------------------------------------
                 # Send/receive to Bluetooth interface
                 #
@@ -2153,3 +2102,12 @@ class Gearbox:
         self.ReductionCassetteX = ReductionCassetteX
         self.CranksetIndex = CranksetIndex
         self.CassetteIndex = CassetteIndex
+
+
+@dataclass
+class ReceivedData():
+    def __init__(self):
+        self.HeartRate = None
+        self.Cadence = None
+        self.SpeedKmh = None
+        self.Power = None

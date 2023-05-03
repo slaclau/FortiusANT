@@ -42,14 +42,18 @@ SWrevisionMain_PWR = 1  # char
 SWrevisionSupp_PWR = 1  # char
 
 channel_PWR = 2  # ANT+ Channel for Power Profile
-
+DeviceTypeID_bike_power = 11
 
 class AntPWR(AntInterface):
     """Interface for communicating as an ANT+ power sensor."""
 
     interleave_reset = 121
+    
+    channel = channel_PWR
+    device_type_id = DeviceTypeID_bike_power
 
-    def __init__(self):
+    def __init__(self, master=true):
+        super().__init__(master)
         self.interleave = None
         self.accumulated_power = None
         self.event_count = None

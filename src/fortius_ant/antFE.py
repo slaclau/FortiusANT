@@ -26,14 +26,17 @@ SWrevisionMain_FE = 1  # char
 SWrevisionSupp_FE = 1  # char
 
 channel_FE = 0  # ANT+ channel for Fitness Equipment
-
+DeviceTypeID_fitness_equipment = 17
 
 class antFE(AntInterface):
     """Interface for communicating as an ANT+ Fitness Equipment."""
 
     interleave_reset = 256
+    channel = channel_FE
+    device_type_id = DeviceTypeID_fitness_equipment
 
-    def __init__(self):
+    def __init__(self, master=true):
+        super().__init__(master)
         self.interleave = None
         self.event_count = None
         self.accumulated_power = None

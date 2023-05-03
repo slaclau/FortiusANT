@@ -15,14 +15,17 @@ from fortius_ant.antPage import SCSPage
 from fortius_ant.usbTrainer import clsTacxTrainer
 
 channel_SCS = 3  # ANT+ Channel for Speed Cadence Sensor
-
+DeviceTypeID_bike_speed_cadence = 121
 
 class AntSCS(AntInterface):
     """Interface for communicating as a speed and cadence sensor."""
 
     interleave_reset = 0
+    channel = channel_SCS
+    device_type_id = DeviceTypeID_bike_speed_cadence
 
-    def __init__(self):
+    def __init__(self, master=true):
+        super().__init__(master)
         self.pedal_echo_previous_count = None  # There is no previous
         self.cadence_event_time = None  # Initiate the even variables
         self.cadence_event_count = None

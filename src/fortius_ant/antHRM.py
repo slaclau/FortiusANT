@@ -23,14 +23,17 @@ HWrevision_HRM = 1  # char
 SWversion_HRM = 1  # char
 
 channel_HRM = 1  # ANT+ channel for Heart Rate Monitor
-
+DeviceTypeID_heart_rate = 120
 
 class AntHRM(AntInterface):
     """Interface for communicating as an ANT+ HRM."""
 
     interleave_reset = 256
+    channel = channel_HRM
+    device_type_id = DeviceTypeID_heart_rate
 
-    def __init__(self):
+    def __init__(self, master=true):
+        super().__init__(master)
         self.interleave = None
         self.heart_beat_counter = None
         self.heart_beat_event_time = None
@@ -105,6 +108,12 @@ class AntHRM(AntInterface):
             int(HeartRate),
         )
         return AntMessage.compose(msgID_BroadcastData, page)
+        
+    def _handle_channel_id_message(info):
+        super()._handle_channel_id_message(info)
+        if self.paired == True:
+            self.FortiusAntGui.SetMessages(
+                HRM="Heart Rate Monitor paired: %s" % DeviceNumber
 
 
 hrm = AntHRM()
