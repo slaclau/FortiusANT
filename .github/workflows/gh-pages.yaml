@@ -43,6 +43,7 @@ jobs:
           pip install -e .
       - name: Write to jsons
         run: |
+          source ../venv/bin/activate
           mkdir docs
           mkdir docs/api
           mkdir docs/api/version
