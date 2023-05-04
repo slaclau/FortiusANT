@@ -808,12 +808,12 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
 
     if debug.on(debug.Function):
         logfile.Write("Tacx2Dongle; initialize ANT")
- 
+
     ant_fe = fe.AntFE()
     ant_fe.set_clv(clv)
     ant_fe.set_received_data(received_data)
     ant_fe.set_trainer(TacxTrainer)
- 
+
     if clv.HRM > 0:
         ant_hrm = hrm.AntHRM(False)
         ant_hrm.set_received_data(received_data)
@@ -823,7 +823,7 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
     ant_pwr = pwr.AntPWR()
     ant_scs = pwr.AntSCS()
     ant_ctrl = pwr.AntCTRL()
-    
+
     interfaces = [ant_fe, ant_hrm, ant_pwr, ant_scs, ant_ctrl]
     # ---------------------------------------------------------------------------
     # Initialize CycleTime: fast for PedalStrokeAnalysis
@@ -909,9 +909,19 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
             # -------------------------------------------------------------------
             if QuarterSecond:
                 FortiusAntGui.SetLeds(
-                    received_data.antEvent, received_data.bleEvent, pedalEvent, None, TacxTrainer.tacxEvent
+                    received_data.antEvent,
+                    received_data.bleEvent,
+                    pedalEvent,
+                    None,
+                    TacxTrainer.tacxEvent,
                 )
-                rpi.SetLeds(received_data.antEvent, received_data.bleEvent, pedalEvent, None, TacxTrainer.tacxEvent)
+                rpi.SetLeds(
+                    received_data.antEvent,
+                    received_data.bleEvent,
+                    pedalEvent,
+                    None,
+                    TacxTrainer.tacxEvent,
+                )
                 if rpi.CheckShutdown(FortiusAntGui):
                     FortiusAntGui.RunningSwitch = False
 
@@ -961,7 +971,9 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
             # -------------------------------------------------------------------
             # Store in JSON format
             # -------------------------------------------------------------------
-            logfile.WriteJson(QuarterSecond, TacxTrainer, tcx, received_data.get("HeartRate"))
+            logfile.WriteJson(
+                QuarterSecond, TacxTrainer, tcx, received_data.get("HeartRate")
+            )
 
             # -------------------------------------------------------------------
             # Pedal Stroke Analysis
@@ -1042,10 +1054,9 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
                         messages.append(
                             ant_interface.broadcast_message_from_trainer(TacxTrainer)
                         )
- 
+
                 if clv.ble:
                     _handle_bleCTP(received_data, Steering)
-
 
             # -------------------------------------------------------------------
             # Broadcast and receive ANT+ responses
@@ -1054,7 +1065,7 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
                 AntDongle.Write(messages, True, False, flush)
                 flush = False
                 # antEvent is not set here; only for data on FE-C channel
-                
+
             while AntDongle.MessageQueueSize() > 0:
                 d = AntDongle.MessageQueueGet()
 
@@ -1201,9 +1212,19 @@ def _calibrate_if_possible(FortiusAntGui, rpi, Restart, received_data):
             TacxTrainer.Refresh(True, usbTrainer.modeCalibrate)
 
             FortiusAntGui.SetLeds(
-                received_data.antEvent, received_data.bleEvent, pedalEvent, None, TacxTrainer.tacxEvent
+                received_data.antEvent,
+                received_data.bleEvent,
+                pedalEvent,
+                None,
+                TacxTrainer.tacxEvent,
             )
-            rpi.SetLeds(received_data.antEvent, received_data.bleEvent, pedalEvent, None, TacxTrainer.tacxEvent)
+            rpi.SetLeds(
+                received_data.antEvent,
+                received_data.bleEvent,
+                pedalEvent,
+                None,
+                TacxTrainer.tacxEvent,
+            )
             if rpi.CheckShutdown(FortiusAntGui):
                 FortiusAntGui.RunningSwitch = False
 
@@ -1527,7 +1548,7 @@ def _handle_bleCTP(received_data: ReceivedData, Steering):
     bleCTP.SetTrainerData(
         received_data.get("SpeedKmh"),
         received_data.get("Cadence"),
-        received_data.get("CurrentPower")
+        received_data.get("CurrentPower"),
     )
 
     if Steering is not None:
@@ -1552,11 +1573,7 @@ def _handle_bleCTP(received_data: ReceivedData, Steering):
 
                 TacxTrainer.SetGrade(Grade)
 
-        if (
-            bleCTP.WindResistance
-            and bleCTP.WindSpeed
-            and bleCTP.DraftingFactor
-        ):
+        if bleCTP.WindResistance and bleCTP.WindSpeed and bleCTP.DraftingFactor:
             TacxTrainer.SetWind(
                 bleCTP.WindResistance,
                 bleCTP.WindSpeed,

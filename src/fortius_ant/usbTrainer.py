@@ -4033,7 +4033,7 @@ class clsTacxNewUsbTrainer(clsTacxUsbTrainer):
         if debug.on(debug.Function):
             logfile.Write("... returns %s" % rtn)
         return rtn
-        
+
 
 @dataclass
 class ReceivedData:

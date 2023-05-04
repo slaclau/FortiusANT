@@ -218,9 +218,7 @@ class AntFE(AntInterface):
             # Update "last command" data in case page 71 is requested later
             self.p71_LastReceivedCommandID = data_page_number
             # wrap around after 254 (255 = no command received)
-            self.p71_SequenceNr = (
-                self.p71_SequenceNr + 1
-            ) % 255
+            self.p71_SequenceNr = (self.p71_SequenceNr + 1) % 255
             self.p71_CommandStatus = 0  # successfully processed
             # echo raw command data (cannot use unpage, unpage does unit conversion etc)
             self.p71_Data2 = 0xFF
@@ -239,9 +237,7 @@ class AntFE(AntInterface):
             # Update "last command" data in case page 71 is requested later
             self.p71_LastReceivedCommandID = data_page_number
             # wrap around after 254 (255 = no command received)
-            self.p71_SequenceNr = (
-                self.p71_SequenceNr + 1
-            ) % 255
+            self.p71_SequenceNr = (self.p71_SequenceNr + 1) % 255
             self.p71_CommandStatus = 0  # successfully processed
             # echo raw command data (cannot use unpage, unpage does unit conversion etc)
             self.p71_Data2 = 0xFF
@@ -262,9 +258,7 @@ class AntFE(AntInterface):
             # Update "last command" data in case page 71 is requested later
             self.p71_LastReceivedCommandID = data_page_number
             # wrap around after 254 (255 = no command received)
-            self.p71_SequenceNr = (
-                self.p71_SequenceNr + 1
-            ) % 255
+            self.p71_SequenceNr = (self.p71_SequenceNr + 1) % 255
             self.p71_CommandStatus = 0  # successfully processed
             # echo raw command data (cannot use unpage, unpage does unit conversion etc)
             self.p71_Data2 = info[6]  # wind resistance coefficient
@@ -320,9 +314,7 @@ class AntFE(AntInterface):
             # Update "last command" data in case page 71 is requested later
             self.p71_LastReceivedCommandID = data_page_number
             # wrap around after 254 (255 = no command received)
-            self.p71_SequenceNr = (
-                self.p71_SequenceNr + 1
-            ) % 255
+            self.p71_SequenceNr = (self.p71_SequenceNr + 1) % 255
             self.p71_CommandStatus = 0  # successfully processed
             # echo raw command data (cannot use unpage, unpage does unit conversion etc)
             self.p71_Data2 = info[6]  # target grade (LSB)

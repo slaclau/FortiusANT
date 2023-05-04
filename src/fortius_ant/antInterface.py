@@ -35,7 +35,7 @@ class AntInterface:
 
     def __init__(self, master=True):
         self.master = master
-        
+
         self.p71_LastReceivedCommandID = 255
         self.p71_SequenceNr = 255
         self.p71_CommandStatus = 255
