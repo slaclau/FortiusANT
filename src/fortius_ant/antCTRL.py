@@ -110,8 +110,7 @@ class AntCTRL(AntInterface):
             self.p71_SequenceNr = SequenceNr
             self.p71_CommandStatus = 0  # successfully processed
             self.p71_Data1 = ctrl_CommandNr & 0x00FF
-            self.
-p71_Data2 = (ctrl_CommandNr & 0xFF00) >> 8
+            self.p71_Data2 = (ctrl_CommandNr & 0xFF00) >> 8
             self.p71_Data3 = 0xFF
             self.p71_Data4 = 0xFF
 
