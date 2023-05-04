@@ -154,6 +154,7 @@ import random
 import struct
 import sys
 import time
+from dataclasses import dataclass
 from enum import Enum
 
 import lib_programname
@@ -4032,3 +4033,42 @@ class clsTacxNewUsbTrainer(clsTacxUsbTrainer):
         if debug.on(debug.Function):
             logfile.Write("... returns %s" % rtn)
         return rtn
+        
+
+@dataclass
+class ReceivedData:
+    def __init__(self, TacxTrainer):
+        self.TacxTrainer = TacxTrainer
+        self.HeartRate = None
+        self.Cadence = None
+        self.SpeedKmh = None
+        self.VirtualSpeedKmh = None
+        self.Power = None
+        self.ctrl_commands = []
+        self.CTP_command_time = 0
+        self.ant_event = False
+
+        # ---------------------------------------------------------------------------
+        # Command status data for ANT Control
+        # ---------------------------------------------------------------------------
+        self.ctrl_p71_LastReceivedCommandID = 255
+        self.ctrl_p71_SequenceNr = 255
+        self.ctrl_p71_CommandStatus = 255
+        self.ctrl_p71_Data1 = 0xFF
+        self.ctrl_p71_Data2 = 0xFF
+        self.ctrl_p71_Data3 = 0xFF
+        self.ctrl_p71_Data4 = 0xFF
+
+        self.PowerModeActive = None
+
+    def get(self, attribute):
+        """Get receieved data if present otherwise get trainer data."""
+        return (
+            getattr(self, attribute)
+            if getattr(self, attribute) is not None
+            else getattr(self.TacxTrainer, attribute)
+        )
+
+    def set(self, attribute, value):
+        """Set received data."""
+        setattr(self, attribute, value)

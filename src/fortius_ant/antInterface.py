@@ -3,9 +3,8 @@
 __version__ = "2023-04-16"
 # 2023-04-16    Rewritten in class based fashion
 
-from fortius_ant.FortiusAntBody import ReceivedData
 from fortius_ant.FortiusAntCommand import CommandLineVariables
-from fortius_ant.usbTrainer import clsTacxTrainer
+from fortius_ant.usbTrainer import clsTacxTrainer, ReceivedData
 from fortius_ant.antDongle import (
     clsAntDongle,
     unmsg51_ChannelID,
