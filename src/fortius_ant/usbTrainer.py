@@ -4048,17 +4048,6 @@ class ReceivedData:
         self.CTP_command_time = 0
         self.ant_event = False
 
-        # ---------------------------------------------------------------------------
-        # Command status data for ANT Control
-        # ---------------------------------------------------------------------------
-        self.ctrl_p71_LastReceivedCommandID = 255
-        self.ctrl_p71_SequenceNr = 255
-        self.ctrl_p71_CommandStatus = 255
-        self.ctrl_p71_Data1 = 0xFF
-        self.ctrl_p71_Data2 = 0xFF
-        self.ctrl_p71_Data3 = 0xFF
-        self.ctrl_p71_Data4 = 0xFF
-
         self.PowerModeActive = None
 
     def get(self, attribute):

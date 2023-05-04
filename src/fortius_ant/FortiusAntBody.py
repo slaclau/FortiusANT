@@ -759,47 +759,19 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
     assert TacxTrainer  # The class must be created
     assert bleCTP  # The class must be created
 
-    AntHRMpaired = False
-
     gearbox = Gearbox()
     received_data = ReceivedData(TacxTrainer)
 
-    # ---------------------------------------------------------------------------
-    # Command status data
-    # ---------------------------------------------------------------------------
-    p71_LastReceivedCommandID = 255
-    p71_SequenceNr = 255
-    p71_CommandStatus = 255
-    p71_Data1 = 0xFF
-    p71_Data2 = 0xFF
-    p71_Data3 = 0xFF
-    p71_Data4 = 0xFF
-
     ctrl_Commands = []  # Containing tuples (manufacturer, serial, CommandNr)
 
-    # ---------------------------------------------------------------------------
-    # Info from ANT slave channels
-    # ---------------------------------------------------------------------------
-    HeartRate = 0  # This field is displayed
-    # We have two sources: the trainer or
-    # our own HRM slave channel.
-    # Cadence        = 0         # Analogously for Speed Cadence Sensor
-    # But is not yet implemented
-    # ---------------------------------------------------------------------------
-    # Pedal stroke Analysis
-    # ---------------------------------------------------------------------------
     pdaInfo = []  # Collection of (time, power)
     LastPedalEcho = 0  # Flag that cadence sensor was seen
 
     AntDongle.initialize(clv, TacxTrainer)
     Steering = AntDongle.Steering
     BlackTrack = AntDongle.BlackTrack
-    # ---------------------------------------------------------------------------
-    # Loop control
-    # ---------------------------------------------------------------------------
-    EventCounter = 0
 
-    _calibrate_if_possible(FortiusAntGui, rpi, Restart)
+    _calibrate_if_possible(FortiusAntGui, rpi, Restart, received_data)
 
     # ---------------------------------------------------------------------------
     # Initialize variables
@@ -836,19 +808,23 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
 
     if debug.on(debug.Function):
         logfile.Write("Tacx2Dongle; initialize ANT")
-    master_interfaces = [
-        fe.AntFE(),
-        hrm.AntHRM(),
-        pwr.AntPWR(),
-        scs.AntSCS(),
-        ctrl.AntCTRL(),
-    ]
-    slave_interfaces = []
+ 
+    ant_fe = fe.AntFE()
+    ant_fe.set_clv(clv)
+    ant_fe.set_received_data(received_data)
+    ant_fe.set_trainer(TacxTrainer)
+ 
     if clv.HRM > 0:
-        slave_hrm = hrm.AntHRM(False)
-        slave_hrm.set_received_data(received_data)
-        slave_interfaces.append(slave_hrm)
+        ant_hrm = hrm.AntHRM(False)
+        ant_hrm.set_received_data(received_data)
+    else:
+        ant_hrm = hrm.AntHRM()
 
+    ant_pwr = pwr.AntPWR()
+    ant_scs = pwr.AntSCS()
+    ant_ctrl = pwr.AntCTRL()
+    
+    interfaces = [ant_fe, ant_hrm, ant_pwr, ant_scs, ant_ctrl]
     # ---------------------------------------------------------------------------
     # Initialize CycleTime: fast for PedalStrokeAnalysis
     # ---------------------------------------------------------------------------
@@ -889,7 +865,6 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
     # ---------------------------------------------------------------------------
     flush = True
     bleEvent = False
-    antEvent = False
     pedalEvent = False
     TacxTrainer.tacxEvent = False
     TacxMessage = ""
@@ -920,8 +895,8 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
             # Update displayed status; most relevant for Console-mode.
             # Also the DisplayState texts may have changed (due to trainer state)
             # -------------------------------------------------------------------
-            if TacxMessage != TacxTrainer.Message + PowerModeActive:
-                TacxMessage = TacxTrainer.Message + PowerModeActive
+            if TacxMessage != TacxTrainer.Message + received_data.PowerModeActive:
+                TacxMessage = TacxTrainer.Message + received_data.PowerModeActive
                 FortiusAntGui.SetMessages(Tacx=TacxMessage)
                 rpi.DisplayState(constants.faOperational, TacxTrainer)
 
@@ -934,9 +909,9 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
             # -------------------------------------------------------------------
             if QuarterSecond:
                 FortiusAntGui.SetLeds(
-                    antEvent, bleEvent, pedalEvent, None, TacxTrainer.tacxEvent
+                    received_data.antEvent, received_data.bleEvent, pedalEvent, None, TacxTrainer.tacxEvent
                 )
-                rpi.SetLeds(antEvent, bleEvent, pedalEvent, None, TacxTrainer.tacxEvent)
+                rpi.SetLeds(received_data.antEvent, received_data.bleEvent, pedalEvent, None, TacxTrainer.tacxEvent)
                 if rpi.CheckShutdown(FortiusAntGui):
                     FortiusAntGui.RunningSwitch = False
 
@@ -947,8 +922,8 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
                 elif rpi.buttonDown:
                     TacxTrainer.Buttons = usbTrainer.DownButton
 
-                bleEvent = False
-                antEvent = False
+                received_data.bleEvent = False
+                received_data.antEvent = False
                 pedalEvent = False
                 TacxTrainer.tacxEvent = False
                 rpi.buttonUp = False
@@ -986,7 +961,7 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
             # -------------------------------------------------------------------
             # Store in JSON format
             # -------------------------------------------------------------------
-            logfile.WriteJson(QuarterSecond, TacxTrainer, tcx, HeartRate)
+            logfile.WriteJson(QuarterSecond, TacxTrainer, tcx, received_data.get("HeartRate"))
 
             # -------------------------------------------------------------------
             # Pedal Stroke Analysis
@@ -1010,7 +985,7 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
             # -------------------------------------------------------------------
             # Handle Control command
             # -------------------------------------------------------------------
-            if len(ctrl_Commands):
+            if len(received_data.ctrl_commands):
                 (
                     ctrl_SlaveManufacturerID,
                     ctrl_SlaveSerialNumber,
@@ -1062,59 +1037,15 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
                 # Sending i-Vortex messages is done by Refesh() not here
                 # ---------------------------------------------------------------
 
-                for ant_interface in master_interfaces:
-                    messages.append(
-                        ant_interface.broadcast_message_from_trainer(TacxTrainer)
-                    )
-                # ---------------------------------------------------------------
-                # Send/receive to Bluetooth interface
-                #
-                # When data is received, TacxTrainer parameters are copied from
-                # the bleCTP object.
-                # ---------------------------------------------------------------
+                for ant_interface in interfaces:
+                    if ant_interface.master:
+                        messages.append(
+                            ant_interface.broadcast_message_from_trainer(TacxTrainer)
+                        )
+ 
                 if clv.ble:
-                    bleCTP.SetAthleteData(HeartRate)
-                    bleCTP.SetTrainerData(
-                        TacxTrainer.SpeedKmh,
-                        TacxTrainer.Cadence,
-                        TacxTrainer.CurrentPower,
-                    )
+                    _handle_bleCTP(received_data, Steering)
 
-                    if Steering is not None:
-                        bleCTP.SetSteeringAngle(Steering.Angle)
-
-                    if bleCTP.Refresh():
-                        bleEvent = True
-                        CTPcommandTime = time.time()
-                        if bleCTP.TargetMode == mode_Power:
-                            TargetPowerTime = time.time()
-                            TacxTrainer.SetPower(bleCTP.TargetPower)
-
-                        if bleCTP.TargetMode == mode_Grade:
-                            if clv.PowerMode and (time.time() - TargetPowerTime) < 30:
-                                pass
-                            else:
-                                Grade = bleCTP.TargetGrade
-                                Grade += clv.GradeShift
-                                Grade *= clv.GradeFactor
-                                if Grade < 0:
-                                    Grade *= clv.GradeFactorDH
-
-                                TacxTrainer.SetGrade(Grade)
-
-                        if (
-                            bleCTP.WindResistance
-                            and bleCTP.WindSpeed
-                            and bleCTP.DraftingFactor
-                        ):
-                            TacxTrainer.SetWind(
-                                bleCTP.WindResistance,
-                                bleCTP.WindSpeed,
-                                bleCTP.DraftingFactor,
-                            )
-
-                        if bleCTP.RollingResistance:
-                            TacxTrainer.SetRollingResistance(bleCTP.RollingResistance)
 
             # -------------------------------------------------------------------
             # Broadcast and receive ANT+ responses
@@ -1123,19 +1054,7 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
                 AntDongle.Write(messages, True, False, flush)
                 flush = False
                 # antEvent is not set here; only for data on FE-C channel
-
-            # -------------------------------------------------------------------
-            # Here all response from the ANT dongle are processed (receive=True)
-            #
-            # Commands from dongle that are expected are:
-            # - TargetGradeFromDongle or TargetPowerFromDongle
-            # - Information from HRM (if paired)
-            # - Information from i-Vortex (if paired)
-            #
-            # Input is grouped by messageID, then channel. This has little
-            # practical impact; grouping by Channel would enable to handle all
-            # ANT in a channel (device) module. No advantage today.
-            # -------------------------------------------------------------------
+                
             while AntDongle.MessageQueueSize() > 0:
                 d = AntDongle.MessageQueueGet()
 
@@ -1159,16 +1078,16 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
                     if BlackTrack.HandleAntMessage(d):
                         continue
 
-                for slave_interface in slave_interfaces:
+                for ant_interface in interfaces:
                     try:
-                        slave_interface.handle_received_info(
+                        ant_interface.handle_received_info(
                             Channel, id, DataPageNumber, info
                         )
 
                     except WrongChannel:
                         pass
 
-                if error and (PrintWarnings or debug.on(debug.Data1)):
+                if error and debug.on(debug.Data1):
                     logfile.Write(
                         f"ANT Dongle:{error}: synch={synch}, len={length}, id={hex(id)}"
                         f", check={checksum}, channel={Channel}, page={DataPageNumber}"
@@ -1193,9 +1112,6 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
                         % (ElapsedTime, SleepTime * -1, CycleTime)
                     )
                 pass
-
-            EventCounter += 1  # Increment and ...
-            EventCounter &= 0xFF  # maximize to 255
 
     except KeyboardInterrupt:
         logfile.Console("Stopped")
@@ -1226,7 +1142,7 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
     return True
 
 
-def _calibrate_if_possible(FortiusAntGui, rpi, Restart):
+def _calibrate_if_possible(FortiusAntGui, rpi, Restart, received_data):
     # ---------------------------------------------------------------------------
     # During calibration, save powerfactor to avoid undesired correction.
     # ---------------------------------------------------------------------------
@@ -1255,8 +1171,8 @@ def _calibrate_if_possible(FortiusAntGui, rpi, Restart):
     StartPedaling = True
     Counter = 0
 
-    bleEvent = False
-    antEvent = False
+    received_data.bleEvent = False
+    received_data.antEvent = False
     pedalEvent = False
     TacxTrainer.tacxEvent = False
 
@@ -1285,9 +1201,9 @@ def _calibrate_if_possible(FortiusAntGui, rpi, Restart):
             TacxTrainer.Refresh(True, usbTrainer.modeCalibrate)
 
             FortiusAntGui.SetLeds(
-                antEvent, bleEvent, pedalEvent, None, TacxTrainer.tacxEvent
+                received_data.antEvent, received_data.bleEvent, pedalEvent, None, TacxTrainer.tacxEvent
             )
-            rpi.SetLeds(antEvent, bleEvent, pedalEvent, None, TacxTrainer.tacxEvent)
+            rpi.SetLeds(received_data.antEvent, received_data.bleEvent, pedalEvent, None, TacxTrainer.tacxEvent)
             if rpi.CheckShutdown(FortiusAntGui):
                 FortiusAntGui.RunningSwitch = False
 
@@ -1387,15 +1303,15 @@ def _calibrate_if_possible(FortiusAntGui, rpi, Restart):
                 # ---------------------------------------------------------------
                 # While calibrating: blink ANT/BLE
                 # ---------------------------------------------------------------
-                antEvent = True
-                bleEvent = True
+                received_data.antEvent = True
+                received_data.bleEvent = True
                 pedalEvent = False
             else:
                 # ---------------------------------------------------------------
                 # While waiting for pedal-kick: blink ANT/BLE/Cadence
                 # ---------------------------------------------------------------
-                antEvent = True
-                bleEvent = True
+                received_data.antEvent = True
+                received_data.bleEvent = True
                 pedalEvent = True
 
             # -------------------------------------------------------------------
@@ -1545,9 +1461,9 @@ class Gearbox:
         self.CranksetIndex = CranksetIndex
         self.CassetteIndex = CassetteIndex
 
-        self.set_reduction(ReductionChanged)
+        self._set_reduction(ReductionChanged)
 
-    def set_reduction(self, ReductionChanged):
+    def _set_reduction(self, ReductionChanged):
         ReductionCrankset = self.ReductionCrankset
         ReductionCassette = self.ReductionCassette
         ReductionCassetteX = self.ReductionCassetteX
@@ -1604,3 +1520,48 @@ class Gearbox:
         self.ReductionCassetteX = ReductionCassetteX
         self.CranksetIndex = CranksetIndex
         self.CassetteIndex = CassetteIndex
+
+
+def _handle_bleCTP(received_data: ReceivedData, Steering):
+    bleCTP.SetAthleteData(received_data.get("HeartRate"))
+    bleCTP.SetTrainerData(
+        received_data.get("SpeedKmh"),
+        received_data.get("Cadence"),
+        received_data.get("CurrentPower")
+    )
+
+    if Steering is not None:
+        bleCTP.SetSteeringAngle(Steering.Angle)
+
+    if bleCTP.Refresh():
+        received_data.bleEvent = True
+        received_data.CTPcommandTime = time.time()
+        if bleCTP.TargetMode == mode_Power:
+            TargetPowerTime = time.time()
+            TacxTrainer.SetPower(bleCTP.TargetPower)
+
+        if bleCTP.TargetMode == mode_Grade:
+            if clv.PowerMode and (time.time() - TargetPowerTime) < 30:
+                pass
+            else:
+                Grade = bleCTP.TargetGrade
+                Grade += clv.GradeShift
+                Grade *= clv.GradeFactor
+                if Grade < 0:
+                    Grade *= clv.GradeFactorDH
+
+                TacxTrainer.SetGrade(Grade)
+
+        if (
+            bleCTP.WindResistance
+            and bleCTP.WindSpeed
+            and bleCTP.DraftingFactor
+        ):
+            TacxTrainer.SetWind(
+                bleCTP.WindResistance,
+                bleCTP.WindSpeed,
+                bleCTP.DraftingFactor,
+            )
+
+        if bleCTP.RollingResistance:
+            TacxTrainer.SetRollingResistance(bleCTP.RollingResistance)

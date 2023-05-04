@@ -35,6 +35,14 @@ class AntInterface:
 
     def __init__(self, master=True):
         self.master = master
+        
+        self.p71_LastReceivedCommandID = 255
+        self.p71_SequenceNr = 255
+        self.p71_CommandStatus = 255
+        self.p71_Data1 = 0xFF
+        self.p71_Data2 = 0xFF
+        self.p71_Data3 = 0xFF
+        self.p71_Data4 = 0xFF
 
     def set_gui(self, gui):
         """Assign a GUI instance to the interface."""

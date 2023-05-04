@@ -216,16 +216,16 @@ class AntFE(AntInterface):
             self.trainer.SetWind(0.51, 0.0, 1.0)
 
             # Update "last command" data in case page 71 is requested later
-            self.received_data.p71_LastReceivedCommandID = data_page_number
+            self.p71_LastReceivedCommandID = data_page_number
             # wrap around after 254 (255 = no command received)
-            self.received_data.p71_SequenceNr = (
-                self.received_data.p71_SequenceNr + 1
+            self.p71_SequenceNr = (
+                self.p71_SequenceNr + 1
             ) % 255
-            self.received_data.p71_CommandStatus = 0  # successfully processed
+            self.p71_CommandStatus = 0  # successfully processed
             # echo raw command data (cannot use unpage, unpage does unit conversion etc)
-            self.received_data.p71_Data2 = 0xFF
-            self.received_data.p71_Data3 = 0xFF
-            self.received_data.p71_Data4 = info[8]  # target resistance
+            self.p71_Data2 = 0xFF
+            self.p71_Data3 = 0xFF
+            self.p71_Data4 = info[8]  # target resistance
             return None
         # -------------------------------------------------------
         # Data page 49 (0x31) Target Power
@@ -237,16 +237,16 @@ class AntFE(AntInterface):
                 logfile.Write("PowerMode: TargetPower info received - timestamp set")
 
             # Update "last command" data in case page 71 is requested later
-            self.received_data.p71_LastReceivedCommandID = data_page_number
+            self.p71_LastReceivedCommandID = data_page_number
             # wrap around after 254 (255 = no command received)
-            self.received_data.p71_SequenceNr = (
-                self.received_data.p71_SequenceNr + 1
+            self.p71_SequenceNr = (
+                self.p71_SequenceNr + 1
             ) % 255
-            self.received_data.p71_CommandStatus = 0  # successfully processed
+            self.p71_CommandStatus = 0  # successfully processed
             # echo raw command data (cannot use unpage, unpage does unit conversion etc)
-            self.received_data.p71_Data2 = 0xFF
-            self.received_data.p71_Data3 = info[7]  # target power (LSB)
-            self.received_data.p71_Data4 = info[8]  # target power (MSB)
+            self.p71_Data2 = 0xFF
+            self.p71_Data3 = info[7]  # target power (LSB)
+            self.p71_Data4 = info[8]  # target power (MSB)
             return None
         # -------------------------------------------------------
         # Data page 50 (0x32) Wind Resistance
@@ -260,16 +260,16 @@ class AntFE(AntInterface):
             self.trainer.SetWind(WindResistance, WindSpeed, DraftingFactor)
 
             # Update "last command" data in case page 71 is requested later
-            self.received_data.p71_LastReceivedCommandID = data_page_number
+            self.p71_LastReceivedCommandID = data_page_number
             # wrap around after 254 (255 = no command received)
-            self.received_data.p71_SequenceNr = (
-                self.received_data.p71_SequenceNr + 1
+            self.p71_SequenceNr = (
+                self.p71_SequenceNr + 1
             ) % 255
-            self.received_data.p71_CommandStatus = 0  # successfully processed
+            self.p71_CommandStatus = 0  # successfully processed
             # echo raw command data (cannot use unpage, unpage does unit conversion etc)
-            self.received_data.p71_Data2 = info[6]  # wind resistance coefficient
-            self.received_data.p71_Data3 = info[7]  # wind speed
-            self.received_data.p71_Data4 = info[8]  # drafting factor
+            self.p71_Data2 = info[6]  # wind resistance coefficient
+            self.p71_Data3 = info[7]  # wind speed
+            self.p71_Data4 = info[8]  # drafting factor
             return None
         # -------------------------------------------------------
         # Data page 51 (0x33) Track resistance
@@ -318,16 +318,16 @@ class AntFE(AntInterface):
                 self.received_data.PowerModeActive = ""
 
             # Update "last command" data in case page 71 is requested later
-            self.received_data.p71_LastReceivedCommandID = data_page_number
+            self.p71_LastReceivedCommandID = data_page_number
             # wrap around after 254 (255 = no command received)
-            self.received_data.p71_SequenceNr = (
-                self.received_data.p71_SequenceNr + 1
+            self.p71_SequenceNr = (
+                self.p71_SequenceNr + 1
             ) % 255
-            self.received_data.p71_CommandStatus = 0  # successfully processed
+            self.p71_CommandStatus = 0  # successfully processed
             # echo raw command data (cannot use unpage, unpage does unit conversion etc)
-            self.received_data.p71_Data2 = info[6]  # target grade (LSB)
-            self.received_data.p71_Data3 = info[7]  # target grade (MSB)
-            self.received_data.p71_Data4 = info[8]  # rolling resistance coefficient
+            self.p71_Data2 = info[6]  # target grade (LSB)
+            self.p71_Data3 = info[7]  # target grade (MSB)
+            self.p71_Data4 = info[8]  # rolling resistance coefficient
             return None
         # -------------------------------------------------------
         # Data page 55 User configuration
@@ -373,13 +373,13 @@ class AntFE(AntInterface):
             elif RequestedPageNumber == 71:
                 info = msgPage71_CommandStatus(
                     self.channel,
-                    self.received_data.p71_LastReceivedCommandID,
-                    self.received_data.p71_SequenceNr,
-                    self.received_data.p71_CommandStatus,
-                    self.received_data.p71_Data1,
-                    self.received_data.p71_Data2,
-                    self.received_data.p71_Data3,
-                    self.received_data.p71_Data4,
+                    self.p71_LastReceivedCommandID,
+                    self.p71_SequenceNr,
+                    self.p71_CommandStatus,
+                    self.p71_Data1,
+                    self.p71_Data2,
+                    self.p71_Data3,
+                    self.p71_Data4,
                 )
 
             elif RequestedPageNumber == 80:

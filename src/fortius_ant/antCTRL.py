@@ -106,13 +106,14 @@ class AntCTRL(AntInterface):
             ) = msgUnpage73_GenericCommand(info)
 
             # Update "last command" data in case page 71 is requested later
-            self.received_data.ctrl_p71_LastReceivedCommandID = data_page_number
-            self.received_data.ctrl_p71_SequenceNr = SequenceNr
-            self.received_data.ctrl_p71_CommandStatus = 0  # successfully processed
-            self.received_data.ctrl_p71_Data1 = ctrl_CommandNr & 0x00FF
-            self.received_data.ctrl_p71_Data2 = (ctrl_CommandNr & 0xFF00) >> 8
-            self.received_data.ctrl_p71_Data3 = 0xFF
-            self.received_data.ctrl_p71_Data4 = 0xFF
+            self.p71_LastReceivedCommandID = data_page_number
+            self.p71_SequenceNr = SequenceNr
+            self.p71_CommandStatus = 0  # successfully processed
+            self.p71_Data1 = ctrl_CommandNr & 0x00FF
+            self.
+p71_Data2 = (ctrl_CommandNr & 0xFF00) >> 8
+            self.p71_Data3 = 0xFF
+            self.p71_Data4 = 0xFF
 
             # ---------------------------------------------------
             # Commands should not overwrite, therefore stored
@@ -152,13 +153,13 @@ class AntCTRL(AntInterface):
             if RequestedPageNumber == 71:
                 info = msgPage71_CommandStatus(
                     self.channel,
-                    self.received_data.ctrl_p71_LastReceivedCommandID,
-                    self.received_data.ctrl_p71_SequenceNr,
-                    self.received_data.ctrl_p71_CommandStatus,
-                    self.received_data.ctrl_p71_Data1,
-                    self.received_data.ctrl_p71_Data2,
-                    self.received_data.ctrl_p71_Data3,
-                    self.received_data.ctrl_p71_Data4,
+                    self.p71_LastReceivedCommandID,
+                    self.p71_SequenceNr,
+                    self.p71_CommandStatus,
+                    self.p71_Data1,
+                    self.p71_Data2,
+                    self.p71_Data3,
+                    self.p71_Data4,
                 )
             else:
                 raise UnsupportedPage
