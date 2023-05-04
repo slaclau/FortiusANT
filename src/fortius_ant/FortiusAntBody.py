@@ -1,3 +1,4 @@
+"""Main program to imterface between various elements."""
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
@@ -205,21 +206,6 @@ import usb.core
 #
 #               The trainer is transmitted as a tacx. If the heartrate is
 #               detected on the trainer, the HRM is transmitted as a garmin.
-#
-#               Todo:
-#               - why is HeartRate not sent to Trainer Road directly but is a
-#                   separate HRM channel needed?
-#                   (see function ComposeGeneralFeInfo)
-#                   done - 2020-02-09: Because TrainerRoad and/or Zwift expect an
-#                       independant ANT+ HRM
-#               - read buttons from trainer and navigate through menu
-#                   (see function IdleFunction)
-#                   done - 2019-12-20
-#
-#               Tests (and extensions) to be done:
-#               - test with Trainer Road, resistance mode; done 2019-12-19
-#               - test with Zwift; done 2019-12-24
-#               - calibration test; done 2020-01-07
 # -------------------------------------------------------------------------------
 from fortius_ant.constants import mode_Grade, mode_Power
 import fortius_ant.antCTRL as ctrl
@@ -251,10 +237,10 @@ tcx = None
 bleCTP = None
 rpi = None
 manualMsg = None
-# ------------------------------------------------------------------------------
-# Initialize globals
-# ------------------------------------------------------------------------------
+
+
 def Initialize(pclv):
+    """Initialize program globals."""
     global clv, AntDongle, TacxTrainer, tcx, bleCTP, rpi
     clv = pclv
     AntDongle = None
@@ -282,12 +268,8 @@ def Initialize(pclv):
         # No methods may be called
 
 
-# ------------------------------------------------------------------------------
-# The opposite, hoping that this will properly release USB device, see #203
-# Ref: https://github.com/pyusb/pyusb/blob/a16251f3d62de1e0b50cdfb431482d08a34355b4/docs/tutorial.rst#dont-be-selfish
-#      https://github.com/pyusb/pyusb/blob/ffe6faf42c6ad273880b0b464b9bbf44c1d4b2e9/usb/util.py#L206
-# ------------------------------------------------------------------------------
 def Terminate():
+    """Tidy up globals before exit."""
     global clv, AntDongle, TacxTrainer, tcx, bleCTP
     f = logfile.Write
     # f = logfile.Console            # For quick testing
@@ -346,6 +328,7 @@ def Terminate():
 # Returns:      The actual status of the headunit buttons
 # ------------------------------------------------------------------------------
 def IdleFunction(FortiusAntGui):
+    """Read trainer while idle."""
     rtn = 0
     rpi.DisplayState(None, TacxTrainer)  # Repeat last message
     if TacxTrainer and TacxTrainer.OK:
@@ -384,6 +367,7 @@ def IdleFunction(FortiusAntGui):
 # Returns:      True
 # ------------------------------------------------------------------------------
 def Settings(FortiusAntGui, pRestartApplication, pclv):
+    """Read new command line variables."""
     global clv
     clv = pclv
     if debug.on(debug.Function):
@@ -408,6 +392,7 @@ def Settings(FortiusAntGui, pRestartApplication, pclv):
 # Returns:      True if TRAINER and DONGLE found
 # ------------------------------------------------------------------------------
 def LocateHW(FortiusAntGui):
+    """Locate hardware."""
     global AntDongle, TacxTrainer, manualMsg
     if debug.on(debug.Application):
         logfile.Write("Scan for hardware")
@@ -509,6 +494,7 @@ def LocateHW(FortiusAntGui):
 # Returns:      True
 # ------------------------------------------------------------------------------
 def Runoff(FortiusAntGui):
+    """Do runoff procedure."""
     if clv.SimulateTrainer or clv.Tacx_Vortex or clv.Tacx_Genius or clv.Tacx_Bushido:
         logfile.Console(
             "Runoff not implemented for Simulated trainer or Tacx Vortex/Genius/Bushido"
@@ -654,7 +640,7 @@ def Runoff(FortiusAntGui):
             if (
                 LastPedalEcho == 0
                 and TacxTrainer.PedalEcho == 1
-                and len(pdaInfo)
+                and pdaInfo
                 and TacxTrainer.Cadence
             ):
                 # Pedal triggers cadence sensor
@@ -703,7 +689,6 @@ def Runoff(FortiusAntGui):
                     "Runoff; Processing time %5.3f is %5.3f longer than planned %5.3f (seconds)"
                     % (ElapsedTime, SleepTime * -1, CycleTime)
                 )
-            pass
 
     # ---------------------------------------------------------------------------
     # Finalize
@@ -984,7 +969,7 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
                 if (
                     LastPedalEcho == 0
                     and TacxTrainer.PedalEcho == 1
-                    and len(pdaInfo)
+                    and pdaInfo
                     and TacxTrainer.Cadence
                 ):
                     # Pedal triggers cadence sensor
@@ -999,7 +984,7 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
             # -------------------------------------------------------------------
             # Handle Control command
             # -------------------------------------------------------------------
-            if len(received_data.ctrl_commands):
+            if received_data.ctrl_commands:
                 (
                     ctrl_SlaveManufacturerID,
                     ctrl_SlaveSerialNumber,
@@ -1124,7 +1109,6 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
                         "Tacx2Dongle; Processing time %5.3f is %5.3f longer than planned %5.3f (seconds)"
                         % (ElapsedTime, SleepTime * -1, CycleTime)
                     )
-                pass
 
     except KeyboardInterrupt:
         logfile.Console("Stopped")
