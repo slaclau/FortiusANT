@@ -21,6 +21,7 @@ extend-select = [
 ]
 extend-ignore = [
 	"E203",
+	"D107",
 ]
 extend-exclude = [
 	"src/fortius_ant/_version.py"

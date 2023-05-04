@@ -340,10 +340,11 @@ msgID_BurstData = 0x50
 
 # profile.xlsx: antplus_device_type
 DeviceTypeID_antfs = 1
-
+DeviceTypeID_bike_power = 11
 DeviceTypeID_environment_sensor_legacy = 12
 DeviceTypeID_multi_sport_speed_distance = 15
-
+DeviceTypeID_control = 16
+DeviceTypeID_fitness_equipment = 17
 DeviceTypeID_blood_pressure = 18
 DeviceTypeID_geocache_node = 19
 DeviceTypeID_light_electric_vehicle = 20
@@ -357,7 +358,8 @@ DeviceTypeID_exd = 38
 DeviceTypeID_bike_radar = 40
 DeviceTypeID_bike_aero = 46
 DeviceTypeID_weight_scale = 119
-
+DeviceTypeID_heart_rate = 120
+DeviceTypeID_bike_speed_cadence = 121
 DeviceTypeID_bike_cadence = 122
 DeviceTypeID_bike_speed = 123
 DeviceTypeID_stride_speed_distance = 124
@@ -369,6 +371,11 @@ Manufacturer_tacx = 89
 Manufacturer_trainer_road = 281
 Manufacturer_dev = 255
 
+DeviceTypeID_FE = DeviceTypeID_fitness_equipment
+DeviceTypeID_HRM = DeviceTypeID_heart_rate
+DeviceTypeID_PWR = DeviceTypeID_bike_power
+DeviceTypeID_SCS = DeviceTypeID_bike_speed_cadence
+DeviceTypeID_CTRL = DeviceTypeID_control
 DeviceTypeID_VTX = 61  # Tacx Vortex
 DeviceTypeID_GNS = 83  # Tacx Genius
 DeviceTypeID_BHU = 82  # Tacx Bushido head unit
