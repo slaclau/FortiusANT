@@ -4047,6 +4047,7 @@ class ReceivedData:
         self.ctrl_commands = []
         self.CTP_command_time = 0
         self.ant_event = False
+        self.bleEvent = False
 
         self.PowerModeActive = None
 

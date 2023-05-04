@@ -244,7 +244,13 @@ PrintWarnings = False  # Print warnings even when logging = off
 CycleTimeFast = 0.02  # TRAINER- SHOULD WRITE THEN READ 70MS LATER REALLY
 CycleTimeANT = 0.25
 
-
+clv = None
+AntDongle = None
+TacxTrainer = None
+tcx = None
+bleCTP = None
+rpi = None
+manualMsg = None
 # ------------------------------------------------------------------------------
 # Initialize globals
 # ------------------------------------------------------------------------------
@@ -290,7 +296,7 @@ def Terminate():
     # --------------------------------------------------------------------------
     # If there is an AntDongle, release it as good as possible
     # --------------------------------------------------------------------------
-    if AntDongle != None and AntDongle.OK:
+    if AntDongle is not None and AntDongle.OK:
         if debug.on(debug.Function):
             f("AntDongle.reset()")
         AntDongle.devAntDongle.reset()
@@ -340,7 +346,6 @@ def Terminate():
 # Returns:      The actual status of the headunit buttons
 # ------------------------------------------------------------------------------
 def IdleFunction(FortiusAntGui):
-    global TacxTrainer, rpi
     rtn = 0
     rpi.DisplayState(None, TacxTrainer)  # Repeat last message
     if TacxTrainer and TacxTrainer.OK:
@@ -403,7 +408,7 @@ def Settings(FortiusAntGui, pRestartApplication, pclv):
 # Returns:      True if TRAINER and DONGLE found
 # ------------------------------------------------------------------------------
 def LocateHW(FortiusAntGui):
-    global clv, AntDongle, TacxTrainer, bleCTP, manualMsg
+    global AntDongle, TacxTrainer, manualMsg
     if debug.on(debug.Application):
         logfile.Write("Scan for hardware")
 
@@ -450,7 +455,7 @@ def LocateHW(FortiusAntGui):
     # ---------------------------------------------------------------------------
     # Show where the heartrate comes from
     # ---------------------------------------------------------------------------
-    if clv.hrm == None:
+    if clv.hrm is None:
         FortiusAntGui.SetMessages(HRM="Heartrate expected from Tacx Trainer")
     elif clv.hrm < 0:
         FortiusAntGui.SetMessages(HRM="No heartrate monitor connected")
@@ -504,7 +509,6 @@ def LocateHW(FortiusAntGui):
 # Returns:      True
 # ------------------------------------------------------------------------------
 def Runoff(FortiusAntGui):
-    global clv, AntDongle, TacxTrainer
     if clv.SimulateTrainer or clv.Tacx_Vortex or clv.Tacx_Genius or clv.Tacx_Bushido:
         logfile.Console(
             "Runoff not implemented for Simulated trainer or Tacx Vortex/Genius/Bushido"
@@ -538,7 +542,7 @@ def Runoff(FortiusAntGui):
     else:
         CycleTime = CycleTimeANT  # 0.25 Seconds, inspired by 4Hz ANT+
 
-    while FortiusAntGui.RunningSwitch == True:
+    while FortiusAntGui.RunningSwitch:
         StartTime = time.time()
         # -----------------------------------------------------------------------
         # Get data from trainer
@@ -771,7 +775,7 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
     Steering = AntDongle.Steering
     BlackTrack = AntDongle.BlackTrack
 
-    _calibrate_if_possible(FortiusAntGui, rpi, Restart, received_data)
+    _calibrate_if_possible(FortiusAntGui, Restart, received_data)
 
     # ---------------------------------------------------------------------------
     # Initialize variables
@@ -795,7 +799,6 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
         TacxTrainer.SetGearboxReduction(1)
 
     received_data.CTPcommandTime = 0  # Time that last CTP command received
-    TargetPowerTime = 0  # Time that last TargetPower received
     received_data.PowerModeActive = ""  # Text showing in userinterface
 
     LastANTtime = 0  # ANT+ interface is sent/received only
@@ -821,8 +824,8 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
         ant_hrm = hrm.AntHRM()
 
     ant_pwr = pwr.AntPWR()
-    ant_scs = pwr.AntSCS()
-    ant_ctrl = pwr.AntCTRL()
+    ant_scs = scs.AntSCS()
+    ant_ctrl = ctrl.AntCTRL()
 
     interfaces = [ant_fe, ant_hrm, ant_pwr, ant_scs, ant_ctrl]
     # ---------------------------------------------------------------------------
@@ -864,7 +867,6 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
     # -- Modify data, due to Buttons or ANT
     # ---------------------------------------------------------------------------
     flush = True
-    bleEvent = False
     pedalEvent = False
     TacxTrainer.tacxEvent = False
     TacxMessage = ""
@@ -872,7 +874,7 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
         logfile.Write("Tacx2Dongle; start main loop")
     rpi.DisplayState(constants.faOperational, TacxTrainer)
     try:
-        while FortiusAntGui.RunningSwitch == True and not AntDongle.DongleReconnected:
+        while FortiusAntGui.RunningSwitch and not AntDongle.DongleReconnected:
             StartTime = time.time()
             # -------------------------------------------------------------------
             # ANT process is done once every 250ms
@@ -1042,7 +1044,6 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
             # Do ANT/BLE work every 1/4 second
             # -------------------------------------------------------------------
             messages = []  # messages to be sent to ANT
-            data = []  # responses received from ANT
             if QuarterSecond:
                 # LastANTtime = time.time()         # 2020-11-13 removed since duplicate
                 # ---------------------------------------------------------------
@@ -1091,9 +1092,10 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
 
                 for ant_interface in interfaces:
                     try:
-                        ant_interface.handle_received_info(
+                        rtn = ant_interface.handle_received_info(
                             Channel, id, DataPageNumber, info
                         )
+                        AntDongle.Write(rtn) 
 
                     except WrongChannel:
                         pass
@@ -1153,7 +1155,7 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
     return True
 
 
-def _calibrate_if_possible(FortiusAntGui, rpi, Restart, received_data):
+def _calibrate_if_possible(FortiusAntGui, Restart, received_data):
     # ---------------------------------------------------------------------------
     # During calibration, save powerfactor to avoid undesired correction.
     # ---------------------------------------------------------------------------
