@@ -2487,6 +2487,20 @@ def msgPage172_TacxVortexHU_ChangeHeadunitMode(Channel, Mode):
     return info
 
 
+def msgPage172_command(Channel, command):
+    DataPageNumber = 172
+
+    fChannel = sc.unsigned_char  # First byte of the ANT+ message content
+    fDataPageNumber = sc.unsigned_char  # First byte of the ANT+ datapage (payload)
+    fCommand = sc.unsigned_char  # 0x03 Change headunit Mode
+    fReserved = sc.pad * 6
+
+    format = sc.big_endian + fChannel + fDataPageNumber + fCommand + fReserved
+    info = struct.pack(format, Channel, DataPageNumber, command)
+
+    return info
+
+
 def msgUnpage221_TacxVortexHU_ButtonPressed(info):
     fChannel = sc.unsigned_char  # 0 First byte of the ANT+ message content
     fDataPageNumber = sc.unsigned_char  # 1 First byte of the ANT+ datapage (payload)

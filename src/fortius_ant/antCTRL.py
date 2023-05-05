@@ -96,7 +96,7 @@ class AntCTRL(AntInterface):
     def _handle_broadcast_message(self, data_page_number: int, info: bytes):
         pass
 
-    def _handle_aknowledged_message(self, data_page_number, info):
+    def _handle_acknowledged_message(self, data_page_number, info):
         if data_page_number == 73:
             (
                 ctrl_SlaveSerialNumber,

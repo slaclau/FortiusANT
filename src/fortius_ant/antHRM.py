@@ -147,7 +147,7 @@ class AntHRM(AntInterface):
             return None
         raise UnknownDataPage
 
-    def _handle_aknowledged_message(self, data_page_number, info):
+    def _handle_acknowledged_message(self, data_page_number, info):
         pass
 
 

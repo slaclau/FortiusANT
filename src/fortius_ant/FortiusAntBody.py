@@ -214,6 +214,7 @@ import fortius_ant.antFE as fe
 import fortius_ant.antHRM as hrm
 import fortius_ant.antPWR as pwr
 import fortius_ant.antSCS as scs
+from fortius_ant import antTrainer
 from fortius_ant import bleBless
 from fortius_ant import bleDongle
 from fortius_ant import constants
@@ -224,7 +225,7 @@ from fortius_ant import TCXexport
 from fortius_ant import usbTrainer
 from fortius_ant.usbTrainer import ReceivedData
 from fortius_ant.antMessage import AntMessage
-from fortius_ant.antInterface import WrongChannel
+from fortius_ant.antInterface import WrongChannel, UnsupportedPage, UnknownMessageID
 
 PrintWarnings = False  # Print warnings even when logging = off
 CycleTimeFast = 0.02  # TRAINER- SHOULD WRITE THEN READ 70MS LATER REALLY
@@ -815,6 +816,8 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
     ant_scs = scs.AntSCS()
     ant_ctrl = ctrl.AntCTRL()
 
+    ant_trainer = antTrainer.AntTrainer()
+
     interfaces.extend([ant_pwr, ant_scs, ant_ctrl])
 
     for interface in interfaces:
@@ -1072,6 +1075,12 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
                 error = False
 
                 if clv.Tacx_Vortex or clv.Tacx_Genius or clv.Tacx_Bushido:
+                    try:
+                        ant_trainer.handle_received_info(
+                            Channel, id, DataPageNumber, info
+                        )
+                    except WrongChannel:
+                        pass
                     if TacxTrainer.HandleANTmessage(d):
                         continue  # Message is handled or ignored
 
@@ -1079,21 +1088,23 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
                     if BlackTrack.HandleAntMessage(d):
                         continue
 
-                print(
-                    f"Channel: {Channel}, Message id: {id}, "
-                    f"data page number: {DataPageNumber}, info: {info}"
-                )
-
                 for ant_interface in interfaces:
                     try:
                         rtn = ant_interface.handle_received_info(
                             Channel, id, DataPageNumber, info
                         )
                         if rtn is not None:
+                            print(rtn[0])
                             AntDongle.Write(rtn)
 
                     except WrongChannel:
                         pass
+                    except UnsupportedPage as e:
+                        print(e.message)
+                        print(e.info)
+                    except UnknownMessageID as e:
+                        print(e.message)
+                        print(e.info)
 
                 if error and debug.on(debug.Data1):
                     logfile.Write(
@@ -1103,7 +1114,7 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
                     )
 
             # -------------------------------------------------------------------
-            # WAIT untill CycleTime is done
+            # WAIT until CycleTime is done
             # -------------------------------------------------------------------
             ElapsedTime = time.time() - StartTime
             SleepTime = CycleTime - ElapsedTime

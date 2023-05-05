@@ -17,6 +17,8 @@ from fortius_ant.antMessage import (
     msgID_BurstData,
 )
 
+print_debug = False
+
 
 class AntInterface:
     """Interface for communicating as an ANT+ device."""
@@ -31,7 +33,7 @@ class AntInterface:
     gui = None
     clv = None
     trainer = None
-    received_data: ReceivedData = None
+    received_data: ReceivedData | None = None
 
     def __init__(self, master=True):
         self.master = master
@@ -97,11 +99,11 @@ class AntInterface:
         elif message_id == msgID_BroadcastData:
             self._handle_broadcast_message(data_page_number, info)
         elif message_id == msgID_AcknowledgedData:
-            self._handle_aknowledged_message(data_page_number, info)
+            self._handle_acknowledged_message(data_page_number, info)
         elif message_id == msgID_BurstData:
             self._handle_burst_data(info)
         else:
-            raise UnknownMessageID
+            raise UnknownMessageID(info, message_id, type(self).__name__)
 
     def _handle_channel_id_message(self, info: bytes):
         (
@@ -118,7 +120,14 @@ class AntInterface:
             self.paired = True
 
     def _handle_channel_response_message(self, info: bytes):
-        pass
+        channel = info[0]
+        initiating_id = info[1]
+        code = info[2]
+        if print_debug:
+            print(
+                f"Channel response on channel {channel} initiated by {initiating_id} "
+                f"with code {code}"
+            )
 
     def _handle_burst_data(self, info: bytes):
         pass
@@ -126,7 +135,7 @@ class AntInterface:
     def _handle_broadcast_message(self, data_page_number: int, info: bytes):
         raise NotImplementedError
 
-    def _handle_aknowledged_message(self, data_page_number, info):
+    def _handle_acknowledged_message(self, data_page_number, info):
         raise NotImplementedError
 
 
@@ -137,11 +146,18 @@ class WrongChannel(Exception):
 class UnknownMessageID(Exception):
     """Raise when attempting to handle an unknown message ID."""
 
+    def __init__(self, info: bytes, message_id: int, interface: str):
+        self.info = info
+        self.message_id = message_id
+        self.interface = interface
+        self.message = f"Message id {message_id} is not known by {interface}"
+
 
 class UnknownDataPage(Exception):
     """Raise when attempting to handle an unknown data page."""
 
-    def __init__(self, page_number: int = None):
+    def __init__(self, info: bytes = b"", page_number: int = -1):
+        self.info = info
         self.page_number = page_number
         self.message = f"Page {page_number} is not known"
 
@@ -149,6 +165,7 @@ class UnknownDataPage(Exception):
 class UnsupportedPage(Exception):
     """Raise when an unsupported page is requested."""
 
-    def __init__(self, page_number: int = None):
+    def __init__(self, info: bytes = b"", page_number: int = -1):
+        self.info = info
         self.page_number = page_number
         self.message = f"Page {page_number} is not supported"
