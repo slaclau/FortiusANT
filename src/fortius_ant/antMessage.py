@@ -56,8 +56,8 @@ class AntMessage(bytes):
         fId = sc.unsigned_char
         fInfo = str(len(info)) + sc.char_array  # 9 character string
 
-        messageFormat = sc.no_alignment + fSynch + fLength + fId + fInfo
-        data = struct.pack(messageFormat, 0xA4, len(info), messageID, info)
+        messagemessage_format = sc.no_alignment + fSynch + fLength + fId + fInfo
+        data = struct.pack(messagemessage_format, 0xA4, len(info), messageID, info)
         # -----------------------------------------------------------------------
         # Add the checksum
         # (antifier added \00\00 after each message for unknown reason)
@@ -119,3 +119,166 @@ def calc_checksum(message):
     #   print('checksum', logfile.HexSpace(message), xor_value, bytes([xor_value]))
 
     return bytes([xor_value])
+
+
+class SpecialMessage(AntMessage):
+    """Special case messages."""
+
+    message_id: int
+    info: bytes
+
+    @classmethod
+    def _parse_args(cls, **kwargs):
+        raise NotImplementedError
+
+    @classmethod
+    def create(cls, **kwargs):
+        """Create message."""
+        cls._parse_args(**kwargs)
+        return cls.compose(cls.message_id, cls.info)
+
+
+class Message41(SpecialMessage):
+    """Unassign channel."""
+
+    message_id = msgID_UnassignChannel
+
+    @classmethod
+    def _parse_args(cls, **kwargs):
+        channel = kwargs["channel"]
+        message_format = sc.no_alignment + sc.unsigned_char
+        cls.info = struct.pack(message_format, channel)
+
+
+class Message42(SpecialMessage):
+    """Assign channel."""
+
+    message_id = msgID_AssignChannel
+
+    @classmethod
+    def _parse_args(cls, **kwargs):
+        channel = kwargs["channel"]
+        channel_type = kwargs["type"]
+        network = kwargs["network"]
+        message_format = (
+            sc.no_alignment + sc.unsigned_char + sc.unsigned_char + sc.unsigned_char
+        )
+        cls.info = struct.pack(message_format, channel, channel_type, network)
+
+
+class Message43(SpecialMessage):
+    """Set period."""
+
+    message_id = msgID_ChannelPeriod
+
+    @classmethod
+    def _parse_args(cls, **kwargs):
+        channel = kwargs["channel"]
+        period = kwargs["period"]
+        message_format = sc.no_alignment + sc.unsigned_char + sc.unsigned_short
+        cls.info = struct.pack(message_format, channel, period)
+
+
+class Message44(SpecialMessage):
+    """Set search timeoute."""
+
+    message_id = msgID_ChannelSearchTimeout
+
+    @classmethod
+    def _parse_args(cls, **kwargs):
+        channel = kwargs["channel"]
+        timeout = kwargs["timeout"]
+        message_format = sc.no_alignment + sc.unsigned_char + sc.unsigned_short
+        cls.info = struct.pack(message_format, channel, timeout)
+
+
+class Message45(SpecialMessage):
+    """Set channel RF frequency."""
+
+    message_id = msgID_ChannelRfFrequency
+
+    @classmethod
+    def _parse_args(cls, **kwargs):
+        channel = kwargs["channel"]
+        frequency = kwargs["frequency"]
+        message_format = sc.no_alignment + sc.unsigned_char + sc.unsigned_char
+        cls.info = struct.pack(message_format, channel, frequency)
+
+
+class Message46(SpecialMessage):
+    """Set network key."""
+
+    message_id = msgID_SetNetworkKey
+
+    @classmethod
+    def _parse_args(cls, **kwargs):
+        network = kwargs["network"] if "network" in kwargs else 0x00
+        key = kwargs["key"] if "key" in kwargs else 0x45C372BDFB21A5B9
+        message_format = sc.no_alignment + sc.unsigned_char + sc.unsigned_long_long
+        cls.info = struct.pack(message_format, network, key)
+
+
+class Message4A(SpecialMessage):
+    """Reset system."""
+
+    message_id = msgID_ResetSystem
+
+    @classmethod
+    def _parse_args(cls, **kwargs):
+        message_format = sc.no_alignment + sc.unsigned_char
+        cls.info = struct.pack(message_format, 0x00)
+
+
+class Message4B(SpecialMessage):
+    """Open channel."""
+
+    message_id = msgID_OpenChannel
+
+    @classmethod
+    def _parse_args(cls, **kwargs):
+        channel = kwargs["channel"]
+        message_format = sc.no_alignment + sc.unsigned_char
+        cls.info = struct.pack(message_format, channel)
+
+
+class Message4D(SpecialMessage):
+    """Request message."""
+
+    message_id = msgID_RequestMessage
+
+    @classmethod
+    def _parse_args(cls, **kwargs):
+        channel = kwargs["channel"]
+        requested_id = kwargs["id"]
+        message_format = sc.no_alignment + sc.unsigned_char + sc.unsigned_char
+        cls.info = struct.pack(message_format, channel, requested_id)
+
+
+class Message51(SpecialMessage):
+    """Set channel ID."""
+
+    message_id = msgID_ChannelID
+
+    @classmethod
+    def _parse_args(cls, **kwargs):
+        message_format = (
+            sc.no_alignment
+            + sc.unsigned_char
+            + sc.unsigned_short
+            + sc.unsigned_char
+            + sc.unsigned_char
+        )
+        cls.info = struct.pack(
+            message_format, ChannelNumber, DeviceNumber, DeviceTypeID, TransmissionType
+        )
+
+
+class Message50(SpecialMessage):
+    """Set transmit power."""
+
+    message_id = msgID_ChannelTransmitPower
+
+    @classmethod
+    def _parse_args(cls, **kwargs):
+        message_format = sc.no_alignment + sc.unsigned_char + sc.unsigned_char
+        cls.info = struct.pack(message_format, ChannelNumber, TransmitPower)
