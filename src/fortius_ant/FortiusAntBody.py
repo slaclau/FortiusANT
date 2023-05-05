@@ -1,9 +1,9 @@
+"""Main program to imterface between various elements."""
 # -------------------------------------------------------------------------------
 # Version info
 # -------------------------------------------------------------------------------
 __version__ = "2022-08-22"
 import time
-
 import numpy
 import usb.core
 
@@ -206,52 +206,42 @@ import usb.core
 #
 #               The trainer is transmitted as a tacx. If the heartrate is
 #               detected on the trainer, the HRM is transmitted as a garmin.
-#
-#               Todo:
-#               - why is HeartRate not sent to Trainer Road directly but is a
-#                   separate HRM channel needed?
-#                   (see function ComposeGeneralFeInfo)
-#                   done - 2020-02-09: Because TrainerRoad and/or Zwift expect an
-#                       independant ANT+ HRM
-#               - read buttons from trainer and navigate through menu
-#                   (see function IdleFunction)
-#                   done - 2019-12-20
-#
-#               Tests (and extensions) to be done:
-#               - test with Trainer Road, resistance mode; done 2019-12-19
-#               - test with Zwift; done 2019-12-24
-#               - calibration test; done 2020-01-07
 # -------------------------------------------------------------------------------
-from fortius_ant.constants import UseGui, mode_Grade, mode_Power
-
-from datetime import datetime
-
+from fortius_ant.constants import mode_Grade, mode_Power
 import fortius_ant.antCTRL as ctrl
 import fortius_ant.antDongle as ant
 import fortius_ant.antFE as fe
 import fortius_ant.antHRM as hrm
 import fortius_ant.antPWR as pwr
 import fortius_ant.antSCS as scs
-import fortius_ant.bleBless as bleBless
-import fortius_ant.bleDongle as bleDongle
-import fortius_ant.constants as constants
-import fortius_ant.debug as debug
-import fortius_ant.logfile as logfile
-import fortius_ant.raspberry as raspberry
-import fortius_ant.steering as steering
-import fortius_ant.TCXexport as TCXexport
-import fortius_ant.usbTrainer as usbTrainer
+from fortius_ant import antTrainer
+from fortius_ant import bleBless
+from fortius_ant import bleDongle
+from fortius_ant import constants
+from fortius_ant import debug
+from fortius_ant import logfile
+from fortius_ant import raspberry
+from fortius_ant import TCXexport
+from fortius_ant import usbTrainer
+from fortius_ant.usbTrainer import ReceivedData
 from fortius_ant.antMessage import AntMessage
+from fortius_ant.antInterface import WrongChannel, UnsupportedPage, UnknownMessageID
 
 PrintWarnings = False  # Print warnings even when logging = off
 CycleTimeFast = 0.02  # TRAINER- SHOULD WRITE THEN READ 70MS LATER REALLY
 CycleTimeANT = 0.25
 
+clv = None
+AntDongle = None
+TacxTrainer = None
+tcx = None
+bleCTP = None
+rpi = None
+manualMsg = None
 
-# ------------------------------------------------------------------------------
-# Initialize globals
-# ------------------------------------------------------------------------------
+
 def Initialize(pclv):
+    """Initialize program globals."""
     global clv, AntDongle, TacxTrainer, tcx, bleCTP, rpi
     clv = pclv
     AntDongle = None
@@ -279,12 +269,8 @@ def Initialize(pclv):
         # No methods may be called
 
 
-# ------------------------------------------------------------------------------
-# The opposite, hoping that this will properly release USB device, see #203
-# Ref: https://github.com/pyusb/pyusb/blob/a16251f3d62de1e0b50cdfb431482d08a34355b4/docs/tutorial.rst#dont-be-selfish
-#      https://github.com/pyusb/pyusb/blob/ffe6faf42c6ad273880b0b464b9bbf44c1d4b2e9/usb/util.py#L206
-# ------------------------------------------------------------------------------
 def Terminate():
+    """Tidy up globals before exit."""
     global clv, AntDongle, TacxTrainer, tcx, bleCTP
     f = logfile.Write
     # f = logfile.Console            # For quick testing
@@ -293,7 +279,7 @@ def Terminate():
     # --------------------------------------------------------------------------
     # If there is an AntDongle, release it as good as possible
     # --------------------------------------------------------------------------
-    if AntDongle != None and AntDongle.OK:
+    if AntDongle is not None and AntDongle.OK:
         if debug.on(debug.Function):
             f("AntDongle.reset()")
         AntDongle.devAntDongle.reset()
@@ -343,7 +329,7 @@ def Terminate():
 # Returns:      The actual status of the headunit buttons
 # ------------------------------------------------------------------------------
 def IdleFunction(FortiusAntGui):
-    global TacxTrainer, rpi
+    """Read trainer while idle."""
     rtn = 0
     rpi.DisplayState(None, TacxTrainer)  # Repeat last message
     if TacxTrainer and TacxTrainer.OK:
@@ -382,6 +368,7 @@ def IdleFunction(FortiusAntGui):
 # Returns:      True
 # ------------------------------------------------------------------------------
 def Settings(FortiusAntGui, pRestartApplication, pclv):
+    """Read new command line variables."""
     global clv
     clv = pclv
     if debug.on(debug.Function):
@@ -406,7 +393,8 @@ def Settings(FortiusAntGui, pRestartApplication, pclv):
 # Returns:      True if TRAINER and DONGLE found
 # ------------------------------------------------------------------------------
 def LocateHW(FortiusAntGui):
-    global clv, AntDongle, TacxTrainer, bleCTP, manualMsg
+    """Locate hardware."""
+    global AntDongle, TacxTrainer, manualMsg
     if debug.on(debug.Application):
         logfile.Write("Scan for hardware")
 
@@ -453,7 +441,7 @@ def LocateHW(FortiusAntGui):
     # ---------------------------------------------------------------------------
     # Show where the heartrate comes from
     # ---------------------------------------------------------------------------
-    if clv.hrm == None:
+    if clv.hrm is None:
         FortiusAntGui.SetMessages(HRM="Heartrate expected from Tacx Trainer")
     elif clv.hrm < 0:
         FortiusAntGui.SetMessages(HRM="No heartrate monitor connected")
@@ -507,7 +495,7 @@ def LocateHW(FortiusAntGui):
 # Returns:      True
 # ------------------------------------------------------------------------------
 def Runoff(FortiusAntGui):
-    global clv, AntDongle, TacxTrainer
+    """Do runoff procedure."""
     if clv.SimulateTrainer or clv.Tacx_Vortex or clv.Tacx_Genius or clv.Tacx_Bushido:
         logfile.Console(
             "Runoff not implemented for Simulated trainer or Tacx Vortex/Genius/Bushido"
@@ -541,7 +529,7 @@ def Runoff(FortiusAntGui):
     else:
         CycleTime = CycleTimeANT  # 0.25 Seconds, inspired by 4Hz ANT+
 
-    while FortiusAntGui.RunningSwitch == True:
+    while FortiusAntGui.RunningSwitch:
         StartTime = time.time()
         # -----------------------------------------------------------------------
         # Get data from trainer
@@ -653,7 +641,7 @@ def Runoff(FortiusAntGui):
             if (
                 LastPedalEcho == 0
                 and TacxTrainer.PedalEcho == 1
-                and len(pdaInfo)
+                and pdaInfo
                 and TacxTrainer.Cadence
             ):
                 # Pedal triggers cadence sensor
@@ -702,7 +690,6 @@ def Runoff(FortiusAntGui):
                     "Runoff; Processing time %5.3f is %5.3f longer than planned %5.3f (seconds)"
                     % (ElapsedTime, SleepTime * -1, CycleTime)
                 )
-            pass
 
     # ---------------------------------------------------------------------------
     # Finalize
@@ -737,10 +724,15 @@ def Runoff(FortiusAntGui):
 # Returns:      True
 # ------------------------------------------------------------------------------
 def Tacx2Dongle(FortiusAntGui):
-    global clv, AntDongle, TacxTrainer, bleCTP, manualMsg
+    """Exchange data between the dongle and the trainer.
+
+    Parameters
+    ----------
+    FortiusAntGui
+    """
     Restart = False
     while True:
-        rtn = Tacx2DongleSub(FortiusAntGui, Restart)
+        rtn = _tacx_2_dongle(FortiusAntGui, Restart)
         if AntDongle.DongleReconnected:
             FortiusAntGui.SetMessages(
                 Dongle=AntDongle.Message + bleCTP.Message + manualMsg
@@ -752,69 +744,28 @@ def Tacx2Dongle(FortiusAntGui):
     return rtn
 
 
+<<<<<<< HEAD
 def Tacx2DongleSub(FortiusAntGui, Restart):
+=======
+def _tacx_2_dongle(FortiusAntGui, Restart):
+>>>>>>> feature/ant-classes
     assert AntDongle  # The class must be created
     assert TacxTrainer  # The class must be created
     assert bleCTP  # The class must be created
 
-    AntHRMpaired = False
-
-    # ---------------------------------------------------------------------------
-    # Front/rear shifting
-    # ---------------------------------------------------------------------------
-    ReductionCrankset = 1  # ratio between selected/start (front)
-    ReductionCassette = 1  # same, rear
-    ReductionCassetteX = 1  # same, beyond cassette range
-    CranksetIndex = clv.CranksetStart
-    CassetteIndex = clv.CassetteStart
-
-    # ---------------------------------------------------------------------------
-    # Command status data
-    # ---------------------------------------------------------------------------
-    p71_LastReceivedCommandID = 255
-    p71_SequenceNr = 255
-    p71_CommandStatus = 255
-    p71_Data1 = 0xFF
-    p71_Data2 = 0xFF
-    p71_Data3 = 0xFF
-    p71_Data4 = 0xFF
-
-    # ---------------------------------------------------------------------------
-    # Command status data for ANT Control
-    # ---------------------------------------------------------------------------
-    ctrl_p71_LastReceivedCommandID = 255
-    ctrl_p71_SequenceNr = 255
-    ctrl_p71_CommandStatus = 255
-    ctrl_p71_Data1 = 0xFF
-    ctrl_p71_Data2 = 0xFF
-    ctrl_p71_Data3 = 0xFF
-    ctrl_p71_Data4 = 0xFF
+    gearbox = Gearbox()
+    received_data = ReceivedData(TacxTrainer)
 
     ctrl_Commands = []  # Containing tuples (manufacturer, serial, CommandNr)
 
-    # ---------------------------------------------------------------------------
-    # Info from ANT slave channels
-    # ---------------------------------------------------------------------------
-    HeartRate = 0  # This field is displayed
-    # We have two sources: the trainer or
-    # our own HRM slave channel.
-    # Cadence        = 0         # Analogously for Speed Cadence Sensor
-    # But is not yet implemented
-    # ---------------------------------------------------------------------------
-    # Pedal stroke Analysis
-    # ---------------------------------------------------------------------------
     pdaInfo = []  # Collection of (time, power)
     LastPedalEcho = 0  # Flag that cadence sensor was seen
 
     AntDongle.initialize(clv, TacxTrainer)
     Steering = AntDongle.Steering
     BlackTrack = AntDongle.BlackTrack
-    # ---------------------------------------------------------------------------
-    # Loop control
-    # ---------------------------------------------------------------------------
-    EventCounter = 0
 
-    calibrate_if_possible(clv, TacxTrainer, FortiusAntGui, rpi, Restart)
+    _calibrate_if_possible(FortiusAntGui, Restart, received_data)
 
     # ---------------------------------------------------------------------------
     # Initialize variables
@@ -837,9 +788,8 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
             TacxTrainer.SetPower(100)
         TacxTrainer.SetGearboxReduction(1)
 
-    CTPcommandTime = 0  # Time that last CTP command received
-    TargetPowerTime = 0  # Time that last TargetPower received
-    PowerModeActive = ""  # Text showing in userinterface
+    received_data.CTPcommandTime = 0  # Time that last CTP command received
+    received_data.PowerModeActive = ""  # Text showing in userinterface
 
     LastANTtime = 0  # ANT+ interface is sent/received only
     # every 250ms
@@ -851,12 +801,31 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
 
     if debug.on(debug.Function):
         logfile.Write("Tacx2Dongle; initialize ANT")
-    fe.Initialize()
-    hrm.Initialize()
-    pwr.Initialize()
-    scs.Initialize()
-    ctrl.Initialize()
 
+    ant_fe = fe.AntFE()
+    ant_fe.set_clv(clv)
+    ant_fe.set_received_data(received_data)
+
+    interfaces = [ant_fe]
+
+    if clv.hrm is None:
+        ant_hrm = hrm.AntHRM()
+        interfaces.append(ant_hrm)
+    elif clv.hrm >= 0:
+        ant_hrm = hrm.AntHRM(False)
+        ant_hrm.set_received_data(received_data)
+        interfaces.append(ant_hrm)
+
+    ant_pwr = pwr.AntPWR()
+    ant_scs = scs.AntSCS()
+    ant_ctrl = ctrl.AntCTRL()
+
+    ant_trainer = antTrainer.AntTrainer()
+
+    interfaces.extend([ant_pwr, ant_scs, ant_ctrl])
+
+    for interface in interfaces:
+        interface.set_trainer(TacxTrainer)
     # ---------------------------------------------------------------------------
     # Initialize CycleTime: fast for PedalStrokeAnalysis
     # ---------------------------------------------------------------------------
@@ -896,8 +865,6 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
     # -- Modify data, due to Buttons or ANT
     # ---------------------------------------------------------------------------
     flush = True
-    bleEvent = False
-    antEvent = False
     pedalEvent = False
     TacxTrainer.tacxEvent = False
     TacxMessage = ""
@@ -905,7 +872,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
         logfile.Write("Tacx2Dongle; start main loop")
     rpi.DisplayState(constants.faOperational, TacxTrainer)
     try:
-        while FortiusAntGui.RunningSwitch == True and not AntDongle.DongleReconnected:
+        while FortiusAntGui.RunningSwitch and not AntDongle.DongleReconnected:
             StartTime = time.time()
             # -------------------------------------------------------------------
             # ANT process is done once every 250ms
@@ -928,8 +895,8 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
             # Update displayed status; most relevant for Console-mode.
             # Also the DisplayState texts may have changed (due to trainer state)
             # -------------------------------------------------------------------
-            if TacxMessage != TacxTrainer.Message + PowerModeActive:
-                TacxMessage = TacxTrainer.Message + PowerModeActive
+            if TacxMessage != TacxTrainer.Message + received_data.PowerModeActive:
+                TacxMessage = TacxTrainer.Message + received_data.PowerModeActive
                 FortiusAntGui.SetMessages(Tacx=TacxMessage)
                 rpi.DisplayState(constants.faOperational, TacxTrainer)
 
@@ -942,9 +909,19 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
             # -------------------------------------------------------------------
             if QuarterSecond:
                 FortiusAntGui.SetLeds(
-                    antEvent, bleEvent, pedalEvent, None, TacxTrainer.tacxEvent
+                    received_data.antEvent,
+                    received_data.bleEvent,
+                    pedalEvent,
+                    None,
+                    TacxTrainer.tacxEvent,
                 )
-                rpi.SetLeds(antEvent, bleEvent, pedalEvent, None, TacxTrainer.tacxEvent)
+                rpi.SetLeds(
+                    received_data.antEvent,
+                    received_data.bleEvent,
+                    pedalEvent,
+                    None,
+                    TacxTrainer.tacxEvent,
+                )
                 if rpi.CheckShutdown(FortiusAntGui):
                     FortiusAntGui.RunningSwitch = False
 
@@ -955,27 +932,12 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
                 elif rpi.buttonDown:
                     TacxTrainer.Buttons = usbTrainer.DownButton
 
-                bleEvent = False
-                antEvent = False
+                received_data.bleEvent = False
+                received_data.antEvent = False
                 pedalEvent = False
                 TacxTrainer.tacxEvent = False
                 rpi.buttonUp = False
                 rpi.buttonDown = False
-
-            # -------------------------------------------------------------------
-            # If NO Speed Cadence Sensor defined, use Trainer-info
-            # Hook for future development
-            # -------------------------------------------------------------------
-            # if clv.scs == None:
-            #     SpeedKmh   = SpeedKmhSCS
-            #     Cadence    = CadenceSCS
-
-            # -------------------------------------------------------------------
-            # If NO HRM defined, use the HeartRate from the trainer
-            # -------------------------------------------------------------------
-            if clv.hrm == None:
-                HeartRate = TacxTrainer.HeartRate
-                # print('Use heartrate from trainer', HeartRate)
 
             # -------------------------------------------------------------------
             # Show actual status; once for the GUI, once for Raspberry
@@ -983,17 +945,17 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
             o = FortiusAntGui
             for __ in (0, 1):
                 o.SetValues(
-                    TacxTrainer.VirtualSpeedKmh,
-                    TacxTrainer.Cadence,
-                    TacxTrainer.CurrentPower,
-                    TacxTrainer.TargetMode,
-                    TacxTrainer.TargetPower,
-                    TacxTrainer.TargetGrade,
-                    TacxTrainer.TargetResistance,
-                    HeartRate,
-                    CranksetIndex,
-                    CassetteIndex,
-                    ReductionCassetteX,
+                    received_data.get("VirtualSpeedKmh"),
+                    received_data.get("Cadence"),
+                    received_data.get("CurrentPower"),
+                    received_data.get("TargetMode"),
+                    received_data.get("TargetPower"),
+                    received_data.get("TargetGrade"),
+                    received_data.get("TargetResistance"),
+                    received_data.get("HeartRate"),
+                    gearbox.CranksetIndex,
+                    gearbox.CassetteIndex,
+                    gearbox.ReductionCassetteX,
                 )
                 if TacxTrainer.Operational:
                     o = rpi
@@ -1004,12 +966,14 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
             # Add trackpoint
             # -------------------------------------------------------------------
             if QuarterSecond and clv.exportTCX:
-                tcx.TrackpointX(TacxTrainer, HeartRate)
+                tcx.TrackpointX(TacxTrainer, received_data.get("HeartRate"))
 
             # -------------------------------------------------------------------
             # Store in JSON format
             # -------------------------------------------------------------------
-            logfile.WriteJson(QuarterSecond, TacxTrainer, tcx, HeartRate)
+            logfile.WriteJson(
+                QuarterSecond, TacxTrainer, tcx, received_data.get("HeartRate")
+            )
 
             # -------------------------------------------------------------------
             # Pedal Stroke Analysis
@@ -1018,14 +982,11 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
                 if (
                     LastPedalEcho == 0
                     and TacxTrainer.PedalEcho == 1
-                    and len(pdaInfo)
+                    and pdaInfo
                     and TacxTrainer.Cadence
                 ):
                     # Pedal triggers cadence sensor
                     FortiusAntGui.PedalStrokeAnalysis(pdaInfo, TacxTrainer.Cadence)
-
-                    # logfile.Console('PedalStrokeAnalysis - Cadence=%3s pdaInfo=%3s StartTime=%s' % \
-                    #    (TacxTrainer.Cadence, len(pdaInfo), pdaInfo[0][0]))
 
                     pdaInfo = []
                 pdaInfo.append(
@@ -1036,7 +997,7 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
             # -------------------------------------------------------------------
             # Handle Control command
             # -------------------------------------------------------------------
-            if len(ctrl_Commands):
+            if received_data.ctrl_commands:
                 (
                     ctrl_SlaveManufacturerID,
                     ctrl_SlaveSerialNumber,
@@ -1073,257 +1034,26 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
                 # -------------------------------------------------------------------
                 ctrl_Commands.pop(0)
 
-            # -------------------------------------------------------------------
-            # In manual-mode, power can be incremented or decremented
-            #   and operation can be stopped. Manual mode is intended for test-purpose.
-            # homeTrainer mode is intended for stand-alone use.
-            #
-            # TargetMode  is set here (manual mode) or received from ANT+ (Zwift)
-            # TargetPower and TargetGrade are set in this section only!
-            # -------------------------------------------------------------------
-            ReductionChanged = False
-            if clv.homeTrainer and not (time.time() - CTPcommandTime) < 30:
-                # In homeTrainer mode, buttons are only valid when no CTP active
-                if TacxTrainer.Buttons == usbTrainer.EnterButton:
-                    pass
-                elif TacxTrainer.Buttons == usbTrainer.DownButton:
-                    TacxTrainer.MultiplyPower(1 / 1.1)
-                elif TacxTrainer.Buttons == usbTrainer.OKButton:
-                    TacxTrainer.SetPower(100)
-                elif TacxTrainer.Buttons == usbTrainer.UpButton:
-                    TacxTrainer.MultiplyPower(1.1)
-                elif TacxTrainer.Buttons == usbTrainer.CancelButton:
-                    FortiusAntGui.RunningSwitch = False
-                else:
-                    pass
-            elif clv.manual:
-                if TacxTrainer.Buttons == usbTrainer.EnterButton:
-                    pass
-                elif TacxTrainer.Buttons == usbTrainer.DownButton:
-                    TacxTrainer.AddPower(-10)
-                elif TacxTrainer.Buttons == usbTrainer.OKButton:
-                    TacxTrainer.SetPower(100)
-                elif TacxTrainer.Buttons == usbTrainer.UpButton:
-                    TacxTrainer.AddPower(10)
-                elif TacxTrainer.Buttons == usbTrainer.CancelButton:
-                    FortiusAntGui.RunningSwitch = False
-                else:
-                    pass
-            elif clv.manualGrade:
-                if TacxTrainer.Buttons == usbTrainer.EnterButton:
-                    pass
-                elif TacxTrainer.Buttons == usbTrainer.DownButton:
-                    TacxTrainer.AddGrade(-1)
-                elif TacxTrainer.Buttons == usbTrainer.OKButton:
-                    TacxTrainer.SetGrade(0)
-                elif TacxTrainer.Buttons == usbTrainer.UpButton:
-                    TacxTrainer.AddGrade(1)
-                elif TacxTrainer.Buttons == usbTrainer.CancelButton:
-                    FortiusAntGui.RunningSwitch = False
-                else:
-                    pass
-            else:
-                if (
-                    TacxTrainer.Buttons == usbTrainer.EnterButton
-                    or TacxTrainer.Buttons == usbTrainer.OKButton
-                ):
-                    ReductionChanged = True
-                    CranksetIndex = clv.CranksetStart  # Reset both front
-                    CassetteIndex = clv.CassetteStart  # and rear
-
-                elif (
-                    TacxTrainer.Buttons == usbTrainer.UpButton
-                ):  # Switch rear right (smaller) = higher index
-                    ReductionChanged = True
-                    if CassetteIndex < 0:
-                        CassetteIndex += 1
-                        ReductionCassetteX *= 1.1
-                    elif CassetteIndex < len(clv.Cassette) - 1:
-                        CassetteIndex += 1
-                    elif ReductionCassetteX < 2:
-                        # Plus 7 extra steps beyond the end of the cassette
-                        CassetteIndex += 1
-                        ReductionCassetteX *= 1.1
-
-                elif (
-                    TacxTrainer.Buttons == usbTrainer.DownButton
-                ):  # Switch rear left (bigger) = lower index
-                    ReductionChanged = True
-                    if CassetteIndex >= len(clv.Cassette):
-                        CassetteIndex -= 1
-                        ReductionCassetteX /= 1.1
-                    elif CassetteIndex > 0:
-                        CassetteIndex -= 1
-                    elif ReductionCassetteX > 0.6:
-                        # Plus 8 extra steps beyond the end of the cassette
-                        CassetteIndex -= 1
-                        ReductionCassetteX /= 1.1
-
-                elif (
-                    TacxTrainer.Buttons == usbTrainer.CancelButton
-                ):  # Switch front up (round robin)
-                    ReductionChanged = True
-                    # FortiusAntGui.RunningSwitch = False
-                    CranksetIndex += 1
-                    if CranksetIndex == len(clv.Crankset):
-                        CranksetIndex = 0
-
-                else:
-                    pass
-
-            # -------------------------------------------------------------------
-            # Calculate Reduction
-            #
-            # Note that, the VIRTUAL gearbox has Reduction = 1 when the indexes
-            #      are in the initial position (not when front = rear!).
-            #
-            # ReductionCrankset: >1 when chainring > start-value
-            # ReductionCassette:  >1 when sprocket  < start-value
-            # ReductionCassetteX: is a factor when index outside the cassette!
-            # -------------------------------------------------------------------
-            if ReductionChanged:
-                if 0 <= CranksetIndex < len(clv.Crankset):
-                    ReductionCrankset = (
-                        clv.Crankset[CranksetIndex] / clv.Crankset[clv.CranksetStart]
-                    )
-
-                if 0 <= CassetteIndex < len(clv.Cassette):
-                    ReductionCassetteX = 1
-                    ReductionCassette = (
-                        clv.Cassette[clv.CassetteStart] / clv.Cassette[CassetteIndex]
-                    )
-
-                if debug.on(debug.Function):
-                    if CassetteIndex >= len(clv.Cassette):
-                        i = len(clv.Cassette) - 1
-                    else:
-                        i = CassetteIndex
-                    logfile.Print(
-                        "gearbox changed: index=%ix%2i ratio=%ix%i R=%3.1f*%3.1f*%3.1f=%3.1f"
-                        % (
-                            CranksetIndex,
-                            CassetteIndex,
-                            clv.Crankset[CranksetIndex],
-                            clv.Cassette[i],
-                            ReductionCrankset,
-                            ReductionCassette,
-                            ReductionCassetteX,
-                            ReductionCrankset * ReductionCassette * ReductionCassetteX,
-                        )
-                    )
-
-                TacxTrainer.SetGearboxReduction(
-                    ReductionCrankset * ReductionCassette * ReductionCassetteX
-                )
+            gearbox.respond_to_control_input(
+                FortiusAntGui, received_data.CTPcommandTime
+            )
 
             # -------------------------------------------------------------------
             # Do ANT/BLE work every 1/4 second
             # -------------------------------------------------------------------
             messages = []  # messages to be sent to ANT
-            data = []  # responses received from ANT
             if QuarterSecond:
                 # LastANTtime = time.time()         # 2020-11-13 removed since duplicate
                 # ---------------------------------------------------------------
                 # Sending i-Vortex messages is done by Refesh() not here
                 # ---------------------------------------------------------------
 
-                # ---------------------------------------------------------------
-                # Broadcast Heartrate message
-                # ---------------------------------------------------------------
-                if clv.hrm == None and TacxTrainer.HeartRate > 0:
-                    messages.append(hrm.BroadcastHeartrateMessage(HeartRate))
+                for ant_interface in interfaces:
+                    if ant_interface.master:
+                        messages.append(ant_interface.broadcast_message_from_trainer())
 
-                # ---------------------------------------------------------------
-                # Broadcast Bike Power message
-                # ---------------------------------------------------------------
-                if True:
-                    messages.append(
-                        pwr.BroadcastMessage(
-                            TacxTrainer.CurrentPower, TacxTrainer.Cadence
-                        )
-                    )
-
-                # ---------------------------------------------------------------
-                # Broadcast Speed and Cadence Sensor message
-                # ---------------------------------------------------------------
-                if clv.scs == None:
-                    messages.append(
-                        scs.BroadcastMessage(
-                            TacxTrainer.PedalEchoTime,
-                            TacxTrainer.PedalEchoCount,
-                            TacxTrainer.VirtualSpeedKmh,
-                            TacxTrainer.Cadence,
-                        )
-                    )
-
-                # ---------------------------------------------------------------
-                # Broadcast Controllable message
-                # ---------------------------------------------------------------
-                if True:
-                    messages.append(ctrl.BroadcastControlMessage())
-
-                # ---------------------------------------------------------------
-                # Broadcast TrainerData message to the CTP (Trainer Road, ...)
-                # ---------------------------------------------------------------
-                # print('fe.BroadcastTrainerDataMessage', Cadence, CurrentPower, SpeedKmh, HeartRate)
-                messages.append(
-                    fe.BroadcastTrainerDataMessage(
-                        TacxTrainer.Cadence,
-                        TacxTrainer.CurrentPower,
-                        TacxTrainer.SpeedKmh,
-                        TacxTrainer.HeartRate,
-                    )
-                )
-
-                # ---------------------------------------------------------------
-                # Send/receive to Bluetooth interface
-                #
-                # When data is received, TacxTrainer parameters are copied from
-                # the bleCTP object.
-                # ---------------------------------------------------------------
                 if clv.ble:
-                    bleCTP.SetAthleteData(HeartRate)
-                    bleCTP.SetTrainerData(
-                        TacxTrainer.SpeedKmh,
-                        TacxTrainer.Cadence,
-                        TacxTrainer.CurrentPower,
-                    )
-
-                    if Steering is not None:
-                        bleCTP.SetSteeringAngle(Steering.Angle)
-
-                    if bleCTP.Refresh():
-                        bleEvent = True
-                        CTPcommandTime = time.time()
-                        if bleCTP.TargetMode == mode_Power:
-                            TargetPowerTime = time.time()
-                            TacxTrainer.SetPower(bleCTP.TargetPower)
-
-                        if bleCTP.TargetMode == mode_Grade:
-                            if clv.PowerMode and (time.time() - TargetPowerTime) < 30:
-                                pass
-                            else:
-                                Grade = bleCTP.TargetGrade
-                                Grade += clv.GradeShift
-                                Grade *= clv.GradeFactor
-                                if Grade < 0:
-                                    Grade *= clv.GradeFactorDH
-
-                                TacxTrainer.SetGrade(Grade)
-
-                        if (
-                            bleCTP.WindResistance
-                            and bleCTP.WindSpeed
-                            and bleCTP.DraftingFactor
-                        ):
-                            TacxTrainer.SetWind(
-                                bleCTP.WindResistance,
-                                bleCTP.WindSpeed,
-                                bleCTP.DraftingFactor,
-                            )
-
-                        if bleCTP.RollingResistance:
-                            TacxTrainer.SetRollingResistance(bleCTP.RollingResistance)
+                    _handle_bleCTP(received_data, Steering)
 
             # -------------------------------------------------------------------
             # Broadcast and receive ANT+ responses
@@ -1333,18 +1063,6 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
                 flush = False
                 # antEvent is not set here; only for data on FE-C channel
 
-            # -------------------------------------------------------------------
-            # Here all response from the ANT dongle are processed (receive=True)
-            #
-            # Commands from dongle that are expected are:
-            # - TargetGradeFromDongle or TargetPowerFromDongle
-            # - Information from HRM (if paired)
-            # - Information from i-Vortex (if paired)
-            #
-            # Input is grouped by messageID, then channel. This has little
-            # practical impact; grouping by Channel would enable to handle all
-            # ANT in a channel (device) module. No advantage today.
-            # -------------------------------------------------------------------
             while AntDongle.MessageQueueSize() > 0:
                 d = AntDongle.MessageQueueGet()
 
@@ -1361,6 +1079,12 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
                 error = False
 
                 if clv.Tacx_Vortex or clv.Tacx_Genius or clv.Tacx_Bushido:
+                    try:
+                        ant_trainer.handle_received_info(
+                            Channel, id, DataPageNumber, info
+                        )
+                    except WrongChannel:
+                        pass
                     if TacxTrainer.HandleANTmessage(d):
                         continue  # Message is handled or ignored
 
@@ -1368,510 +1092,33 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
                     if BlackTrack.HandleAntMessage(d):
                         continue
 
-                # ---------------------------------------------------------------
-                # AcknowledgedData = Slave -> Master
-                #       channel_FE = From CTP (Trainer Road, Zwift) --> Tacx
-                # ---------------------------------------------------------------
-                if id == ant.msgID_AcknowledgedData:
-                    # -----------------------------------------------------------
-                    # Fitness Equipment Channel inputs
-                    # -----------------------------------------------------------
-                    if Channel == ant.channel_FE:
-                        antEvent = True
-                        CTPcommandTime = time.time()
-                        # -------------------------------------------------------
-                        # Data page 48 (0x30) Basic resistance
-                        # -------------------------------------------------------
-                        if DataPageNumber == 48:
-                            # logfile.Console('Data page 48 Basic mode not implemented')
-                            # I never saw this appear anywhere (2020-05-08)
-                            # TargetMode            = mode_Basic
-                            # TargetGradeFromDongle = 0
-                            # TargetPowerFromDongle = ant.msgUnpage48_BasicResistance(info) * 1000  # n % of maximum of 1000Watt
+                for ant_interface in interfaces:
+                    try:
+                        rtn = ant_interface.handle_received_info(
+                            Channel, id, DataPageNumber, info
+                        )
+                        if rtn is not None:
+                            print(rtn[0])
+                            AntDongle.Write(rtn)
 
-                            # 2020-11-04 as requested in issue 119
-                            # The percentage is used to calculate grade 0...20%
-                            Grade = ant.msgUnpage48_BasicResistance(info) * 20
-
-                            # Implemented for Magnetic Brake:
-                            # - grade is NOT shifted with GradeShift (here never negative)
-                            # - but is reduced with factor
-                            # - and is NOT reduced with factorDH since never negative
-                            Grade *= clv.GradeFactor
-
-                            TacxTrainer.SetGrade(Grade)
-                            TacxTrainer.SetRollingResistance(0.004)
-                            TacxTrainer.SetWind(0.51, 0.0, 1.0)
-
-                            # Update "last command" data in case page 71 is requested later
-                            p71_LastReceivedCommandID = DataPageNumber
-                            # wrap around after 254 (255 = no command received)
-                            p71_SequenceNr = (p71_SequenceNr + 1) % 255
-                            p71_CommandStatus = 0  # successfully processed
-                            # echo raw command data (cannot use unpage, unpage does unit conversion etc)
-                            p71_Data2 = 0xFF
-                            p71_Data3 = 0xFF
-                            p71_Data4 = info[8]  # target resistance
-
-                        # -------------------------------------------------------
-                        # Data page 49 (0x31) Target Power
-                        # -------------------------------------------------------
-                        elif DataPageNumber == 49:
-                            TacxTrainer.SetPower(ant.msgUnpage49_TargetPower(info))
-                            TargetPowerTime = time.time()
-                            if False and clv.PowerMode and debug.on(debug.Application):
-                                logfile.Write(
-                                    "PowerMode: TargetPower info received - timestamp set"
-                                )
-
-                            # Update "last command" data in case page 71 is requested later
-                            p71_LastReceivedCommandID = DataPageNumber
-                            # wrap around after 254 (255 = no command received)
-                            p71_SequenceNr = (p71_SequenceNr + 1) % 255
-                            p71_CommandStatus = 0  # successfully processed
-                            # echo raw command data (cannot use unpage, unpage does unit conversion etc)
-                            p71_Data2 = 0xFF
-                            p71_Data3 = info[7]  # target power (LSB)
-                            p71_Data4 = info[8]  # target power (MSB)
-
-                        # -------------------------------------------------------
-                        # Data page 50 (0x32) Wind Resistance
-                        # -------------------------------------------------------
-                        elif DataPageNumber == 50:
-                            (
-                                WindResistance,
-                                WindSpeed,
-                                DraftingFactor,
-                            ) = ant.msgUnpage50_WindResistance(info)
-                            TacxTrainer.SetWind(
-                                WindResistance, WindSpeed, DraftingFactor
-                            )
-
-                            # Update "last command" data in case page 71 is requested later
-                            p71_LastReceivedCommandID = DataPageNumber
-                            # wrap around after 254 (255 = no command received)
-                            p71_SequenceNr = (p71_SequenceNr + 1) % 255
-                            p71_CommandStatus = 0  # successfully processed
-                            # echo raw command data (cannot use unpage, unpage does unit conversion etc)
-                            p71_Data2 = info[6]  # wind resistance coefficient
-                            p71_Data3 = info[7]  # wind speed
-                            p71_Data4 = info[8]  # drafting factor
-
-                        # -------------------------------------------------------
-                        # Data page 51 (0x33) Track resistance
-                        # -------------------------------------------------------
-                        elif DataPageNumber == 51:
-                            if clv.PowerMode and (time.time() - TargetPowerTime) < 30:
-                                # -----------------------------------------------
-                                # In PowerMode, TrackResistance is ignored
-                                #       (for xx seconds after the last power-command)
-                                # So if TrainerRoad is used simultaneously with
-                                #       Zwift/Rouvythe power commands from TR
-                                #       take precedence over Zwift/Rouvy and a
-                                #       power-training can be done while riding
-                                #       a Zwift/Rouvy simulation/video!
-                                # When TrainerRoad is finished, the Track
-                                #       resistance is active again
-                                # -----------------------------------------------
-                                PowerModeActive = " [P]"
-                                if (
-                                    False
-                                    and clv.PowerMode
-                                    and debug.on(debug.Application)
-                                ):
-                                    logfile.Write("PowerMode: Grade info ignored")
-                                pass
-                            else:
-                                (
-                                    Grade,
-                                    RollingResistance,
-                                ) = ant.msgUnpage51_TrackResistance(info)
-
-                                # -----------------------------------------------
-                                # Implemented when implementing Magnetic Brake:
-                                # [-] grade is shifted with GradeShift (-10% --> 0) ]
-                                # - then reduced with factor (can be re-adjusted with Virtual Gearbox)
-                                # - and reduced with factorDH (for downhill only)
-                                #
-                                # GradeAdjust is valid for all configurations!
-                                #
-                                # GradeShift is not expected to be used anymore,
-                                # and only left from earliest implementations
-                                # to avoid it has to be re-introduced in future again.
-                                # -----------------------------------------------
-                                Grade += clv.GradeShift
-                                Grade *= clv.GradeFactor
-                                if Grade < 0:
-                                    Grade *= clv.GradeFactorDH
-
-                                TacxTrainer.SetGrade(Grade)
-                                TacxTrainer.SetRollingResistance(RollingResistance)
-                                PowerModeActive = ""
-
-                            # Update "last command" data in case page 71 is requested later
-                            p71_LastReceivedCommandID = DataPageNumber
-                            # wrap around after 254 (255 = no command received)
-                            p71_SequenceNr = (p71_SequenceNr + 1) % 255
-                            p71_CommandStatus = 0  # successfully processed
-                            # echo raw command data (cannot use unpage, unpage does unit conversion etc)
-                            p71_Data2 = info[6]  # target grade (LSB)
-                            p71_Data3 = info[7]  # target grade (MSB)
-                            p71_Data4 = info[8]  # rolling resistance coefficient
-
-                        # -------------------------------------------------------
-                        # Data page 55 User configuration
-                        # -------------------------------------------------------
-                        elif DataPageNumber == 55:
-                            (
-                                UserWeight,
-                                BicycleWeight,
-                                BicycleWheelDiameter,
-                                GearRatio,
-                            ) = ant.msgUnpage55_UserConfiguration(info)
-                            TacxTrainer.SetUserConfiguration(
-                                UserWeight,
-                                BicycleWeight,
-                                BicycleWheelDiameter,
-                                GearRatio,
-                            )
-
-                        # -------------------------------------------------------
-                        # Data page 70 Request data page
-                        # -------------------------------------------------------
-                        elif DataPageNumber == 70:
-                            (
-                                _SlaveSerialNumber,
-                                _DescriptorByte1,
-                                _DescriptorByte2,
-                                _AckRequired,
-                                NrTimes,
-                                RequestedPageNumber,
-                                _CommandType,
-                            ) = ant.msgUnpage70_RequestDataPage(info)
-
-                            info = False
-                            if RequestedPageNumber == 54:
-                                # Capabilities;
-                                # bit 0 = Basic mode
-                                # bit 1 = Target/Power/Ergo mode
-                                # bit 2 = Simulation/Restance/Slope mode
-                                info = ant.msgPage54_FE_Capabilities(
-                                    ant.channel_FE, 0xFF, 0xFF, 0xFF, 0xFF, 1000, 0x07
-                                )
-
-                            elif RequestedPageNumber == 71:
-                                info = ant.msgPage71_CommandStatus(
-                                    ant.channel_FE,
-                                    p71_LastReceivedCommandID,
-                                    p71_SequenceNr,
-                                    p71_CommandStatus,
-                                    p71_Data1,
-                                    p71_Data2,
-                                    p71_Data3,
-                                    p71_Data4,
-                                )
-
-                            elif RequestedPageNumber == 80:
-                                info = ant.msgPage80_ManufacturerInfo(
-                                    ant.channel_FE,
-                                    0xFF,
-                                    0xFF,
-                                    ant.HWrevision_FE,
-                                    ant.Manufacturer_tacx,
-                                    ant.ModelNumber_FE,
-                                )
-
-                            elif RequestedPageNumber == 81:
-                                info = ant.msgPage81_ProductInformation(
-                                    ant.channel_FE,
-                                    0xFF,
-                                    ant.SWrevisionSupp_FE,
-                                    ant.SWrevisionMain_FE,
-                                    ant.SerialNumber_FE,
-                                )
-
-                            elif RequestedPageNumber == 82:
-                                info = ant.msgPage82_BatteryStatus(ant.channel_FE)
-
-                            else:
-                                error = "Requested page not suported"
-
-                            if info != False:
-                                data = []
-                                d = AntMessage.compose(ant.msgID_BroadcastData, info)
-                                while NrTimes:
-                                    data.append(d)
-                                    NrTimes -= 1
-                                AntDongle.Write(data, False)
-
-                        # -------------------------------------------------------
-                        # Data page 252 ????
-                        # -------------------------------------------------------
-                        elif DataPageNumber == 252 and (
-                            PrintWarnings or debug.on(debug.Data1)
-                        ):
-                            logfile.Write(
-                                "FE data page 252 ignored. info=%s"
-                                % logfile.HexSpace(info)
-                            )
-                            pass
-
-                        # -------------------------------------------------------
-                        # Other data pages
-                        # -------------------------------------------------------
-                        else:
-                            error = "Unknown FE data page"
-
-                    # -----------------------------------------------------------
-                    # Control Channel inputs
-                    # -----------------------------------------------------------
-                    if Channel == ant.channel_CTRL:
-                        # -------------------------------------------------------
-                        # Data page 73 (0x53) Generic Command
-                        # -------------------------------------------------------
-                        if DataPageNumber == 73:
-                            (
-                                ctrl_SlaveSerialNumber,
-                                ctrl_SlaveManufacturerID,
-                                SequenceNr,
-                                ctrl_CommandNr,
-                            ) = ant.msgUnpage73_GenericCommand(info)
-
-                            # Update "last command" data in case page 71 is requested later
-                            ctrl_p71_LastReceivedCommandID = DataPageNumber
-                            ctrl_p71_SequenceNr = SequenceNr
-                            ctrl_p71_CommandStatus = 0  # successfully processed
-                            ctrl_p71_Data1 = ctrl_CommandNr & 0x00FF
-                            ctrl_p71_Data2 = (ctrl_CommandNr & 0xFF00) >> 8
-                            ctrl_p71_Data3 = 0xFF
-                            ctrl_p71_Data4 = 0xFF
-
-                            # ---------------------------------------------------
-                            # Commands should not overwrite, therefore stored
-                            # in a table as tuples.
-                            # ---------------------------------------------------
-                            ctrl_Commands.append(
-                                (
-                                    ctrl_SlaveManufacturerID,
-                                    ctrl_SlaveSerialNumber,
-                                    ctrl_CommandNr,
-                                )
-                            )
-                            CommandName = ctrl.CommandName.get(
-                                ctrl_CommandNr, "Unknown"
-                            )
-                            if debug.on(debug.Application):
-                                logfile.Print(
-                                    f"ANT+ Control {ctrl_SlaveManufacturerID} {ctrl_SlaveSerialNumber}: Received command {ctrl_CommandNr} = {CommandName} "
-                                )
-
-                        # -------------------------------------------------------
-                        # Data page 70 Request data page
-                        # -------------------------------------------------------
-                        elif DataPageNumber == 70:
-                            (
-                                _SlaveSerialNumber,
-                                _DescriptorByte1,
-                                _DescriptorByte2,
-                                _AckRequired,
-                                NrTimes,
-                                RequestedPageNumber,
-                                _CommandType,
-                            ) = ant.msgUnpage70_RequestDataPage(info)
-
-                            info = False
-                            if RequestedPageNumber == 71:
-                                info = ant.msgPage71_CommandStatus(
-                                    ant.channel_CTRL,
-                                    ctrl_p71_LastReceivedCommandID,
-                                    ctrl_p71_SequenceNr,
-                                    ctrl_p71_CommandStatus,
-                                    ctrl_p71_Data1,
-                                    ctrl_p71_Data2,
-                                    ctrl_p71_Data3,
-                                    ctrl_p71_Data4,
-                                )
-                            else:
-                                error = "Requested page not suported"
-
-                            if info != False:
-                                data = []
-                                d = AntMessage.compose(ant.msgID_BroadcastData, info)
-                                while NrTimes:
-                                    data.append(d)
-                                    NrTimes -= 1
-                                AntDongle.Write(data, False)
-
-                        # -------------------------------------------------------
-                        # Other data pages
-                        # -------------------------------------------------------
-                        else:
-                            error = "Unknown Control data page"
-
-                    # -----------------------------------------------------------
-                    # Unknown channel
-                    # -----------------------------------------------------------
-                    else:
-                        error = "Unknown channel"
-
-                # ---------------------------------------------------------------
-                # BroadcastData = Master -> Slave
-                #       channel_HRM_s = Heartbeat received from HRM
-                #       channel_SCS_s = Speed/Cadence received from SCS
-                # ---------------------------------------------------------------
-                elif id == ant.msgID_BroadcastData:
-                    # -----------------------------------------------------------
-                    # Heart Rate Monitor inputs
-                    # -----------------------------------------------------------
-                    if Channel == ant.channel_HRM_s:
-                        # -------------------------------------------------------
-                        # Ask what device is paired
-                        # -------------------------------------------------------
-                        if not AntHRMpaired:
-                            msg = ant.msg4D_RequestMessage(
-                                ant.channel_HRM_s, ant.msgID_ChannelID
-                            )
-                            AntDongle.Write([msg], False)
-
-                        # -------------------------------------------------------
-                        # Data page 0...4 HRM data
-                        # Only expected when -H flag specified
-                        # -------------------------------------------------------
-                        if DataPageNumber & 0x7F in (0, 1, 2, 3, 4, 5, 6, 7, 89, 95):
-                            if clv.hrm >= 0:
-                                (
-                                    _Channel,
-                                    _DataPageNumber,
-                                    _Spec1,
-                                    _Spec2,
-                                    _Spec3,
-                                    _HeartBeatEventTime,
-                                    _HeartBeatCount,
-                                    HeartRate,
-                                ) = ant.msgUnpage_Hrm(info)
-                                # print('Set heartrate from HRM', HeartRate)
-
-                            else:
-                                pass  # Ignore it
-
-                        # -------------------------------------------------------
-                        # Data page 89 (HRM strap Garmin#3), 95(HRM strap Garmin#4)
-                        # Added to previous set, provides HR info
-                        # -------------------------------------------------------
-                        elif DataPageNumber in (89, 95):
-                            pass  # Ignore it
-
-                        # -------------------------------------------------------
-                        # Other data pages
-                        # -------------------------------------------------------
-                        else:
-                            error = "Unknown HRM data page"
-
-                    # -----------------------------------------------------------
-                    # Speed Cadence Sensor inputs
-                    # -----------------------------------------------------------
-                    elif Channel == ant.channel_SCS:
-                        # -------------------------------------------------------
-                        # Data page 0 CSC data
-                        # Only expected when -S flag specified
-                        # -------------------------------------------------------
-                        if False:
-                            pass
-                        # scs                    elif clv.scs >= 0 and DataPageNumber & 0x7f == 0:
-                        # scs                        Channel, DataPageNumber, BikeCadenceEventTime, \
-                        # scs                            CumulativeCadenceRevolutionCount, BikeSpeedEventTime, \
-                        # scs                            CumulativeSpeedRevolutionCount = \
-                        # scs                            ant.msgUnpage0_CombinedSpeedCadence(info)
-                        # scs                        SpeedKmh   = ...
-                        # scs                        Cadence    = ...
-
-                        # -------------------------------------------------------
-                        # Other data pages
-                        # -------------------------------------------------------
-                        else:
-                            error = "Unknown SCS data page"
-
-                    # -----------------------------------------------------------
-                    # Unknown channel
-                    # -----------------------------------------------------------
-                    else:
-                        error = "Unknown channel"
-
-                # ---------------------------------------------------------------
-                # ChannelID - the info that a master on the network is paired
-                # ---------------------------------------------------------------
-                elif id == ant.msgID_ChannelID:
-                    (
-                        Channel,
-                        DeviceNumber,
-                        DeviceTypeID,
-                        _TransmissionType,
-                    ) = ant.unmsg51_ChannelID(info)
-
-                    if DeviceNumber == 0:  # No device paired, ignore
+                    except WrongChannel:
                         pass
+                    except UnsupportedPage as e:
+                        print(e.message)
+                        print(e.info)
+                    except UnknownMessageID as e:
+                        print(e.message)
+                        print(e.info)
 
-                    elif (
-                        Channel == ant.channel_HRM_s
-                        and DeviceTypeID == ant.DeviceTypeID_HRM
-                    ):
-                        AntHRMpaired = True
-                        FortiusAntGui.SetMessages(
-                            HRM="Heart Rate Monitor paired: %s" % DeviceNumber
-                        )
-
-                    elif Channel == ant.channel_CTRL:
-                        pass  # Ignore since 2022-08-22; to be investigated
-                        # Obviously message was dropped before
-
-                    else:
-                        logfile.Console(
-                            "Unexpected device %s on channel %s"
-                            % (DeviceNumber, Channel)
-                        )
-
-                # ---------------------------------------------------------------
-                # Message ChannelResponse, acknowledges a message
-                # ---------------------------------------------------------------
-                elif id == ant.msgID_ChannelResponse:
-                    (
-                        Channel,
-                        _InitiatingMessageID,
-                        _ResponseCode,
-                    ) = ant.unmsg64_ChannelResponse(info)
-                    pass
-
-                # ---------------------------------------------------------------
-                # Message BurstData, ignored
-                # ---------------------------------------------------------------
-                elif id == ant.msgID_BurstData:
-                    pass
-
-                else:
-                    error = "Unknown message ID"
-
-                # ---------------------------------------------------------------
-                # Unsupported channel, message or page can be silently ignored
-                # Show WHAT we ignore, not to be blind for surprises!
-                # ---------------------------------------------------------------
-                if error and (PrintWarnings or debug.on(debug.Data1)):
+                if error and debug.on(debug.Data1):
                     logfile.Write(
-                        "ANT Dongle:%s: synch=%s, len=%2s, id=%s, check=%s, channel=%s, page=%s(%s) info=%s"
-                        % (
-                            error,
-                            synch,
-                            length,
-                            hex(id),
-                            checksum,
-                            Channel,
-                            DataPageNumber,
-                            hex(DataPageNumber),
-                            logfile.HexSpace(info),
-                        )
+                        f"ANT Dongle:{error}: synch={synch}, len={length}, id={hex(id)}"
+                        f", check={checksum}, channel={Channel}, page={DataPageNumber}"
+                        f"({hex(DataPageNumber)}) info={logfile.HexSpace(info)}"
                     )
 
             # -------------------------------------------------------------------
-            # WAIT untill CycleTime is done
+            # WAIT until CycleTime is done
             # -------------------------------------------------------------------
             ElapsedTime = time.time() - StartTime
             SleepTime = CycleTime - ElapsedTime
@@ -1887,10 +1134,6 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
                         "Tacx2Dongle; Processing time %5.3f is %5.3f longer than planned %5.3f (seconds)"
                         % (ElapsedTime, SleepTime * -1, CycleTime)
                     )
-                pass
-
-            EventCounter += 1  # Increment and ...
-            EventCounter &= 0xFF  # maximize to 255
 
     except KeyboardInterrupt:
         logfile.Console("Stopped")
@@ -1920,7 +1163,8 @@ def Tacx2DongleSub(FortiusAntGui, Restart):
 
     return True
 
-def calibrate_if_possible(clv, TacxTrainer, FortiusAntGui, rpi, Restart):
+
+def _calibrate_if_possible(FortiusAntGui, Restart, received_data):
     # ---------------------------------------------------------------------------
     # During calibration, save powerfactor to avoid undesired correction.
     # ---------------------------------------------------------------------------
@@ -1949,8 +1193,8 @@ def calibrate_if_possible(clv, TacxTrainer, FortiusAntGui, rpi, Restart):
     StartPedaling = True
     Counter = 0
 
-    bleEvent = False
-    antEvent = False
+    received_data.bleEvent = False
+    received_data.antEvent = False
     pedalEvent = False
     TacxTrainer.tacxEvent = False
 
@@ -1979,9 +1223,19 @@ def calibrate_if_possible(clv, TacxTrainer, FortiusAntGui, rpi, Restart):
             TacxTrainer.Refresh(True, usbTrainer.modeCalibrate)
 
             FortiusAntGui.SetLeds(
-                antEvent, bleEvent, pedalEvent, None, TacxTrainer.tacxEvent
+                received_data.antEvent,
+                received_data.bleEvent,
+                pedalEvent,
+                None,
+                TacxTrainer.tacxEvent,
             )
-            rpi.SetLeds(antEvent, bleEvent, pedalEvent, None, TacxTrainer.tacxEvent)
+            rpi.SetLeds(
+                received_data.antEvent,
+                received_data.bleEvent,
+                pedalEvent,
+                None,
+                TacxTrainer.tacxEvent,
+            )
             if rpi.CheckShutdown(FortiusAntGui):
                 FortiusAntGui.RunningSwitch = False
 
@@ -2081,15 +1335,15 @@ def calibrate_if_possible(clv, TacxTrainer, FortiusAntGui, rpi, Restart):
                 # ---------------------------------------------------------------
                 # While calibrating: blink ANT/BLE
                 # ---------------------------------------------------------------
-                antEvent = True
-                bleEvent = True
+                received_data.antEvent = True
+                received_data.bleEvent = True
                 pedalEvent = False
             else:
                 # ---------------------------------------------------------------
                 # While waiting for pedal-kick: blink ANT/BLE/Cadence
                 # ---------------------------------------------------------------
-                antEvent = True
-                bleEvent = True
+                received_data.antEvent = True
+                received_data.bleEvent = True
                 pedalEvent = True
 
             # -------------------------------------------------------------------
@@ -2115,3 +1369,227 @@ def calibrate_if_possible(clv, TacxTrainer, FortiusAntGui, rpi, Restart):
     # Restore powerfactor after calibration
     # ---------------------------------------------------------------------------
     clv.PowerFactor = SavePowerFactor
+
+
+class Gearbox:
+    def __init__(self):
+        # ---------------------------------------------------------------------------
+        # Front/rear shifting
+        # ---------------------------------------------------------------------------
+        self.ReductionCrankset = 1  # ratio between selected/start (front)
+        self.ReductionCassette = 1  # same, rear
+        self.ReductionCassetteX = 1  # same, beyond cassette range
+        self.CranksetIndex = clv.CranksetStart
+        self.CassetteIndex = clv.CassetteStart
+
+    def respond_to_control_input(self, FortiusAntGui, CTPcommandTime):
+        ReductionCrankset = self.ReductionCrankset
+        ReductionCassette = self.ReductionCassette
+        ReductionCassetteX = self.ReductionCassetteX
+        CranksetIndex = self.CranksetIndex
+        CassetteIndex = self.CassetteIndex
+
+        # -------------------------------------------------------------------
+        # In manual-mode, power can be incremented or decremented
+        #   and operation can be stopped. Manual mode is intended for test-purpose.
+        # homeTrainer mode is intended for stand-alone use.
+        #
+        # TargetMode  is set here (manual mode) or received from ANT+ (Zwift)
+        # TargetPower and TargetGrade are set in this section only!
+        # -------------------------------------------------------------------
+        ReductionChanged = False
+        if clv.homeTrainer and not (time.time() - CTPcommandTime) < 30:
+            # In homeTrainer mode, buttons are only valid when no CTP active
+            if TacxTrainer.Buttons == usbTrainer.EnterButton:
+                pass
+            elif TacxTrainer.Buttons == usbTrainer.DownButton:
+                TacxTrainer.MultiplyPower(1 / 1.1)
+            elif TacxTrainer.Buttons == usbTrainer.OKButton:
+                TacxTrainer.SetPower(100)
+            elif TacxTrainer.Buttons == usbTrainer.UpButton:
+                TacxTrainer.MultiplyPower(1.1)
+            elif TacxTrainer.Buttons == usbTrainer.CancelButton:
+                FortiusAntGui.RunningSwitch = False
+            else:
+                pass
+        elif clv.manual:
+            if TacxTrainer.Buttons == usbTrainer.EnterButton:
+                pass
+            elif TacxTrainer.Buttons == usbTrainer.DownButton:
+                TacxTrainer.AddPower(-10)
+            elif TacxTrainer.Buttons == usbTrainer.OKButton:
+                TacxTrainer.SetPower(100)
+            elif TacxTrainer.Buttons == usbTrainer.UpButton:
+                TacxTrainer.AddPower(10)
+            elif TacxTrainer.Buttons == usbTrainer.CancelButton:
+                FortiusAntGui.RunningSwitch = False
+            else:
+                pass
+        elif clv.manualGrade:
+            if TacxTrainer.Buttons == usbTrainer.EnterButton:
+                pass
+            elif TacxTrainer.Buttons == usbTrainer.DownButton:
+                TacxTrainer.AddGrade(-1)
+            elif TacxTrainer.Buttons == usbTrainer.OKButton:
+                TacxTrainer.SetGrade(0)
+            elif TacxTrainer.Buttons == usbTrainer.UpButton:
+                TacxTrainer.AddGrade(1)
+            elif TacxTrainer.Buttons == usbTrainer.CancelButton:
+                FortiusAntGui.RunningSwitch = False
+            else:
+                pass
+        else:
+            if (
+                TacxTrainer.Buttons == usbTrainer.EnterButton
+                or TacxTrainer.Buttons == usbTrainer.OKButton
+            ):
+                ReductionChanged = True
+                CranksetIndex = clv.CranksetStart  # Reset both front
+                CassetteIndex = clv.CassetteStart  # and rear
+
+            elif (
+                TacxTrainer.Buttons == usbTrainer.UpButton
+            ):  # Switch rear right (smaller) = higher index
+                ReductionChanged = True
+                if CassetteIndex < 0:
+                    CassetteIndex += 1
+                    ReductionCassetteX *= 1.1
+                elif CassetteIndex < len(clv.Cassette) - 1:
+                    CassetteIndex += 1
+                elif ReductionCassetteX < 2:
+                    # Plus 7 extra steps beyond the end of the cassette
+                    CassetteIndex += 1
+                    ReductionCassetteX *= 1.1
+
+            elif (
+                TacxTrainer.Buttons == usbTrainer.DownButton
+            ):  # Switch rear left (bigger) = lower index
+                ReductionChanged = True
+                if CassetteIndex >= len(clv.Cassette):
+                    CassetteIndex -= 1
+                    ReductionCassetteX /= 1.1
+                elif CassetteIndex > 0:
+                    CassetteIndex -= 1
+                elif ReductionCassetteX > 0.6:
+                    # Plus 8 extra steps beyond the end of the cassette
+                    CassetteIndex -= 1
+                    ReductionCassetteX /= 1.1
+
+            elif (
+                TacxTrainer.Buttons == usbTrainer.CancelButton
+            ):  # Switch front up (round robin)
+                ReductionChanged = True
+                # FortiusAntGui.RunningSwitch = False
+                CranksetIndex += 1
+                if CranksetIndex == len(clv.Crankset):
+                    CranksetIndex = 0
+
+            else:
+                pass
+
+        self.ReductionCrankset = ReductionCrankset
+        self.ReductionCassette = ReductionCassette
+        self.ReductionCassetteX = ReductionCassetteX
+        self.CranksetIndex = CranksetIndex
+        self.CassetteIndex = CassetteIndex
+
+        self._set_reduction(ReductionChanged)
+
+    def _set_reduction(self, ReductionChanged):
+        ReductionCrankset = self.ReductionCrankset
+        ReductionCassette = self.ReductionCassette
+        ReductionCassetteX = self.ReductionCassetteX
+        CranksetIndex = self.CranksetIndex
+        CassetteIndex = self.CassetteIndex
+
+        # -------------------------------------------------------------------
+        # Calculate Reduction
+        #
+        # Note that, the VIRTUAL gearbox has Reduction = 1 when the indexes
+        #      are in the initial position (not when front = rear!).
+        #
+        # ReductionCrankset: >1 when chainring > start-value
+        # ReductionCassette:  >1 when sprocket  < start-value
+        # ReductionCassetteX: is a factor when index outside the cassette!
+        # -------------------------------------------------------------------
+        if ReductionChanged:
+            if 0 <= CranksetIndex < len(clv.Crankset):
+                ReductionCrankset = (
+                    clv.Crankset[CranksetIndex] / clv.Crankset[clv.CranksetStart]
+                )
+
+            if 0 <= CassetteIndex < len(clv.Cassette):
+                ReductionCassetteX = 1
+                ReductionCassette = (
+                    clv.Cassette[clv.CassetteStart] / clv.Cassette[CassetteIndex]
+                )
+
+            if debug.on(debug.Function):
+                if CassetteIndex >= len(clv.Cassette):
+                    i = len(clv.Cassette) - 1
+                else:
+                    i = CassetteIndex
+                logfile.Print(
+                    "gearbox changed: index=%ix%2i ratio=%ix%i R=%3.1f*%3.1f*%3.1f=%3.1f"
+                    % (
+                        CranksetIndex,
+                        CassetteIndex,
+                        clv.Crankset[CranksetIndex],
+                        clv.Cassette[i],
+                        ReductionCrankset,
+                        ReductionCassette,
+                        ReductionCassetteX,
+                        ReductionCrankset * ReductionCassette * ReductionCassetteX,
+                    )
+                )
+
+            TacxTrainer.SetGearboxReduction(
+                ReductionCrankset * ReductionCassette * ReductionCassetteX
+            )
+
+        self.ReductionCrankset = ReductionCrankset
+        self.ReductionCassette = ReductionCassette
+        self.ReductionCassetteX = ReductionCassetteX
+        self.CranksetIndex = CranksetIndex
+        self.CassetteIndex = CassetteIndex
+
+
+def _handle_bleCTP(received_data: ReceivedData, Steering):
+    bleCTP.SetAthleteData(received_data.get("HeartRate"))
+    bleCTP.SetTrainerData(
+        received_data.get("SpeedKmh"),
+        received_data.get("Cadence"),
+        received_data.get("CurrentPower"),
+    )
+
+    if Steering is not None:
+        bleCTP.SetSteeringAngle(Steering.Angle)
+
+    if bleCTP.Refresh():
+        received_data.bleEvent = True
+        received_data.CTPcommandTime = time.time()
+        if bleCTP.TargetMode == mode_Power:
+            TargetPowerTime = time.time()
+            TacxTrainer.SetPower(bleCTP.TargetPower)
+
+        if bleCTP.TargetMode == mode_Grade:
+            if clv.PowerMode and (time.time() - TargetPowerTime) < 30:
+                pass
+            else:
+                Grade = bleCTP.TargetGrade
+                Grade += clv.GradeShift
+                Grade *= clv.GradeFactor
+                if Grade < 0:
+                    Grade *= clv.GradeFactorDH
+
+                TacxTrainer.SetGrade(Grade)
+
+        if bleCTP.WindResistance and bleCTP.WindSpeed and bleCTP.DraftingFactor:
+            TacxTrainer.SetWind(
+                bleCTP.WindResistance,
+                bleCTP.WindSpeed,
+                bleCTP.DraftingFactor,
+            )
+
+        if bleCTP.RollingResistance:
+            TacxTrainer.SetRollingResistance(bleCTP.RollingResistance)

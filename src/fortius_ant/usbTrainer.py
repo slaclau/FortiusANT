@@ -154,6 +154,7 @@ import random
 import struct
 import sys
 import time
+from dataclasses import dataclass
 from enum import Enum
 
 import lib_programname
@@ -1713,6 +1714,11 @@ class clsTacxAntTrainer(clsTacxTrainer):
 
         self._ResetTrainer()
 
+    def send_command(self, command):
+        info = ant.msgPage172_command(self.Channel, command)
+        msg = AntMessage.compose(ant.msgID_BroadcastData, info)
+        return msg
+
     def _ResetTrainer(self):
         self._DeviceNumber = 0  # provided by CHANNEL_ID msg
         self._CommandCounter = 0
@@ -1935,7 +1941,6 @@ class clsTacxAntTrainer(clsTacxTrainer):
                         Temperature,
                         Powerback,
                     ) = ant.msgUnpage221_03_TacxGeniusAlarmTemperature(info)
-
                     if debug.on(debug.Function):
                         logfile.Write(
                             "Tacx Page=%d/%#x (IN)  Alarm=%d Temperature=%d Powerback=%d"
@@ -2488,7 +2493,6 @@ class clsTacxAntBushidoTrainer(clsTacxAntTrainer):
             info = ant.msgPage000_TacxVortexHU_StayAlive(self.Channel)
             msg = AntMessage.compose(ant.msgID_BroadcastData, info)
             messages.append(msg)
-
             if debug.on(debug.Function):
                 logfile.Write("Bushido page 0 (OUT) Keep-alive")
 
@@ -2504,12 +2508,10 @@ class clsTacxAntBushidoTrainer(clsTacxAntTrainer):
             )
             msg = AntMessage.compose(ant.msgID_BroadcastData, info)
             messages.append(msg)
-
             if debug.on(debug.Function):
                 logfile.Write(
                     "Bushido page 172/0x03 (OUT)  Mode=%d" % self.__ModeRequested
                 )
-
         # ---------------------------------------------------------------
         # Handle normal training commands in base class
         # ---------------------------------------------------------------
@@ -2539,7 +2541,6 @@ class clsTacxAntBushidoTrainer(clsTacxAntTrainer):
         SubPageNumber = info[2] if len(info) > 2 else None
         dataHandled = False
         messages = []
-
         if Channel == self.Channel:
             if id == ant.msgID_AcknowledgedData:
                 # -------------------------------------------------------------------
@@ -2580,7 +2581,7 @@ class clsTacxAntBushidoTrainer(clsTacxAntTrainer):
                             Year,
                             DeviceNumber,
                         ) = ant.msgUnpage173_01_TacxBushidoSerialMode(info)
-
+                        self._DeviceNumber = DeviceNumber
                         if debug.on(debug.Function):
                             logfile.Write(
                                 "Bushido Page=%d/%#x (IN)  Mode=%d Year=%d DeviceNumber=%d"
@@ -2592,7 +2593,6 @@ class clsTacxAntBushidoTrainer(clsTacxAntTrainer):
                                     DeviceNumber,
                                 )
                             )
-
                         if Mode == self.__ModeRequested:
                             if Mode == ant.VHU_PCmode:
                                 # PC connection active, go to training mode
@@ -2602,7 +2602,6 @@ class clsTacxAntBushidoTrainer(clsTacxAntTrainer):
                                 self.__ModeRequested = ant.VHU_Training
                             elif Mode == ant.VHU_Training:
                                 self.__SetState(BushidoState.Running)
-
                         dataHandled = True
 
                 elif self.__State == BushidoState.Running:
@@ -4032,3 +4031,36 @@ class clsTacxNewUsbTrainer(clsTacxUsbTrainer):
         if debug.on(debug.Function):
             logfile.Write("... returns %s" % rtn)
         return rtn
+
+
+@dataclass
+class ReceivedData:
+    def __init__(self, TacxTrainer):
+        self.TacxTrainer = TacxTrainer
+        self.HeartRate = None
+        self.Cadence = None
+        self.SpeedKmh = None
+        self.VirtualSpeedKmh = None
+        self.CurrentPower = None
+        self.ctrl_commands = []
+        self.CTP_command_time = 0
+        self.ant_event = False
+        self.bleEvent = False
+
+        self.PowerModeActive = None
+        self.TargetMode = None
+        self.TargetPower = None
+        self.TargetGrade = None
+        self.TargetResistance = None
+
+    def get(self, attribute):
+        """Get receieved data if present otherwise get trainer data."""
+        return (
+            getattr(self, attribute)
+            if getattr(self, attribute) is not None
+            else getattr(self.TacxTrainer, attribute)
+        )
+
+    def set(self, attribute, value):
+        """Set received data."""
+        setattr(self, attribute, value)

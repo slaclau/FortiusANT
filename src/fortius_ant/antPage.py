@@ -147,6 +147,78 @@ class Page82(AntPage):
         return super(Page82, cls).page(*args)
 
 
+class Page221_01(AntPage):
+    """Sub page 1 for page 221 (Legacy trainers)."""
+
+    data_page_number = 221
+    fChannel = sc.unsigned_char  # First byte of the ANT+ message content
+    fDataPageNumber = sc.unsigned_char  # First byte of the ANT+ datapage (payload)
+    fSubPageNumber = sc.unsigned_char  # == 0x01
+    fSpeed = sc.unsigned_short  # speed (km/h) * 10
+    fPower = sc.unsigned_short  # power (W)
+    fCadence = sc.unsigned_char  # cadence (rpm)
+    fBalance = sc.unsigned_char  # L/R power balance (%)
+
+    message_format = (
+        sc.big_endian
+        + fChannel
+        + fDataPageNumber
+        + fSubPageNumber
+        + fSpeed
+        + fPower
+        + fCadence
+        + fBalance
+    )
+
+
+class Page221_02(AntPage):
+    """Sub page 2 for page 221 (Legacy trainers)."""
+
+    data_page_number = 221
+    fChannel = sc.unsigned_char  # First byte of the ANT+ message content
+    fDataPageNumber = sc.unsigned_char  # First byte of the ANT+ datapage (payload)
+    fSubPageNumber = sc.unsigned_char  # == 0x02
+
+    fDistance = sc.unsigned_int  # distance (m)
+    fHeartrate = sc.unsigned_char  # heartrate (bpm) (Vortex/Bushido only?)
+    fPadding = sc.pad
+
+    message_format = (
+        sc.big_endian
+        + fChannel
+        + fDataPageNumber
+        + fSubPageNumber
+        + fDistance
+        + fHeartrate
+        + fPadding
+    )
+
+
+class Page221_03(AntPage):
+    """Sub page 3 for page 221 (Legacy trainers)."""
+
+    data_page_number = 221
+    fChannel = sc.unsigned_char  # First byte of the ANT+ message content
+    fDataPageNumber = sc.unsigned_char  # First byte of the ANT+ datapage (payload)
+    fSubPageNumber = sc.unsigned_char  # == 0x03
+
+    fAlarm = sc.unsigned_short  # alarm bitmask
+    fTemperature = sc.unsigned_char  # brake temperature (°C ?)
+    fPowerback = sc.unsigned_short  # Powerback (W)
+    fPadding = sc.pad
+
+    message_format = (
+        sc.big_endian
+        + fChannel
+        + fDataPageNumber
+        + fSubPageNumber
+        + fAlarm
+        + fTemperature
+        + fPowerback
+        + fPadding
+    )
+
+
 class FEPage16(AntPage):
     """Page 16 contains generic trainer information."""
 
@@ -260,7 +332,6 @@ class HRMPage(AntPage):
 
     @classmethod
     def page(cls, data_page_number, *args):
-        print(*args)
         cls.data_page_number = data_page_number
         return super(HRMPage, cls).page(*args)
 

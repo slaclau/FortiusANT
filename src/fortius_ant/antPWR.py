@@ -42,6 +42,7 @@ SWrevisionMain_PWR = 1  # char
 SWrevisionSupp_PWR = 1  # char
 
 channel_PWR = 2  # ANT+ Channel for Power Profile
+DeviceTypeID_bike_power = 11
 
 
 class AntPWR(AntInterface):
@@ -49,21 +50,29 @@ class AntPWR(AntInterface):
 
     interleave_reset = 121
 
-    def __init__(self):
+    channel = channel_PWR
+    device_type_id = DeviceTypeID_bike_power
+
+    def __init__(self, master=True):
+        super().__init__(master)
         self.interleave = None
         self.accumulated_power = None
         self.event_count = None
         self.initialize()
 
     def initialize(self):
+        """Initialize values to zero."""
         self.interleave = 0
         self.accumulated_power = 0
         self.event_count = 0
-        
-    def broadcast_message_from_trainer(self, TacxTrainer: clsTacxTrainer):
-        return broadcast_message(TacxTrainer.CurrentPower, TacxTrainer.Cadence)
 
-    def _broadcast_message(self, interleave: int, CurrentPower: float, Cadence: float):
+    def broadcast_message_from_trainer(self):
+        """Broadcast power and cadence from trainer."""
+        return self.broadcast_message(self.trainer.CurrentPower, self.trainer.Cadence)
+
+    def _broadcast_message(  # noqa PLW211
+        self, interleave: int, CurrentPower: float, Cadence: float
+    ):
         Cadence = int(min(0xFF, Cadence))
         CurrentPower = int(max(0, min(0x0FFF, CurrentPower)))  # 2021-02-19
         if interleave == 61:  # Transmit page 0x52 = 82
@@ -106,6 +115,12 @@ class AntPWR(AntInterface):
             )
 
         return AntMessage.compose(msgID_BroadcastData, page)
+
+    def _handle_broadcast_message(self, data_page_number: int, info: bytes):
+        pass
+
+    def _handle_acknowledged_message(self, data_page_number, info):
+        pass
 
 
 pwr = AntPWR()

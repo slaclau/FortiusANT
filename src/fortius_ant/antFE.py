@@ -14,10 +14,20 @@ __version__ = "2023-04-16"
 # -------------------------------------------------------------------------------
 import time
 
-from fortius_ant.antInterface import AntInterface
+from fortius_ant.antDongle import (
+    msgUnpage48_BasicResistance,
+    msgUnpage49_TargetPower,
+    msgUnpage50_WindResistance,
+    msgUnpage51_TrackResistance,
+    msgPage54_FE_Capabilities,
+    msgUnpage55_UserConfiguration,
+    msgUnpage70_RequestDataPage,
+    msgPage71_CommandStatus,
+)
+from fortius_ant.antInterface import AntInterface, UnknownDataPage, UnsupportedPage
 from fortius_ant.antMessage import AntMessage, Manufacturer_tacx, msgID_BroadcastData
-from fortius_ant.antPage import Page80, Page81, FEPage16, FEPage25
-from fortius_ant.usbTrainer import clsTacxTrainer
+from fortius_ant.antPage import Page80, Page81, Page82, FEPage16, FEPage25
+from fortius_ant import debug, logfile
 
 ModelNumber_FE = 2875  # short antifier-value=0x8385, Tacx Neo=2875
 SerialNumber_FE = 19590705  # int   1959-7-5
@@ -26,14 +36,18 @@ SWrevisionMain_FE = 1  # char
 SWrevisionSupp_FE = 1  # char
 
 channel_FE = 0  # ANT+ channel for Fitness Equipment
+DeviceTypeID_fitness_equipment = 17
 
 
-class antFE(AntInterface):
+class AntFE(AntInterface):
     """Interface for communicating as an ANT+ Fitness Equipment."""
 
     interleave_reset = 256
+    channel = channel_FE
+    device_type_id = DeviceTypeID_fitness_equipment
 
-    def __init__(self):
+    def __init__(self, master=True):
+        super().__init__(master)
         self.interleave = None
         self.event_count = None
         self.accumulated_power = None
@@ -43,6 +57,7 @@ class antFE(AntInterface):
         self.initialize()
 
     def initialize(self):
+        """Initialize values to zero."""
         super().initialize()
         self.interleave = 0
         self.event_count = 0
@@ -50,7 +65,7 @@ class antFE(AntInterface):
         self.accumulated_time = 0
         self.distance_travelled = 0
         self.accumulated_last_time = time.time()
-        
+
     def broadcast_message(self, *args):
         """Assemble the message to be sent."""
         message = self._broadcast_message(self.interleave, *args)
@@ -58,11 +73,17 @@ class antFE(AntInterface):
         if self.interleave == self.interleave_reset:
             self.interleave = 0
         return message
-        
-    def broadcast_message_from_trainer(self, TacxTrainer: clsTacxTrainer):
-        return broadcast_message(TacxTrainer.Cadence, TacxTrainer.CurrentPower, TacxTrainer.SpeedKmh, TacxTrainer.HeartRate)
 
-    def _broadcast_message(
+    def broadcast_message_from_trainer(self):
+        """Broadcast trainer data as ANT+ FE device."""
+        return self.broadcast_message(
+            self.trainer.Cadence,
+            self.trainer.CurrentPower,
+            self.trainer.SpeedKmh,
+            self.trainer.HeartRate,
+        )
+
+    def _broadcast_message(  # noqa PLW221
         self, interleave: int, Cadence, CurrentPower, SpeedKmh, HeartRate
     ):
         CurrentPower = max(0, CurrentPower)  # Not negative
@@ -163,8 +184,241 @@ class antFE(AntInterface):
         # -------------------------------------------------------------------------
         return AntMessage.compose(msgID_BroadcastData, page)
 
+    def _handle_broadcast_message(self, data_page_number: int, info: bytes):
+        pass
 
-fe = antFE()
+    def _handle_acknowledged_message(self, data_page_number, info):
+        self.received_data.ant_event = True
+        self.received_data.CTP_command_time = time.time()
+        # -------------------------------------------------------
+        # Data page 48 (0x30) Basic resistance
+        # -------------------------------------------------------
+        if data_page_number == 48:
+            # logfile.Console('Data page 48 Basic mode not implemented')
+            # I never saw this appear anywhere (2020-05-08)
+            # TargetMode            = mode_Basic
+            # TargetGradeFromDongle = 0
+            # TargetPowerFromDongle = ant.msgUnpage48_BasicResistance(info) * 1000
+            # n % of maximum of 1000Watt
+
+            # 2020-11-04 as requested in issue 119
+            # The percentage is used to calculate grade 0...20%
+            Grade = msgUnpage48_BasicResistance(info) * 20
+
+            # Implemented for Magnetic Brake:
+            # - grade is NOT shifted with GradeShift (here never negative)
+            # - but is reduced with factor
+            # - and is NOT reduced with factorDH since never negative
+            Grade *= self.clv.GradeFactor
+
+            self.trainer.SetGrade(Grade)
+            self.trainer.SetRollingResistance(0.004)
+            self.trainer.SetWind(0.51, 0.0, 1.0)
+
+            # Update "last command" data in case page 71 is requested later
+            self.p71_LastReceivedCommandID = data_page_number
+            # wrap around after 254 (255 = no command received)
+            self.p71_SequenceNr = (self.p71_SequenceNr + 1) % 255
+            self.p71_CommandStatus = 0  # successfully processed
+            # echo raw command data (cannot use unpage, unpage does unit conversion etc)
+            self.p71_Data2 = 0xFF
+            self.p71_Data3 = 0xFF
+            self.p71_Data4 = info[8]  # target resistance
+            return None
+        # -------------------------------------------------------
+        # Data page 49 (0x31) Target Power
+        # -------------------------------------------------------
+        if data_page_number == 49:
+            self.trainer.SetPower(msgUnpage49_TargetPower(info))
+            TargetPowerTime = time.time()
+            if self.clv.PowerMode and debug.on(debug.Application):
+                logfile.Write("PowerMode: TargetPower info received - timestamp set")
+
+            # Update "last command" data in case page 71 is requested later
+            self.p71_LastReceivedCommandID = data_page_number
+            # wrap around after 254 (255 = no command received)
+            self.p71_SequenceNr = (self.p71_SequenceNr + 1) % 255
+            self.p71_CommandStatus = 0  # successfully processed
+            # echo raw command data (cannot use unpage, unpage does unit conversion etc)
+            self.p71_Data2 = 0xFF
+            self.p71_Data3 = info[7]  # target power (LSB)
+            self.p71_Data4 = info[8]  # target power (MSB)
+            return None
+        # -------------------------------------------------------
+        # Data page 50 (0x32) Wind Resistance
+        # -------------------------------------------------------
+        if data_page_number == 50:
+            (
+                WindResistance,
+                WindSpeed,
+                DraftingFactor,
+            ) = msgUnpage50_WindResistance(info)
+            self.trainer.SetWind(WindResistance, WindSpeed, DraftingFactor)
+
+            # Update "last command" data in case page 71 is requested later
+            self.p71_LastReceivedCommandID = data_page_number
+            # wrap around after 254 (255 = no command received)
+            self.p71_SequenceNr = (self.p71_SequenceNr + 1) % 255
+            self.p71_CommandStatus = 0  # successfully processed
+            # echo raw command data (cannot use unpage, unpage does unit conversion etc)
+            self.p71_Data2 = info[6]  # wind resistance coefficient
+            self.p71_Data3 = info[7]  # wind speed
+            self.p71_Data4 = info[8]  # drafting factor
+            return None
+        # -------------------------------------------------------
+        # Data page 51 (0x33) Track resistance
+        # -------------------------------------------------------
+        if data_page_number == 51:
+            if self.clv.PowerMode and (time.time() - TargetPowerTime) < 30:
+                # -----------------------------------------------
+                # In PowerMode, TrackResistance is ignored
+                #       (for xx seconds after the last power-command)
+                # So if TrainerRoad is used simultaneously with
+                #       Zwift/Rouvythe power commands from TR
+                #       take precedence over Zwift/Rouvy and a
+                #       power-training can be done while riding
+                #       a Zwift/Rouvy simulation/video!
+                # When TrainerRoad is finished, the Track
+                #       resistance is active again
+                # -----------------------------------------------
+                self.received_data.PowerModeActive = " [P]"
+                if debug.on(debug.Application):
+                    logfile.Write("PowerMode: Grade info ignored")
+            else:
+                (
+                    Grade,
+                    RollingResistance,
+                ) = msgUnpage51_TrackResistance(info)
+
+                # -----------------------------------------------
+                # Implemented when implementing Magnetic Brake:
+                # [-] grade is shifted with GradeShift (-10% --> 0) ]
+                # - then reduced with factor (can be re-adjusted with Virtual Gearbox)
+                # - and reduced with factorDH (for downhill only)
+                #
+                # GradeAdjust is valid for all configurations!
+                #
+                # GradeShift is not expected to be used anymore,
+                # and only left from earliest implementations
+                # to avoid it has to be re-introduced in future again.
+                # -----------------------------------------------
+                Grade += self.clv.GradeShift
+                Grade *= self.clv.GradeFactor
+                if Grade < 0:
+                    Grade *= self.clv.GradeFactorDH
+
+                self.trainer.SetGrade(Grade)
+                self.trainer.SetRollingResistance(RollingResistance)
+                self.received_data.PowerModeActive = ""
+
+            # Update "last command" data in case page 71 is requested later
+            self.p71_LastReceivedCommandID = data_page_number
+            # wrap around after 254 (255 = no command received)
+            self.p71_SequenceNr = (self.p71_SequenceNr + 1) % 255
+            self.p71_CommandStatus = 0  # successfully processed
+            # echo raw command data (cannot use unpage, unpage does unit conversion etc)
+            self.p71_Data2 = info[6]  # target grade (LSB)
+            self.p71_Data3 = info[7]  # target grade (MSB)
+            self.p71_Data4 = info[8]  # rolling resistance coefficient
+            return None
+        # -------------------------------------------------------
+        # Data page 55 User configuration
+        # -------------------------------------------------------
+        if data_page_number == 55:
+            (
+                UserWeight,
+                BicycleWeight,
+                BicycleWheelDiameter,
+                GearRatio,
+            ) = msgUnpage55_UserConfiguration(info)
+            self.trainer.SetUserConfiguration(
+                UserWeight,
+                BicycleWeight,
+                BicycleWheelDiameter,
+                GearRatio,
+            )
+            return None
+        # -------------------------------------------------------
+        # Data page 70 Request data page
+        # -------------------------------------------------------
+        if data_page_number == 70:
+            (
+                _SlaveSerialNumber,
+                _DescriptorByte1,
+                _DescriptorByte2,
+                _AckRequired,
+                NrTimes,
+                RequestedPageNumber,
+                _CommandType,
+            ) = msgUnpage70_RequestDataPage(info)
+            info = False
+            if RequestedPageNumber == 54:
+                # Capabilities;
+                # bit 0 = Basic mode
+                # bit 1 = Target/Power/Ergo mode
+                # bit 2 = Simulation/Restance/Slope mode
+                info = msgPage54_FE_Capabilities(
+                    self.channel, 0xFF, 0xFF, 0xFF, 0xFF, 1000, 0x07
+                )
+
+            elif RequestedPageNumber == 71:
+                info = msgPage71_CommandStatus(
+                    self.channel,
+                    self.p71_LastReceivedCommandID,
+                    self.p71_SequenceNr,
+                    self.p71_CommandStatus,
+                    self.p71_Data1,
+                    self.p71_Data2,
+                    self.p71_Data3,
+                    self.p71_Data4,
+                )
+
+            elif RequestedPageNumber == 80:
+                info = Page80.page(
+                    self.channel,
+                    0xFF,
+                    0xFF,
+                    HWrevision_FE,
+                    Manufacturer_tacx,
+                    ModelNumber_FE,
+                )
+
+            elif RequestedPageNumber == 81:
+                info = Page81.page(
+                    self.channel,
+                    0xFF,
+                    SWrevisionSupp_FE,
+                    SWrevisionMain_FE,
+                    SerialNumber_FE,
+                )
+
+            elif RequestedPageNumber == 82:
+                info = Page82.page(self.channel)
+
+            else:
+                raise UnsupportedPage(RequestedPageNumber)
+
+            if info is not False:
+                data = []
+                d = AntMessage.compose(msgID_BroadcastData, info)
+                while NrTimes:
+                    data.append(d)
+                    NrTimes -= 1
+                return (data, False, False, False)
+            return None
+        # -------------------------------------------------------
+        # Data page 252 ????
+        # -------------------------------------------------------
+        if data_page_number == 252 and debug.on(debug.Data1):
+            logfile.Write(f"FE data page 252 ignored. info={logfile.HexSpace(info)}")
+            return None
+        # -------------------------------------------------------
+        # Other data pages
+        # -------------------------------------------------------
+        raise UnknownDataPage(data_page_number)
+
+
+fe = AntFE()
 Interleave = fe.interleave
 
 

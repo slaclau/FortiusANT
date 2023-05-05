@@ -15,14 +15,18 @@ from fortius_ant.antPage import SCSPage
 from fortius_ant.usbTrainer import clsTacxTrainer
 
 channel_SCS = 3  # ANT+ Channel for Speed Cadence Sensor
+DeviceTypeID_bike_speed_cadence = 121
 
 
 class AntSCS(AntInterface):
     """Interface for communicating as a speed and cadence sensor."""
 
     interleave_reset = 0
+    channel = channel_SCS
+    device_type_id = DeviceTypeID_bike_speed_cadence
 
-    def __init__(self):
+    def __init__(self, master=True):
+        super().__init__(master)
         self.pedal_echo_previous_count = None  # There is no previous
         self.cadence_event_time = None  # Initiate the even variables
         self.cadence_event_count = None
@@ -31,16 +35,23 @@ class AntSCS(AntInterface):
         self.initialize()
 
     def initialize(self):
+        """Initialize values to zero."""
         self.pedal_echo_previous_count = 0  # There is no previous
         self.cadence_event_time = 0  # Initiate the even variables
         self.cadence_event_count = 0
         self.speed_event_time = 0
         self.speed_event_count = 0
-        
-    def broadcast_message_from_trainer(self, TacxTrainer: clsTacxTrainer):
-        return broadcast_message(TacxTrainer.PedalEchoTime, TacxTrainer.PedalEchoCount, TacxTrainer.SpeedKmh, TacxTrainer.Cadence)
 
-    def _broadcast_message(
+    def broadcast_message_from_trainer(self):
+        """Broadcast speed and cadence data from trainer."""
+        return self.broadcast_message(
+            self.trainer.PedalEchoTime,
+            self.trainer.PedalEchoCount,
+            self.trainer.SpeedKmh,
+            self.trainer.Cadence,
+        )
+
+    def _broadcast_message(  # noqa PLW211
         self, interleave: int, _PedalEchoTime, PedalEchoCount, SpeedKmh, Cadence
     ):
         if (
@@ -111,6 +122,12 @@ class AntSCS(AntInterface):
             self.speed_event_count,
         )
         return AntMessage.compose(msgID_BroadcastData, page)
+
+    def _handle_broadcast_message(self, data_page_number: int, info: bytes):
+        pass
+
+    def _handle_acknowledged_message(self, data_page_number, info):
+        pass
 
 
 scs = AntSCS()

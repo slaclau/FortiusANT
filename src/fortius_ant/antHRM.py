@@ -12,10 +12,10 @@ __version__ = "2023-04-16"
 # -------------------------------------------------------------------------------
 import time
 
-from fortius_ant.antInterface import AntInterface
+from fortius_ant.antInterface import AntInterface, msgID_ChannelID, UnknownDataPage
 from fortius_ant.antMessage import AntMessage, Manufacturer_garmin, msgID_BroadcastData
 from fortius_ant.antPage import HRMPage
-from fortius_ant.usbTrainer import clsTacxTrainer
+from fortius_ant.antDongle import unmsg51_ChannelID, msg4D_RequestMessage
 
 ModelNumber_HRM = 0x33  # char  antifier-value
 SerialNumber_HRM = 5975  # short 1959-7-5
@@ -23,14 +23,18 @@ HWrevision_HRM = 1  # char
 SWversion_HRM = 1  # char
 
 channel_HRM = 1  # ANT+ channel for Heart Rate Monitor
+DeviceTypeID_heart_rate = 120
 
 
 class AntHRM(AntInterface):
     """Interface for communicating as an ANT+ HRM."""
 
     interleave_reset = 256
+    channel = channel_HRM
+    device_type_id = DeviceTypeID_heart_rate
 
-    def __init__(self):
+    def __init__(self, master=True):
+        super().__init__(master)
         self.interleave = None
         self.heart_beat_counter = None
         self.heart_beat_event_time = None
@@ -39,18 +43,19 @@ class AntHRM(AntInterface):
         self.initialize()
 
     def initialize(self):
+        """Initialize variables to zero."""
         super().initialize()
         self.interleave = 0
         self.heart_beat_counter = 0
         self.heart_beat_event_time = 0
         self.heart_beat_time = 0
         self.page_change_toggle = 0
-        
-    def broadcast_message_from_trainer(self, TacxTrainer: clsTacxTrainer):
-        return broadcast_message(TacxTrainer.HeartRate)
 
+    def broadcast_message_from_trainer(self):
+        """Broadcast the heartrate from the trainer."""
+        return self.broadcast_message(max(self.trainer.HeartRate, 1))
 
-    def _broadcast_message(self, interleave: int, HeartRate):
+    def _broadcast_message(self, interleave: int, HeartRate):  # noqa PLW221
         if (time.time() - self.heart_beat_time) >= (60 / float(HeartRate)):
             self.heart_beat_counter += 1  # Increment heart beat count
             self.heart_beat_event_time += 60 / float(
@@ -101,11 +106,49 @@ class AntHRM(AntInterface):
             Spec1,
             Spec2,
             Spec3,
-            self.heart_beat_event_time,
+            int(self.heart_beat_event_time),
             self.heart_beat_counter,
             int(HeartRate),
         )
         return AntMessage.compose(msgID_BroadcastData, page)
+
+    def _handle_channel_id_message(self, info):
+        super()._handle_channel_id_message(info)
+        (
+            Channel,
+            DeviceNumber,
+            DeviceTypeID,
+            _TransmissionType,
+        ) = unmsg51_ChannelID(info)
+
+        if DeviceNumber == 0:  # No device paired, ignore
+            pass
+
+        elif Channel == self.channel and DeviceTypeID == self.device_type_id:
+            self.paired = True
+            self.gui.SetMessages(HRM=f"Heart Rate Monitor paired: {DeviceNumber}")
+
+    def _handle_broadcast_message(self, data_page_number: int, info: bytes):
+        if not self.paired:
+            message = msg4D_RequestMessage(self.channel, msgID_ChannelID)
+            return ([message], False, True, True)
+        if data_page_number & 0x7F in (0, 1, 2, 3, 4, 5, 6, 7, 89, 95):
+            (
+                _Channel,
+                _DataPageNumber,
+                _Spec1,
+                _Spec2,
+                _Spec3,
+                _HeartBeatEventTime,
+                _HeartBeatCount,
+                HeartRate,
+            ) = HRMPage.unpage(info)
+            self.received_data.set("HeartRate", HeartRate)
+            return None
+        raise UnknownDataPage
+
+    def _handle_acknowledged_message(self, data_page_number, info):
+        pass
 
 
 hrm = AntHRM()
