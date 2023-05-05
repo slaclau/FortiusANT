@@ -744,11 +744,7 @@ def Tacx2Dongle(FortiusAntGui):
     return rtn
 
 
-<<<<<<< HEAD
-def Tacx2DongleSub(FortiusAntGui, Restart):
-=======
 def _tacx_2_dongle(FortiusAntGui, Restart):
->>>>>>> feature/ant-classes
     assert AntDongle  # The class must be created
     assert TacxTrainer  # The class must be created
     assert bleCTP  # The class must be created
