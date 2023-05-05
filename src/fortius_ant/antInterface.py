@@ -85,7 +85,7 @@ class AntInterface:
         """Handle data received over ANT."""
         if channel != self.channel:
             raise WrongChannel
-        self._handle_received_info(message_id, data_page_number, info)
+        return self._handle_received_info(message_id, data_page_number, info)
 
     def _handle_received_info(
         self, message_id: int, data_page_number: int, info: bytes
@@ -141,6 +141,14 @@ class UnknownMessageID(Exception):
 class UnknownDataPage(Exception):
     """Raise when attempting to handle an unknown data page."""
 
+    def __init__(self, page_number: int = None):
+        self.page_number = page_number
+        self.message = f"Page {page_number} is not known"
+
 
 class UnsupportedPage(Exception):
     """Raise when an unsupported page is requested."""
+
+    def __init__(self, page_number: int = None):
+        self.page_number = page_number
+        self.message = f"Page {page_number} is not supported"

@@ -800,19 +800,25 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
     ant_fe = fe.AntFE()
     ant_fe.set_clv(clv)
     ant_fe.set_received_data(received_data)
-    ant_fe.set_trainer(TacxTrainer)
 
-    if clv.HRM > 0:
+    interfaces = [ant_fe]
+
+    if clv.hrm is None:
+        ant_hrm = hrm.AntHRM()
+        interfaces.append(ant_hrm)
+    elif clv.hrm >= 0:
         ant_hrm = hrm.AntHRM(False)
         ant_hrm.set_received_data(received_data)
-    else:
-        ant_hrm = hrm.AntHRM()
+        interfaces.append(ant_hrm)
 
     ant_pwr = pwr.AntPWR()
     ant_scs = scs.AntSCS()
     ant_ctrl = ctrl.AntCTRL()
 
-    interfaces = [ant_fe, ant_hrm, ant_pwr, ant_scs, ant_ctrl]
+    interfaces.extend([ant_pwr, ant_scs, ant_ctrl])
+
+    for interface in interfaces:
+        interface.set_trainer(TacxTrainer)
     # ---------------------------------------------------------------------------
     # Initialize CycleTime: fast for PedalStrokeAnalysis
     # ---------------------------------------------------------------------------
@@ -1037,9 +1043,7 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
 
                 for ant_interface in interfaces:
                     if ant_interface.master:
-                        messages.append(
-                            ant_interface.broadcast_message_from_trainer(TacxTrainer)
-                        )
+                        messages.append(ant_interface.broadcast_message_from_trainer())
 
                 if clv.ble:
                     _handle_bleCTP(received_data, Steering)
@@ -1075,12 +1079,18 @@ def _tacx_2_dongle(FortiusAntGui, Restart):
                     if BlackTrack.HandleAntMessage(d):
                         continue
 
+                print(
+                    f"Channel: {Channel}, Message id: {id}, "
+                    f"data page number: {DataPageNumber}, info: {info}"
+                )
+
                 for ant_interface in interfaces:
                     try:
                         rtn = ant_interface.handle_received_info(
                             Channel, id, DataPageNumber, info
                         )
-                        AntDongle.Write(rtn) 
+                        if rtn is not None:
+                            AntDongle.Write(rtn)
 
                     except WrongChannel:
                         pass

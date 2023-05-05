@@ -260,7 +260,6 @@ class HRMPage(AntPage):
 
     @classmethod
     def page(cls, data_page_number, *args):
-        print(*args)
         cls.data_page_number = data_page_number
         return super(HRMPage, cls).page(*args)
 

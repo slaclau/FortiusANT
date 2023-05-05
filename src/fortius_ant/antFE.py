@@ -397,7 +397,7 @@ class AntFE(AntInterface):
                 info = Page82.page(self.channel)
 
             else:
-                raise UnsupportedPage
+                raise UnsupportedPage(RequestedPageNumber)
 
             if info is not False:
                 data = []
@@ -416,7 +416,7 @@ class AntFE(AntInterface):
         # -------------------------------------------------------
         # Other data pages
         # -------------------------------------------------------
-        raise UnknownDataPage
+        raise UnknownDataPage(data_page_number)
 
 
 fe = AntFE()

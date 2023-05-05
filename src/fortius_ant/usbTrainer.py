@@ -4043,13 +4043,17 @@ class ReceivedData:
         self.Cadence = None
         self.SpeedKmh = None
         self.VirtualSpeedKmh = None
-        self.Power = None
+        self.CurrentPower = None
         self.ctrl_commands = []
         self.CTP_command_time = 0
         self.ant_event = False
         self.bleEvent = False
 
         self.PowerModeActive = None
+        self.TargetMode = None
+        self.TargetPower = None
+        self.TargetGrade = None
+        self.TargetResistance = None
 
     def get(self, attribute):
         """Get receieved data if present otherwise get trainer data."""
