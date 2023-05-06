@@ -129,14 +129,14 @@ class SpecialMessage(AntMessage):
     info: bytes
 
     @classmethod
-    def _parse_args(cls, **kwargs):
+    def _parse_args(cls, **kwargs) -> bytes:
         raise NotImplementedError
 
     @classmethod
     def create(cls, **kwargs):
         """Create message."""
-        cls._parse_args(**kwargs)
-        return cls.compose(cls.message_id, cls.info)
+        info = cls._parse_args(**kwargs)
+        return cls.compose(cls.message_id, info)
         
     @classmethod
     def unmessage(cls, info):
@@ -152,7 +152,7 @@ class Message41(SpecialMessage):
     @classmethod
     def _parse_args(cls, **kwargs):
         channel = kwargs["channel"]
-        cls.info = struct.pack(message_format, channel)
+        return struct.pack(message_format, channel)
 
 
 class Message42(SpecialMessage):
@@ -168,7 +168,7 @@ class Message42(SpecialMessage):
         channel = kwargs["channel"]
         channel_type = kwargs["type"]
         network = kwargs["network"]
-        cls.info = struct.pack(message_format, channel, channel_type, network)
+        return struct.pack(message_format, channel, channel_type, network)
 
 
 class Message43(SpecialMessage):
@@ -181,7 +181,7 @@ class Message43(SpecialMessage):
     def _parse_args(cls, **kwargs):
         channel = kwargs["channel"]
         period = kwargs["period"]
-        cls.info = struct.pack(message_format, channel, period)
+        return struct.pack(message_format, channel, period)
 
 
 class Message44(SpecialMessage):
@@ -194,7 +194,7 @@ class Message44(SpecialMessage):
     def _parse_args(cls, **kwargs):
         channel = kwargs["channel"]
         timeout = kwargs["timeout"]
-        cls.info = struct.pack(message_format, channel, timeout)
+        return struct.pack(message_format, channel, timeout)
 
 
 class Message45(SpecialMessage):
@@ -207,7 +207,7 @@ class Message45(SpecialMessage):
     def _parse_args(cls, **kwargs):
         channel = kwargs["channel"]
         frequency = kwargs["frequency"]
-        cls.info = struct.pack(message_format, channel, frequency)
+        return struct.pack(message_format, channel, frequency)
 
 
 class Message46(SpecialMessage):
@@ -220,7 +220,7 @@ class Message46(SpecialMessage):
     def _parse_args(cls, **kwargs):
         network = kwargs["network"] if "network" in kwargs else 0x00
         key = kwargs["key"] if "key" in kwargs else 0x45C372BDFB21A5B9
-        cls.info = struct.pack(message_format, network, key)
+        return struct.pack(message_format, network, key)
 
 
 class Message4A(SpecialMessage):
@@ -231,7 +231,7 @@ class Message4A(SpecialMessage):
 
     @classmethod
     def _parse_args(cls, **kwargs)
-        cls.info = struct.pack(message_format, 0x00)
+        return struct.pack(message_format, 0x00)
 
 
 class Message4B(SpecialMessage):
@@ -243,7 +243,7 @@ class Message4B(SpecialMessage):
     @classmethod
     def _parse_args(cls, **kwargs):
         channel = kwargs["channel"]
-        cls.info = struct.pack(message_format, channel)
+        return struct.pack(message_format, channel)
 
 
 class Message4D(SpecialMessage):
@@ -256,7 +256,7 @@ class Message4D(SpecialMessage):
     def _parse_args(cls, **kwargs):
         channel = kwargs["channel"]
         requested_id = kwargs["id"]
-        cls.info = struct.pack(message_format, channel, requested_id)
+        return struct.pack(message_format, channel, requested_id)
 
 
 class Message51(SpecialMessage):
@@ -277,7 +277,7 @@ class Message51(SpecialMessage):
         device_number = kwargs["device_number"]
         device_type_id = kwargs["device_type_id"]
         transmission_type = kwargs["transmission_type"]
-        cls.info = struct.pack(
+        return struct.pack(
             message_format, channel, device_number, device_type_id, transmission_type
         )
 
@@ -292,4 +292,4 @@ class Message50(SpecialMessage):
     def _parse_args(cls, **kwargs):
         channel = kwargs["channel"]
         power = kwargs["power"]
-        cls.info = struct.pack(message_format, channel, power)
+        return struct.pack(message_format, channel, power)
