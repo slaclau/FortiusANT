@@ -261,6 +261,10 @@ class Message51(SpecialMessage):
 
     @classmethod
     def _parse_args(cls, **kwargs):
+        channel = kwargs["channel"]
+        device_number = kwargs["device_number"]
+        device_type_id = kwargs["device_type_id"]
+        transmission_type = kwargs["transmission_type"]
         message_format = (
             sc.no_alignment
             + sc.unsigned_char
@@ -269,7 +273,7 @@ class Message51(SpecialMessage):
             + sc.unsigned_char
         )
         cls.info = struct.pack(
-            message_format, ChannelNumber, DeviceNumber, DeviceTypeID, TransmissionType
+            message_format, channel, device_number, device_type_id, transmission_type
         )
 
 
@@ -280,5 +284,7 @@ class Message50(SpecialMessage):
 
     @classmethod
     def _parse_args(cls, **kwargs):
+        channel = kwargs["channel"]
+        power = kwargs["power"]
         message_format = sc.no_alignment + sc.unsigned_char + sc.unsigned_char
-        cls.info = struct.pack(message_format, ChannelNumber, TransmitPower)
+        cls.info = struct.pack(message_format, channel, power)
