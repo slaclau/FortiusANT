@@ -7,7 +7,6 @@ from fortius_ant.FortiusAntCommand import CommandLineVariables
 from fortius_ant.usbTrainer import clsTacxTrainer, ReceivedData
 from fortius_ant.antDongle import (
     clsAntDongle,
-    unmsg51_ChannelID,
 )
 from fortius_ant.antMessage import (
     msgID_AcknowledgedData,
@@ -15,6 +14,7 @@ from fortius_ant.antMessage import (
     msgID_ChannelID,
     msgID_ChannelResponse,
     msgID_BurstData,
+    Message51,
 )
 
 print_debug = False
@@ -111,7 +111,7 @@ class AntInterface:
             DeviceNumber,
             DeviceTypeID,
             _TransmissionType,
-        ) = unmsg51_ChannelID(info)
+        ) = Message51.unmessage(info)
 
         if DeviceNumber == 0:  # No device paired, ignore
             pass
