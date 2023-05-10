@@ -108,8 +108,30 @@ class AntMessage(bytes):
 
         return synch, length, messageID, info, checksum, rest, Channel, DataPageNumber
 
+    @classmethod
+    def decompose_to_dict(cls, message) -> dict:
+        """Decompose message into dictionary."""
+        rtn = {}
+        response = cls.decompose(message)
+        rtn["synch"] = response[0]
+        rtn["length"] = response[1]
+        rtn["id"] = response[2]
+        rtn["info"] = response[3]
+        rtn["checksum"] = response[4]
+        rtn["rest"] = response[5]
+        rtn["channel"] = response[6]
+        rtn["page_number"] = response[7]
+
+        if rtn["synch"] != 0xA4:
+            raise ValueError
+        # if rtn["checksum"] != calc_checksum(message[0:-1]):
+        #    raise ValueError
+
+        return rtn
+
 
 def calc_checksum(message):
+    """Calculate checksum."""
     xor_value = 0
     length = message[1]  # byte 1; length of info
     length += 3  # Add synch, len, id
@@ -137,9 +159,10 @@ class SpecialMessage(AntMessage):
         """Create message."""
         info = cls._parse_args(**kwargs)
         return cls.compose(cls.message_id, info)
-        
+
     @classmethod
     def unmessage(cls, info):
+        """Convert message to parts."""
         return struct.unpack(cls.message_format, info)
 
 
@@ -152,7 +175,7 @@ class Message41(SpecialMessage):
     @classmethod
     def _parse_args(cls, **kwargs):
         channel = kwargs["channel"]
-        return struct.pack(message_format, channel)
+        return struct.pack(cls.message_format, channel)
 
 
 class Message42(SpecialMessage):
@@ -168,7 +191,7 @@ class Message42(SpecialMessage):
         channel = kwargs["channel"]
         channel_type = kwargs["type"]
         network = kwargs["network"]
-        return struct.pack(message_format, channel, channel_type, network)
+        return struct.pack(cls.message_format, channel, channel_type, network)
 
 
 class Message43(SpecialMessage):
@@ -181,7 +204,7 @@ class Message43(SpecialMessage):
     def _parse_args(cls, **kwargs):
         channel = kwargs["channel"]
         period = kwargs["period"]
-        return struct.pack(message_format, channel, period)
+        return struct.pack(cls.message_format, channel, period)
 
 
 class Message44(SpecialMessage):
@@ -194,7 +217,7 @@ class Message44(SpecialMessage):
     def _parse_args(cls, **kwargs):
         channel = kwargs["channel"]
         timeout = kwargs["timeout"]
-        return struct.pack(message_format, channel, timeout)
+        return struct.pack(cls.message_format, channel, timeout)
 
 
 class Message45(SpecialMessage):
@@ -202,12 +225,12 @@ class Message45(SpecialMessage):
 
     message_id = msgID_ChannelRfFrequency
     message_format = sc.no_alignment + sc.unsigned_char + sc.unsigned_char
-    
+
     @classmethod
     def _parse_args(cls, **kwargs):
         channel = kwargs["channel"]
         frequency = kwargs["frequency"]
-        return struct.pack(message_format, channel, frequency)
+        return struct.pack(cls.message_format, channel, frequency)
 
 
 class Message46(SpecialMessage):
@@ -220,7 +243,7 @@ class Message46(SpecialMessage):
     def _parse_args(cls, **kwargs):
         network = kwargs["network"] if "network" in kwargs else 0x00
         key = kwargs["key"] if "key" in kwargs else 0x45C372BDFB21A5B9
-        return struct.pack(message_format, network, key)
+        return struct.pack(cls.message_format, network, key)
 
 
 class Message4A(SpecialMessage):
@@ -230,8 +253,8 @@ class Message4A(SpecialMessage):
     message_format = sc.no_alignment + sc.unsigned_char
 
     @classmethod
-    def _parse_args(cls, **kwargs)
-        return struct.pack(message_format, 0x00)
+    def _parse_args(cls, **kwargs):
+        return struct.pack(cls.message_format, 0x00)
 
 
 class Message4B(SpecialMessage):
@@ -243,7 +266,7 @@ class Message4B(SpecialMessage):
     @classmethod
     def _parse_args(cls, **kwargs):
         channel = kwargs["channel"]
-        return struct.pack(message_format, channel)
+        return struct.pack(cls.message_format, channel)
 
 
 class Message4D(SpecialMessage):
@@ -254,9 +277,11 @@ class Message4D(SpecialMessage):
 
     @classmethod
     def _parse_args(cls, **kwargs):
-        channel = kwargs["channel"]
+        channel = kwargs["channel"] if "channel" in kwargs else 0
         requested_id = kwargs["id"]
-        return struct.pack(message_format, channel, requested_id)
+        print(channel)
+        print(requested_id)
+        return struct.pack(cls.message_format, channel, requested_id)
 
 
 class Message51(SpecialMessage):
@@ -278,7 +303,11 @@ class Message51(SpecialMessage):
         device_type_id = kwargs["device_type_id"]
         transmission_type = kwargs["transmission_type"]
         return struct.pack(
-            message_format, channel, device_number, device_type_id, transmission_type
+            cls.message_format,
+            channel,
+            device_number,
+            device_type_id,
+            transmission_type,
         )
 
 
@@ -292,4 +321,4 @@ class Message50(SpecialMessage):
     def _parse_args(cls, **kwargs):
         channel = kwargs["channel"]
         power = kwargs["power"]
-        return struct.pack(message_format, channel, power)
+        return struct.pack(cls.message_format, channel, power)
