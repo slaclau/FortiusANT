@@ -10,32 +10,6 @@ import struct
 import fortius_ant.structConstants as sc
 from fortius_ant.antPage import AntPage
 
-msgID_RF_EVENT = 0x01
-
-msgID_ANTversion = 0x3E
-msgID_BroadcastData = 0x4E
-msgID_AcknowledgedData = 0x4F
-msgID_ChannelResponse = 0x40
-msgID_Capabilities = 0x54
-
-msgID_UnassignChannel = 0x41
-msgID_AssignChannel = 0x42
-msgID_ChannelPeriod = 0x43
-msgID_ChannelSearchTimeout = 0x44
-msgID_ChannelRfFrequency = 0x45
-msgID_SetNetworkKey = 0x46
-msgID_ResetSystem = 0x4A
-msgID_OpenChannel = 0x4B
-msgID_RequestMessage = 0x4D
-
-msgID_ChannelID = 0x51  # Set, but also receive master channel - but how/when?
-msgID_ChannelTransmitPower = 0x60
-
-msgID_StartUp = 0x6F
-
-msgID_BurstData = 0x50
-
-
 class Id(Enum):
     """Message ID enum."""
 
@@ -57,7 +31,7 @@ class Id(Enum):
     OpenChannel = 0x4B
     RequestMessage = 0x4D
 
-    ChannelID = 0x51  # Set, but also receive master channel - but how/when?
+    ChannelID = 0x51
     ChannelTransmitPower = 0x60
 
     StartUp = 0x6F
@@ -72,37 +46,38 @@ Manufacturer_tacx = 89
 Manufacturer_trainer_road = 281
 Manufacturer_dev = 255
 
+SYNC = 0xA4
+
 
 class AntMessage(bytes):
     """A message to be sent over an ANT+ interface."""
+
+    types = {}
 
     def __init__(self, data: bytes):
         super(bytes, data)
 
     @classmethod
-    def compose(cls, messageID: int, info: AntPage):
+    def compose(cls, message_id: Id, info: AntPage):
         """Compose a message from its id and contents."""
         fSynch = sc.unsigned_char
         fLength = sc.unsigned_char
         fId = sc.unsigned_char
-        fInfo = str(len(info)) + sc.char_array  # 9 character string
+        fInfo = str(len(info)) + sc.char_array
 
         message_format = sc.no_alignment + fSynch + fLength + fId + fInfo
-        data = struct.pack(message_format, 0xA4, len(info), messageID, info)
-        # -----------------------------------------------------------------------
-        # Add the checksum
-        # (antifier added \00\00 after each message for unknown reason)
-        # -----------------------------------------------------------------------
+        data = struct.pack(message_format, SYNC, len(info), message_id.value, info)
+
         data += calc_checksum(data)
 
-        return cls(data)
+        return AntMessage(data)
 
     @classmethod
     def decompose(cls, message) -> tuple:
         """Decompose a message into its constituent parts."""
         synch = 0
         length = 0
-        messageID = 0
+        messageID = None
         checksum = 0
         info = binascii.unhexlify("")  # NULL-string bytes
         rest = ""  # No remainder (normal)
@@ -112,7 +87,7 @@ class AntMessage(bytes):
         if len(message) > 1:
             length = message[1]
         if len(message) > 2:
-            messageID = message[2]
+            messageID = Id(message[2])
         if len(message) > 3 + length:
             if length:
                 info = message[3 : 3 + length]  # Info, if length > 0
@@ -127,24 +102,18 @@ class AntMessage(bytes):
         if length >= 2:
             DataPageNumber = message[4]
 
-        # ---------------------------------------------------------------------------
-        # Special treatment for Burst data
-        # Note that SequenceNumber is not returned and therefore lost, which is to
-        #      be implemented as soon as we will use msgID_BurstData
-        # ---------------------------------------------------------------------------
-
-        if messageID == msgID_BurstData:
-            _SequenceNumber = (Channel & 0b11100000) >> 5  # Upper 3 bits # noqa: F841
+        if messageID == Id.BurstData:
+            burst_sequence_number = (Channel & 0b11100000) >> 5  # Upper 3 bits # noqa: F841
             Channel = Channel & 0b00011111  # Lower 5 bits
 
-        return synch, length, messageID, info, checksum, rest, Channel, DataPageNumber
+        return synch, length, messageID, info, checksum, rest, Channel, DataPageNumber, burst_sequence_number
 
     @classmethod
     def decompose_to_dict(cls, message) -> dict:
         """Decompose message into dictionary."""
         rtn = {}
         response = cls.decompose(message)
-        rtn["synch"] = response[0]
+        rtn["sync"] = response[0]
         rtn["length"] = response[1]
         rtn["id"] = response[2]
         rtn["info"] = response[3]
@@ -152,14 +121,28 @@ class AntMessage(bytes):
         rtn["rest"] = response[5]
         rtn["channel"] = response[6]
         rtn["page_number"] = response[7]
+        if rtn["id"] == Id.BurstData:
+            rtn["sequence_number"] = response[8]
 
-        if rtn["synch"] != 0xA4:
+        if rtn["sync"] != SYNC:
             raise ValueError
         # if rtn["checksum"] != calc_checksum(message[0:-1]):
         #    raise ValueError
 
         return rtn
 
+    @classmethod
+    def type_from_id(cls, message_id: Id):
+        if cls.types == {}:
+            first_subclasses = AntMessage.__subclasses__()
+            subclasses = []
+            for sc in first_subclasses:
+                subclasses += sc.__subclasses__()
+
+            for sc in subclasses:
+                cls.types[sc.message_id] = sc
+
+        return cls.types[message_id]
 
 def calc_checksum(message):
     """Calculate checksum."""
@@ -177,10 +160,13 @@ def calc_checksum(message):
 class SpecialMessageSend(AntMessage):
     """Special case messages - send."""
 
-    message_id: int
+    message_id: Id
     message_format: str
     info: bytes
-
+    
+    def __new__(cls, **kwargs):
+        return cls.create(**kwargs)
+   
     @classmethod
     def _parse_args(cls, **kwargs) -> bytes:
         raise NotImplementedError
@@ -195,7 +181,7 @@ class SpecialMessageSend(AntMessage):
 class SpecialMessageReceive(AntMessage):
     """Special case messages - receive."""
 
-    message_id: int
+    message_id: Id
     message_format: str
     info: bytes
 
@@ -220,7 +206,7 @@ class SpecialMessageReceive(AntMessage):
 class UnassignChannelMessage(SpecialMessageSend):
     """Unassign channel."""
 
-    message_id = msgID_UnassignChannel
+    message_id = Id.UnassignChannel
     message_format = sc.no_alignment + sc.unsigned_char
 
     @classmethod
@@ -232,7 +218,7 @@ class UnassignChannelMessage(SpecialMessageSend):
 class AssignChannelMessage(SpecialMessageSend):
     """Assign channel."""
 
-    message_id = msgID_AssignChannel
+    message_id = Id.AssignChannel
     message_format = (
         sc.no_alignment + sc.unsigned_char + sc.unsigned_char + sc.unsigned_char
     )
@@ -245,10 +231,10 @@ class AssignChannelMessage(SpecialMessageSend):
         return struct.pack(cls.message_format, channel, channel_type, network)
 
 
-class Message43(SpecialMessageSend):
+class SetChannelPeriodMessage(SpecialMessageSend):
     """Set period."""
 
-    message_id = msgID_ChannelPeriod
+    message_id = Id.ChannelPeriod
     message_format = sc.no_alignment + sc.unsigned_char + sc.unsigned_short
 
     @classmethod
@@ -258,10 +244,10 @@ class Message43(SpecialMessageSend):
         return struct.pack(cls.message_format, channel, period)
 
 
-class Message44(SpecialMessageSend):
-    """Set search timeoute."""
+class SetChannelSearchTimeoutMessage(SpecialMessageSend):
+    """Set search timeout."""
 
-    message_id = msgID_ChannelSearchTimeout
+    message_id = Id.ChannelSearchTimeout
     message_format = sc.no_alignment + sc.unsigned_char + sc.unsigned_short
 
     @classmethod
@@ -271,10 +257,10 @@ class Message44(SpecialMessageSend):
         return struct.pack(cls.message_format, channel, timeout)
 
 
-class Message45(SpecialMessageSend):
+class SetChannelFrequencyMessage(SpecialMessageSend):
     """Set channel RF frequency."""
 
-    message_id = msgID_ChannelRfFrequency
+    message_id = Id.ChannelRfFrequency
     message_format = sc.no_alignment + sc.unsigned_char + sc.unsigned_char
 
     @classmethod
@@ -284,10 +270,10 @@ class Message45(SpecialMessageSend):
         return struct.pack(cls.message_format, channel, frequency)
 
 
-class Message46(SpecialMessageSend):
+class SetNetworkKeyMessage(SpecialMessageSend):
     """Set network key."""
 
-    message_id = msgID_SetNetworkKey
+    message_id = Id.SetNetworkKey
     message_format = sc.no_alignment + sc.unsigned_char + sc.unsigned_long_long
 
     @classmethod
@@ -297,10 +283,10 @@ class Message46(SpecialMessageSend):
         return struct.pack(cls.message_format, network, key)
 
 
-class Message4A(SpecialMessageSend):
+class ResetSystemMessage(SpecialMessageSend):
     """Reset system."""
 
-    message_id = msgID_ResetSystem
+    message_id = Id.ResetSystem
     message_format = sc.no_alignment + sc.unsigned_char
 
     @classmethod
@@ -308,10 +294,10 @@ class Message4A(SpecialMessageSend):
         return struct.pack(cls.message_format, 0x00)
 
 
-class Message4B(SpecialMessageSend):
+class OpenChannelMessage(SpecialMessageSend):
     """Open channel."""
 
-    message_id = msgID_OpenChannel
+    message_id = Id.OpenChannel
     message_format = sc.no_alignment + sc.unsigned_char
 
     @classmethod
@@ -320,10 +306,10 @@ class Message4B(SpecialMessageSend):
         return struct.pack(cls.message_format, channel)
 
 
-class Message4D(SpecialMessageSend):
+class RequestMessage(SpecialMessageSend):
     """Request message."""
 
-    message_id = msgID_RequestMessage
+    message_id = Id.RequestMessage
     message_format = sc.no_alignment + sc.unsigned_char + sc.unsigned_char
 
     @classmethod
@@ -335,10 +321,10 @@ class Message4D(SpecialMessageSend):
         return struct.pack(cls.message_format, channel, requested_id)
 
 
-class Message51(SpecialMessageSend):
+class SetChannelIdMessage(SpecialMessageSend):
     """Set channel ID."""
 
-    message_id = msgID_ChannelID
+    message_id = Id.ChannelID
     message_format = (
         sc.no_alignment
         + sc.unsigned_char
@@ -362,10 +348,10 @@ class Message51(SpecialMessageSend):
         )
 
 
-class Message50(SpecialMessageSend):
+class SetChannelTransmitPowerMessage(SpecialMessageSend):
     """Set transmit power."""
 
-    message_id = msgID_ChannelTransmitPower
+    message_id = Id.ChannelTransmitPower
     message_format = sc.no_alignment + sc.unsigned_char + sc.unsigned_char
 
     @classmethod
@@ -378,7 +364,7 @@ class Message50(SpecialMessageSend):
 class ChannelResponseMessage(SpecialMessageReceive):
     """Sent by the dongle in response to channel events."""
 
-    message_id = msgID_ChannelResponse
+    message_id = Id.ChannelResponse
     message_format = (
         sc.no_alignment + sc.unsigned_char + sc.unsigned_char + sc.unsigned_char
     )
@@ -435,7 +421,7 @@ class ChannelResponseMessage(SpecialMessageReceive):
 class StartupMessage(SpecialMessageReceive):
     """Sent by dongle on startup."""
 
-    message_id = msgID_StartUp
+    message_id = Id.StartUp
     message_format = sc.no_alignment + sc.unsigned_char
 
     @classmethod
@@ -458,7 +444,7 @@ class StartupMessage(SpecialMessageReceive):
 class CapabilitiesMessage(SpecialMessageReceive):
     """Sent by dongle with capabilities."""
 
-    message_id = msgID_Capabilities
+    message_id = Id.Capabilities
 
     @classmethod
     def to_dict(cls, message) -> dict:
@@ -473,7 +459,7 @@ class CapabilitiesMessage(SpecialMessageReceive):
 class VersionMessage(SpecialMessageReceive):
     """Sent by dongle with capabilities."""
 
-    message_id = msgID_ANTversion
+    message_id = Id.ANTversion
 
     @classmethod
     def to_dict(cls, message) -> dict:

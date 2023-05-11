@@ -11,15 +11,13 @@ from usb.core import NoBackendError, USBError
 
 from fortius_ant import debug, logfile
 from fortius_ant.ant.message import (
-    Message4A,
-    Message4D,
+    ResetMessage,
+    RequestMessage,
     AntMessage,
     AssignChannelMessage,
     UnassignChannelMessage,
     ChannelResponseMessage,
     StartupMessage,
-    msgID_Capabilities,
-    msgID_ANTversion,
     CapabilitiesMessage,
     VersionMessage,
     WrongMessageId,
@@ -169,7 +167,7 @@ class Dongle:
         if device is None:
             device = self.device
         if device is not None:
-            device.write(0x01, Message4A.create())
+            device.write(0x01, ResetMessage.create())
 
             time.sleep(0.500)
             if debug.on(debug.Function):
@@ -214,13 +212,13 @@ class Dongle:
 
         First send a request for the dongle's capabilities.
         """
-        self._write(Message4D.create(id=msgID_Capabilities))
+        self._write(RequestMessage.create(id=msgID_Capabilities))
         response = self._read(100)
         response_dict = CapabilitiesMessage.to_dict(response)
         self.max_channels = response_dict["max_channels"]
         self.max_networks = response_dict["max_networks"]
 
-        self._write(Message4D.create(id=msgID_ANTversion))
+        self._write(RequestMessage.create(id=msgID_ANTversion))
         response = self._read(100)
         response_dict = VersionMessage.to_dict(response)
         self.ant_version = response_dict["version"]
