@@ -174,8 +174,8 @@ def calc_checksum(message):
     return bytes([xor_value])
 
 
-class SpecialMessage(AntMessage):
-    """Special case messages."""
+class SpecialMessageSend(AntMessage):
+    """Special case messages - send."""
 
     message_id: int
     message_format: str
@@ -190,6 +190,14 @@ class SpecialMessage(AntMessage):
         """Create message."""
         info = cls._parse_args(**kwargs)
         return cls.compose(cls.message_id, info)
+
+
+class SpecialMessageReceive(AntMessage):
+    """Special case messages - receive."""
+
+    message_id: int
+    message_format: str
+    info: bytes
 
     @classmethod
     def to_dict(cls, message):
@@ -209,7 +217,7 @@ class SpecialMessage(AntMessage):
         return cls.decompose_to_dict(message)["info"]
 
 
-class UnassignChannelMessage(SpecialMessage):
+class UnassignChannelMessage(SpecialMessageSend):
     """Unassign channel."""
 
     message_id = msgID_UnassignChannel
@@ -221,7 +229,7 @@ class UnassignChannelMessage(SpecialMessage):
         return struct.pack(cls.message_format, channel)
 
 
-class AssignChannelMessage(SpecialMessage):
+class AssignChannelMessage(SpecialMessageSend):
     """Assign channel."""
 
     message_id = msgID_AssignChannel
@@ -237,7 +245,7 @@ class AssignChannelMessage(SpecialMessage):
         return struct.pack(cls.message_format, channel, channel_type, network)
 
 
-class Message43(SpecialMessage):
+class Message43(SpecialMessageSend):
     """Set period."""
 
     message_id = msgID_ChannelPeriod
@@ -250,7 +258,7 @@ class Message43(SpecialMessage):
         return struct.pack(cls.message_format, channel, period)
 
 
-class Message44(SpecialMessage):
+class Message44(SpecialMessageSend):
     """Set search timeoute."""
 
     message_id = msgID_ChannelSearchTimeout
@@ -263,7 +271,7 @@ class Message44(SpecialMessage):
         return struct.pack(cls.message_format, channel, timeout)
 
 
-class Message45(SpecialMessage):
+class Message45(SpecialMessageSend):
     """Set channel RF frequency."""
 
     message_id = msgID_ChannelRfFrequency
@@ -276,7 +284,7 @@ class Message45(SpecialMessage):
         return struct.pack(cls.message_format, channel, frequency)
 
 
-class Message46(SpecialMessage):
+class Message46(SpecialMessageSend):
     """Set network key."""
 
     message_id = msgID_SetNetworkKey
@@ -289,7 +297,7 @@ class Message46(SpecialMessage):
         return struct.pack(cls.message_format, network, key)
 
 
-class Message4A(SpecialMessage):
+class Message4A(SpecialMessageSend):
     """Reset system."""
 
     message_id = msgID_ResetSystem
@@ -300,7 +308,7 @@ class Message4A(SpecialMessage):
         return struct.pack(cls.message_format, 0x00)
 
 
-class Message4B(SpecialMessage):
+class Message4B(SpecialMessageSend):
     """Open channel."""
 
     message_id = msgID_OpenChannel
@@ -312,7 +320,7 @@ class Message4B(SpecialMessage):
         return struct.pack(cls.message_format, channel)
 
 
-class Message4D(SpecialMessage):
+class Message4D(SpecialMessageSend):
     """Request message."""
 
     message_id = msgID_RequestMessage
@@ -327,7 +335,7 @@ class Message4D(SpecialMessage):
         return struct.pack(cls.message_format, channel, requested_id)
 
 
-class Message51(SpecialMessage):
+class Message51(SpecialMessageSend):
     """Set channel ID."""
 
     message_id = msgID_ChannelID
@@ -354,7 +362,7 @@ class Message51(SpecialMessage):
         )
 
 
-class Message50(SpecialMessage):
+class Message50(SpecialMessageSend):
     """Set transmit power."""
 
     message_id = msgID_ChannelTransmitPower
@@ -367,7 +375,7 @@ class Message50(SpecialMessage):
         return struct.pack(cls.message_format, channel, power)
 
 
-class ChannelResponseMessage(SpecialMessage):
+class ChannelResponseMessage(SpecialMessageReceive):
     """Sent by the dongle in response to channel events."""
 
     message_id = msgID_ChannelResponse
@@ -390,10 +398,41 @@ class ChannelResponseMessage(SpecialMessage):
         """Response codes enum."""
 
         RESPONSE_NO_ERROR = 0
-        UNKNOWN = 1
+        EVENT_RX_SEARCH_TIMEOUT = 1
+        EVENT_RX_FAIL = 2
+        EVENT_TX = 3
+        EVENT_TRANSFER_RX_FAILED = 4
+        EVENT_TRANSFER_TX_COMPLETED = 5
+        EVENT_TRANSFER_TX_FAILED = 6
+        EVENT_CHANNEL_CLOSED = 7
+        EVENT_RX_FAIL_GO_TO_SEARCH = 8
+        EVENT_CHANNEL_COLLISION = 9
+        EVENT_TRANSFER_TX_START = 10
+        EVENT_TRANSFER_NEXT_DATA_BLOCK = 17
+        CHANNEL_IN_WRONG_STATE = 21
+        CHANNEL_NOT_OPENED = 22
+        CHANNEL_ID_NOT_SET = 24
+        CLOSE_ALL_CHANNELS = 25
+        TRANSFER_IN_PROGRESS = 31
+        TRANSFER_SEQUENCE_NUMBER_ERROR = 32
+        TRANSFER_IN_ERROR = 33
+        MESSAGE_SIZE_EXCEEDS_LIMIT = 39
+        INVALID_MESSAGE = 40
+        INVALID_NETWORK_NUMBER = 41
+        INVALID_LIST_ID = 48
+        INVALID_SCAN_TX_CHANNEL = 49
+        INVALID_PARAMETER_PROVIDED = 51
+        EVENT_SERIAL_QUE_OVERFLOW = 52
+        EVENT_QUE_OVERFLOW = 53
+        ENCRYPT_NEGOTIATION_SUCCESS = 56
+        ENCRYPT_NEGOTIATION_FAIL = 57
+        NVM_FULL_ERROR = 64
+        NVM_WRITE_ERROR = 65
+        USB_STRING_WRITE_FAIL = 112
+        MESG_SERIAL_ERROR_ID = 174
 
 
-class StartupMessage(SpecialMessage):
+class StartupMessage(SpecialMessageReceive):
     """Sent by dongle on startup."""
 
     message_id = msgID_StartUp
@@ -416,7 +455,7 @@ class StartupMessage(SpecialMessage):
         return rtn
 
 
-class CapabilitiesMessage(SpecialMessage):
+class CapabilitiesMessage(SpecialMessageReceive):
     """Sent by dongle with capabilities."""
 
     message_id = msgID_Capabilities
@@ -431,7 +470,7 @@ class CapabilitiesMessage(SpecialMessage):
         return rtn
 
 
-class VersionMessage(SpecialMessage):
+class VersionMessage(SpecialMessageReceive):
     """Sent by dongle with capabilities."""
 
     message_id = msgID_ANTversion
