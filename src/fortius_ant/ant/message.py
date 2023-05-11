@@ -338,7 +338,7 @@ class SetChannelIdMessage(SpecialMessageSend):
         channel = kwargs["channel"]
         device_number = kwargs["device_number"]
         device_type_id = kwargs["device_type_id"]
-        transmission_type = kwargs["transmission_type"]
+        transmission_type = kwargs["type"]
         return struct.pack(
             cls.message_format,
             channel,

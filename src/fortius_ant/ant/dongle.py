@@ -41,6 +41,16 @@ class ChannelType(Enum):
     SharedBidirectionalReceive = 0x20  # Slave
     SharedBidirectionalTransmit = 0x30  # Master
 
+class TransmissionType(Enum):
+    PAIRING = 0
+    INDEPENDENT = 1
+    SHARED1 = 2
+    SHARED2 = 3
+        
+    GLOBAL_PAGES = 4
+
+    def __init__(self, type=Type.PAIRING, global):
+        value = 0
 
 class Dongle:
     """Encapsulate dongle functionality."""
@@ -86,6 +96,15 @@ class Dongle:
         assert response_dict["channel"] == channel_number
         assert response_dict["id"] == Id.AssignChannel
         assert response_dict["code"] == ChannelResponseMessage.Code.RESPONSE_NO_ERROR
+        
+        self._write(
+            SetChannelIdMessage.create(
+                channel=channel_number,
+                type=interface.transmission_type,
+                device_number=interface.device_number
+                device_type_id=interface.device_type_id,
+            )
+        )
 
     def _get_next_channel(self):
         if self.channels is None:

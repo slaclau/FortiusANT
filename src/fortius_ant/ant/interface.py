@@ -3,25 +3,12 @@
 __version__ = "2023-04-16"
 # 2023-04-16    Rewritten in class based fashion
 
-from fortius_ant.FortiusAntCommand import CommandLineVariables
-from fortius_ant.usbTrainer import clsTacxTrainer, ReceivedData
-from fortius_ant.antDongle import (
-    clsAntDongle,
-)
-from fortius_ant.ant.message import (
-    msgID_AcknowledgedData,
-    msgID_BroadcastData,
-    msgID_ChannelID,
-    msgID_ChannelResponse,
-    msgID_BurstData,
-    Message51,
-)
-
 from fortius_ant.ant.dongle import (
     default_network_key,
     ant_plus_frequency,
     power_0db,
     ChannelType,
+    TransmissionType,
 )
 
 print_debug = False
@@ -34,6 +21,7 @@ class AntInterface:
     interleave_reset: int
     channel: int
     device_type_id: int
+    device_number
     ant_dongle: clsAntDongle
     master: bool
     paired = False
@@ -45,9 +33,14 @@ class AntInterface:
     network_key = default_network_key
     frequency = ant_plus_frequency
     transmit_power = power_0db
+    
     master_channel_type = ChannelType.BidirectionalTransmit.value
     slave_channel_type = ChannelType.BidirectionalReceive.value
     channel_type = None
+ 
+    master_transmission_type = TransmissionType.INDEPENDENT
+    slave_transmission_type = TransmissionType.PAIRING
+    transmission_type = None
 
     def __init__(self, master=True):
         self.master = master
@@ -62,24 +55,11 @@ class AntInterface:
 
         if self.master:
             self.channel_type = self.master_channel_type
+            self.transmission_type = self.master_transmission_type
         else:
             self.channel_type = self.slave_channel_type
-
-    def set_gui(self, gui):
-        """Assign a GUI instance to the interface."""
-        self.gui = gui
-
-    def set_clv(self, clv: CommandLineVariables):
-        """Assign a clv instance to the interface."""
-        self.clv = clv
-
-    def set_trainer(self, trainer: clsTacxTrainer):
-        """Assign a trainer instance to the interface."""
-        self.trainer = trainer
-
-    def set_received_data(self, received_data: ReceivedData):
-        """Assign a :class:`ReceivedData` instance to the interface."""
-        self.received_data = received_data
+            self.transmission_type = self.slave_transmission_type
+         
 
     def initialize(self):
         """Initialize interface."""
@@ -92,10 +72,6 @@ class AntInterface:
             self.interleave = 0
         self.interleave += 1
         return message
-
-    def broadcast_message_from_trainer(self):
-        """Assemble the message to be sent given a trainer."""
-        raise NotImplementedError
 
     def _broadcast_message(self, interleave: int, *args):
         raise NotImplementedError
