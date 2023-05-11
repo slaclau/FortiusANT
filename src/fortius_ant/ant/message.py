@@ -4,6 +4,7 @@ __version__ = "2023-04-16"
 # 2023-04-16    Rewritten in class based fashion
 
 import binascii
+from enum import Enum
 import struct
 
 import fortius_ant.structConstants as sc
@@ -33,6 +34,36 @@ msgID_ChannelTransmitPower = 0x60
 msgID_StartUp = 0x6F
 
 msgID_BurstData = 0x50
+
+
+class Id(Enum):
+    """Message ID enum."""
+
+    RF_EVENT = 0x01
+
+    ANTversion = 0x3E
+    BroadcastData = 0x4E
+    AcknowledgedData = 0x4F
+    ChannelResponse = 0x40
+    Capabilities = 0x54
+
+    UnassignChannel = 0x41
+    AssignChannel = 0x42
+    ChannelPeriod = 0x43
+    ChannelSearchTimeout = 0x44
+    ChannelRfFrequency = 0x45
+    SetNetworkKey = 0x46
+    ResetSystem = 0x4A
+    OpenChannel = 0x4B
+    RequestMessage = 0x4D
+
+    ChannelID = 0x51  # Set, but also receive master channel - but how/when?
+    ChannelTransmitPower = 0x60
+
+    StartUp = 0x6F
+
+    BurstData = 0x50
+
 
 # Manufacturer ID       see FitSDKRelease_21.20.00 profile.xlsx
 Manufacturer_garmin = 1
@@ -161,12 +192,24 @@ class SpecialMessage(AntMessage):
         return cls.compose(cls.message_id, info)
 
     @classmethod
-    def unmessage(cls, info):
-        """Convert message to parts."""
+    def to_dict(cls, message):
+        """Convert message to dict."""
+        raise NotImplementedError
+
+    @classmethod
+    def _get_content(cls, message):
+        info = cls._get_info(message)
         return struct.unpack(cls.message_format, info)
 
+    @classmethod
+    def _get_info(cls, message):
+        message_id = cls.decompose_to_dict(message)["id"]
+        if message_id != cls.message_id:
+            raise WrongMessageId(message_id, cls.message_id)
+        return cls.decompose_to_dict(message)["info"]
 
-class Message41(SpecialMessage):
+
+class UnassignChannelMessage(SpecialMessage):
     """Unassign channel."""
 
     message_id = msgID_UnassignChannel
@@ -178,7 +221,7 @@ class Message41(SpecialMessage):
         return struct.pack(cls.message_format, channel)
 
 
-class Message42(SpecialMessage):
+class AssignChannelMessage(SpecialMessage):
     """Assign channel."""
 
     message_id = msgID_AssignChannel
@@ -322,3 +365,89 @@ class Message50(SpecialMessage):
         channel = kwargs["channel"]
         power = kwargs["power"]
         return struct.pack(cls.message_format, channel, power)
+
+
+class ChannelResponseMessage(SpecialMessage):
+    """Sent by the dongle in response to channel events."""
+
+    message_id = msgID_ChannelResponse
+    message_format = (
+        sc.no_alignment + sc.unsigned_char + sc.unsigned_char + sc.unsigned_char
+    )
+
+    @classmethod
+    def to_dict(cls, message):
+        """Return breakdown of channel response message."""
+        info = cls._get_info(message)
+        rtn = {}
+        rtn["channel"] = info[0]
+        rtn["id"] = Id(info[1])
+        rtn["code"] = cls.Code(info[2])
+
+        return rtn
+
+    class Code(Enum):
+        """Response codes enum."""
+
+        RESPONSE_NO_ERROR = 0
+        UNKNOWN = 1
+
+
+class StartupMessage(SpecialMessage):
+    """Sent by dongle on startup."""
+
+    message_id = msgID_StartUp
+    message_format = sc.no_alignment + sc.unsigned_char
+
+    @classmethod
+    def to_dict(cls, message):
+        """Return bit field of startup reason."""
+        info = cls._get_info(message)
+        rtn = {}
+        bits = bin(info[0])[2:]
+        bits = "0" * (8 - len(bits)) + bits
+        rtn["bits"] = bits
+
+        reset_type = ""
+        reset_type = "POWER_ON_RESET" if bits == "00000000" else ""
+        reset_type = "COMMAND_RESET" if bits[7 - 5] == "1" else ""
+
+        rtn["type"] = reset_type
+        return rtn
+
+
+class CapabilitiesMessage(SpecialMessage):
+    """Sent by dongle with capabilities."""
+
+    message_id = msgID_Capabilities
+
+    @classmethod
+    def to_dict(cls, message) -> dict:
+        """Return max channels and networks."""
+        info = cls._get_info(message)
+        rtn = {}
+        rtn["max_channels"] = info[0]
+        rtn["max_networks"] = info[1]
+        return rtn
+
+
+class VersionMessage(SpecialMessage):
+    """Sent by dongle with capabilities."""
+
+    message_id = msgID_ANTversion
+
+    @classmethod
+    def to_dict(cls, message) -> dict:
+        """Return version."""
+        info = cls._get_info(message)
+        version = bytes(info[0:-1]).decode("utf-8")
+        return {"version": version}
+
+
+class WrongMessageId(Exception):
+    """Raise when trying to parse the wrong type of message."""
+
+    def __init__(self, received, expected):
+        self.received = received
+        self.expected = expected
+        self.message = f"Received {received} and expected {expected}."

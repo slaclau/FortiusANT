@@ -8,13 +8,20 @@ from fortius_ant.usbTrainer import clsTacxTrainer, ReceivedData
 from fortius_ant.antDongle import (
     clsAntDongle,
 )
-from fortius_ant.antMessage import (
+from fortius_ant.ant.message import (
     msgID_AcknowledgedData,
     msgID_BroadcastData,
     msgID_ChannelID,
     msgID_ChannelResponse,
     msgID_BurstData,
     Message51,
+)
+
+from fortius_ant.ant.dongle import (
+    default_network_key,
+    ant_plus_frequency,
+    power_0db,
+    ChannelType,
 )
 
 print_debug = False
@@ -35,6 +42,13 @@ class AntInterface:
     trainer = None
     received_data: ReceivedData | None = None
 
+    network_key = default_network_key
+    frequency = ant_plus_frequency
+    transmit_power = power_0db
+    master_channel_type = ChannelType.BidirectionalTransmit.value
+    slave_channel_type = ChannelType.BidirectionalReceive.value
+    channel_type = None
+
     def __init__(self, master=True):
         self.master = master
 
@@ -45,6 +59,11 @@ class AntInterface:
         self.p71_Data2 = 0xFF
         self.p71_Data3 = 0xFF
         self.p71_Data4 = 0xFF
+
+        if self.master:
+            self.channel_type = self.master_channel_type
+        else:
+            self.channel_type = self.slave_channel_type
 
     def set_gui(self, gui):
         """Assign a GUI instance to the interface."""

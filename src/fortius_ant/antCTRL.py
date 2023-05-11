@@ -14,8 +14,8 @@ from fortius_ant.antDongle import (
     msgUnpage70_RequestDataPage,
     msgPage71_CommandStatus,
 )
-from fortius_ant.antInterface import AntInterface, UnknownDataPage, UnsupportedPage
-from fortius_ant.antMessage import AntMessage, Manufacturer_dev, msgID_BroadcastData
+from fortius_ant.ant.interface import AntInterface, UnknownDataPage, UnsupportedPage
+from fortius_ant.ant.message import AntMessage, Manufacturer_dev, msgID_BroadcastData
 from fortius_ant.antPage import Page2, Page80, Page81
 from fortius_ant import debug, logfile
 

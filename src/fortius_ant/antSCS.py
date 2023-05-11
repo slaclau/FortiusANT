@@ -9,8 +9,8 @@ __version__ = "2023-04-16"
 # 2020-06-16    Modified: device-by-zero due to zero Cadence/SpeedKmh
 # 2020-06-09    First version, based upon antHRM.py
 # -------------------------------------------------------------------------------
-from fortius_ant.antInterface import AntInterface
-from fortius_ant.antMessage import AntMessage, msgID_BroadcastData
+from fortius_ant.ant.interface import AntInterface
+from fortius_ant.ant.message import AntMessage, msgID_BroadcastData
 from fortius_ant.antPage import SCSPage
 from fortius_ant.usbTrainer import clsTacxTrainer
 

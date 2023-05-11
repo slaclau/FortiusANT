@@ -1,4 +1,4 @@
-from fortius_ant.antInterface import AntInterface, UnknownDataPage
+from fortius_ant.ant.interface import AntInterface, UnknownDataPage
 from fortius_ant.antPage import Page221_01, Page221_02, Page221_03
 
 

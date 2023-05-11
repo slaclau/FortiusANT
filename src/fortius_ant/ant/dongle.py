@@ -1,4 +1,5 @@
 """Interface with usb dongle."""
+from enum import Enum
 import os
 import threading
 import time
@@ -8,20 +9,50 @@ import usb.core
 from usb.core import NoBackendError, USBError
 
 
-from fortius_ant import debug, logfile, antMessage
-from fortius_ant.antMessage import (
-    AntMessage,
+from fortius_ant import debug, logfile
+from fortius_ant.ant.message import (
     Message4A,
     Message4D,
+    AntMessage,
+    AssignChannelMessage,
+    UnassignChannelMessage,
+    ChannelResponseMessage,
+    StartupMessage,
     msgID_Capabilities,
     msgID_ANTversion,
+    CapabilitiesMessage,
+    VersionMessage,
+    WrongMessageId,
+    Id,
 )
+
+default_network_key = 0x45C372BDFB21A5B9
+ant_plus_frequency = 57
+power_0db = 0x03
+
+
+class ChannelType(Enum):
+    """Types of ant channel."""
+
+    BidirectionalReceive = 0x00  # Slave
+    BidirectionalTransmit = 0x10  # Master
+
+    UnidirectionalReceiveOnly = 0x40  # Slave
+    UnidirectionalTransmitOnly = 0x50  # Master
+
+    SharedBidirectionalReceive = 0x20  # Slave
+    SharedBidirectionalTransmit = 0x30  # Master
 
 
 class Dongle:
     """Encapsulate dongle functionality."""
 
     device = None
+    max_channels = None
+    max_networks = None
+    ant_version = None
+    last_reset_type = None
+    channels = None
 
     def __init__(self, device_id: int | None = None):
         """Create a dongle class with the required device id."""
@@ -31,6 +62,42 @@ class Dongle:
 
         self.thread: threading.Thread = None
         self.thread_active = False
+
+    def startup(self):
+        """Call to configure dongle and properties on startup."""
+        self._get_dongle()
+        self.calibrate()
+
+    def configure_channel(self, interface):
+        """Send channel configuration messages to the dongle."""
+        network = 0
+        if interface.network_key != default_network_key:
+            raise NotImplementedError
+        channel_number = self._get_next_channel()
+        self.channels[channel_number] = interface
+        interface.channel = channel_number
+        self._write(
+            AssignChannelMessage.create(
+                channel=channel_number,
+                type=interface.channel_type,
+                network=network,
+            )
+        )
+        response = self._read(100)
+        response_dict = ChannelResponseMessage.to_dict(response)
+        assert response_dict["channel"] == channel_number
+        assert response_dict["id"] == Id.AssignChannel
+        assert response_dict["code"] == ChannelResponseMessage.Code.RESPONSE_NO_ERROR
+
+    def _get_next_channel(self):
+        if self.channels is None:
+            self.channels = [None] * self.max_channels
+        channel = next(
+            (i for i in range(0, self.max_channels) if self.channels[i] is None), -1
+        )
+        if channel == -1:
+            raise NoMoreChannels
+        return channel
 
     def _get_dongle(self) -> bool:
         self.cycplus = False
@@ -93,7 +160,17 @@ class Dongle:
         for _ in range(2):
             if debug.on(debug.Function):
                 logfile.Write("GetDongle - Send reset string to dongle")
-            self.reset(device)
+            if self.reset(device):
+                return True
+        return False
+
+    def reset(self, device=None):
+        """Send reset command to dongle."""
+        if device is None:
+            device = self.device
+        if device is not None:
+            device.write(0x01, Message4A.create())
+
             time.sleep(0.500)
             if debug.on(debug.Function):
                 logfile.Write("GetDongle - Read answer")
@@ -101,31 +178,16 @@ class Dongle:
                 logfile.Write("GetDongle - Check for an ANT+ reply")
             try:
                 message = device.read(0x81, 5)
-                (
-                    synch,
-                    length,
-                    message_id,
-                ) = AntMessage.decompose(
-                    message
-                )[0:3]
-                if (
-                    synch == 0xA4
-                    and length == 0x01
-                    and message_id == antMessage.msgID_StartUp
-                ):
-                    return True
+                message_dict = StartupMessage.to_dict(message)
+                self.last_reset_type = message_dict["type"]
+                return True
 
             except usb.core.USBError as e:
                 if debug.on(debug.Data1 | debug.Function):
                     logfile.Write(f"GetDongle - Exception: {e}")
+            except WrongMessageId:
+                pass
         return False
-
-    def reset(self, device=None):
-        """Send reset command to dongle."""
-        if device is None and self.device is not None:
-            self._write(Message4A.create())
-        elif device is not None:
-            device.write(0x01, Message4A.create())
 
     def reset_if_allowed(self):
         """Send reset command if not a CYCPLUS dongle."""
@@ -154,15 +216,14 @@ class Dongle:
         """
         self._write(Message4D.create(id=msgID_Capabilities))
         response = self._read(100)
-        parsed_response = AntMessage.decompose_to_dict(response)
-        if parsed_response["id"] == msgID_Capabilities:
-            print(parsed_response["info"])
+        response_dict = CapabilitiesMessage.to_dict(response)
+        self.max_channels = response_dict["max_channels"]
+        self.max_networks = response_dict["max_networks"]
 
         self._write(Message4D.create(id=msgID_ANTversion))
         response = self._read(100)
-        parsed_response = AntMessage.decompose_to_dict(response)
-        if parsed_response["id"] == msgID_ANTversion:
-            print(parsed_response["info"])
+        response_dict = VersionMessage.to_dict(response)
+        self.ant_version = response_dict["version"]
 
     def _write(self, message):
         if self.device is not None:
@@ -176,4 +237,21 @@ class Dongle:
 
 
 class NoDongle(Exception):
-    """Raised when no physical dongle is set."""
+    """Raise when no physical dongle is set."""
+
+
+class NoMoreChannels(Exception):
+    """Raise when all channels are in use."""
+
+
+dongle = None
+
+
+def test():
+    from fortius_ant.ant.interface import AntInterface
+
+    global dongle
+    dongle = Dongle()
+    dongle.startup()
+    interface = AntInterface()
+    dongle.configure_channel(interface)

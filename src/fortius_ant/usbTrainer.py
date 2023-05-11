@@ -168,7 +168,7 @@ import fortius_ant.fxload as fxload
 import fortius_ant.logfile as logfile
 import fortius_ant.structConstants as sc
 from fortius_ant.constants import mode_Grade, mode_Power
-from fortius_ant.antMessage import AntMessage
+from fortius_ant.ant.message import AntMessage
 
 # -------------------------------------------------------------------------------
 # Constants

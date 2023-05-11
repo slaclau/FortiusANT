@@ -12,8 +12,8 @@ __version__ = "2023-04-16"
 # -------------------------------------------------------------------------------
 import time
 
-from fortius_ant.antInterface import AntInterface, msgID_ChannelID, UnknownDataPage
-from fortius_ant.antMessage import AntMessage, Manufacturer_garmin, msgID_BroadcastData
+from fortius_ant.ant.interface import AntInterface, msgID_ChannelID, UnknownDataPage
+from fortius_ant.ant.message import AntMessage, Manufacturer_garmin, msgID_BroadcastData
 from fortius_ant.antPage import HRMPage
 from fortius_ant.antDongle import unmsg51_ChannelID, msg4D_RequestMessage
 

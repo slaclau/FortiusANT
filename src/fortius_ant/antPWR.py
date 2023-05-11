@@ -30,8 +30,8 @@ __version__ = "2023-04-16"
 #                   the AccumulatedPower related EventCount.
 # 2020-06-11    First version, based upon antHRM.py
 # -------------------------------------------------------------------------------
-from fortius_ant.antInterface import AntInterface
-from fortius_ant.antMessage import AntMessage, Manufacturer_garmin, msgID_BroadcastData
+from fortius_ant.ant.interface import AntInterface
+from fortius_ant.ant.message import AntMessage, Manufacturer_garmin, msgID_BroadcastData
 from fortius_ant.antPage import Page80, Page81, Page82, PWRPage16
 from fortius_ant.usbTrainer import clsTacxTrainer
 

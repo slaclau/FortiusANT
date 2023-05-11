@@ -224,8 +224,8 @@ from fortius_ant import raspberry
 from fortius_ant import TCXexport
 from fortius_ant import usbTrainer
 from fortius_ant.usbTrainer import ReceivedData
-from fortius_ant.antMessage import AntMessage
-from fortius_ant.antInterface import WrongChannel, UnsupportedPage, UnknownMessageID
+from fortius_ant.ant.message import AntMessage
+from fortius_ant.ant.interface import WrongChannel, UnsupportedPage, UnknownMessageID
 
 PrintWarnings = False  # Print warnings even when logging = off
 CycleTimeFast = 0.02  # TRAINER- SHOULD WRITE THEN READ 70MS LATER REALLY

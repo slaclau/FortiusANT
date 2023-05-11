@@ -132,7 +132,7 @@ import fortius_ant.logfile as logfile
 import fortius_ant.structConstants as sc
 from fortius_ant import steering
 
-from fortius_ant.antMessage import AntMessage, calc_checksum
+from fortius_ant.ant.message import AntMessage, calc_checksum
 
 # ---------------------------------------------------------------------------
 # Our own choice what channels are used
