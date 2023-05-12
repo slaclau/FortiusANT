@@ -1,5 +1,5 @@
 """Interface with usb dongle."""
-from enum import Enum
+from enum import Enum, IntEnum
 import os
 import threading
 import time
@@ -41,7 +41,7 @@ class ChannelType(Enum):
     SharedBidirectionalReceive = 0x20  # Slave
     SharedBidirectionalTransmit = 0x30  # Master
 
-class TransmissionType(Enum):
+class TransmissionType(IntEnum):
     PAIRING = 0
     INDEPENDENT = 1
     SHARED1 = 2
@@ -85,26 +85,43 @@ class Dongle:
         self.channels[channel_number] = interface
         interface.channel = channel_number
         self._write(
-            AssignChannelMessage.create(
+            AssignChannelMessage(
                 channel=channel_number,
                 type=interface.channel_type,
                 network=network,
             )
         )
-        response = self._read(100)
-        response_dict = ChannelResponseMessage.to_dict(response)
-        assert response_dict["channel"] == channel_number
-        assert response_dict["id"] == Id.AssignChannel
-        assert response_dict["code"] == ChannelResponseMessage.Code.RESPONSE_NO_ERROR
+        self._wait_for_response_no_error(channel_number,Id.AssignChannel)
         
         self._write(
-            SetChannelIdMessage.create(
+            SetChannelIdMessage(
                 channel=channel_number,
                 type=interface.transmission_type,
                 device_number=interface.device_number
                 device_type_id=interface.device_type_id,
             )
         )
+
+        self._wait_for_response_no_error(channel_number,Id.ChannelRfFrequency)
+
+        self._write(
+            SetChannelFrequencyMessage(
+                channel=channel_number,
+                frequency=interface.frequency,
+            )
+        )
+
+self._wait_for_response_no_error(channel_number,Id.ChannelRfFrequency)
+
+
+
+        
+    def _wait_for_response_no_error(self, channel, message_id):
+        response = self._read(100)
+        response_dict = ChannelResponseMessage.to_dict(response)
+        assert response_dict["channel"] == channel
+        assert response_dict["id"] == message_id
+        assert response_dict["code"] == ChannelResponseMessage.Code.RESPONSE_NO_ERROR
 
     def _get_next_channel(self):
         if self.channels is None:

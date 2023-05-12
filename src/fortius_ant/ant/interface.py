@@ -21,8 +21,8 @@ class AntInterface:
     interleave_reset: int
     channel: int
     device_type_id: int
-    device_number
-    ant_dongle: clsAntDongle
+    device_number: int
+
     master: bool
     paired = False
     gui = None
@@ -33,6 +33,9 @@ class AntInterface:
     network_key = default_network_key
     frequency = ant_plus_frequency
     transmit_power = power_0db
+    
+    channel_period = 32768 / 4
+    channel_frequency = 57
     
     master_channel_type = ChannelType.BidirectionalTransmit.value
     slave_channel_type = ChannelType.BidirectionalReceive.value
