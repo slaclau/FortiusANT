@@ -32,6 +32,11 @@ class AntPage(bytes):
         return struct.unpack(cls.message_format, page)
 
     @classmethod
+    def unpage_to_dict(cls, page) -> dict:
+        """Convert the supplied page to a dict of its data."""
+        raise NotImplementedError
+
+    @classmethod
     def get_num_args(cls) -> int:
         return len(cls.message_format) - 2
 
@@ -63,6 +68,50 @@ class Page2(AntPage):
         + fReserved5
         + fDeviceCapabilities
     )
+
+
+class Page70(AntPage):
+    """Page 70 is a request for another page to be sent."""
+
+    data_page_number = 70
+
+    fChannel = sc.unsigned_char  # First byte of the ANT+ message content
+    fDataPageNumber = sc.unsigned_char  # First byte of the ANT+ datapage (payload)
+    fSlaveSerialNumber = sc.unsigned_short
+    fDescriptorByte1 = sc.unsigned_char
+    fDescriptorByte2 = sc.unsigned_char
+    fReqTransmissionResp = sc.unsigned_char
+    fRequestedPageNumber = sc.unsigned_char
+    fCommandType = sc.unsigned_char
+
+    message_format = (
+        sc.no_alignment
+        + fChannel
+        + fDataPageNumber
+        + fSlaveSerialNumber
+        + fDescriptorByte1
+        + fDescriptorByte2
+        + fReqTransmissionResp
+        + fRequestedPageNumber
+        + fCommandType
+    )
+
+    @classmethod
+    def unpage_to_dict(cls, page) -> dict:
+        """Convert request page to dict."""
+        unpage = cls.unpage(page)
+        return {
+            "channel": unpage[0],
+            "page_number": unpage[1],
+            "slave_serial_number": unpage[2],
+            "descriptor_1": unpage[3],
+            "descriptor_2": unpage[4],
+            "requested_response": unpage[5],
+            "number_of_responses": unpage[5] & 0x7F,
+            "response_with_acknowledged": bool((unpage[5] & 0x80) >> 7),
+            "requested_page": unpage[6],
+            "command_type": unpage[7],
+        }
 
 
 class Page80(AntPage):

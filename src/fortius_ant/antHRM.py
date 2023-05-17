@@ -112,6 +112,9 @@ class AntHRM(AntInterface):
         )
         return AntMessage.compose(msgID_BroadcastData, page)
 
+    def _broadcast_page(self, page_number: int):
+        pass
+
     def _handle_channel_id_message(self, info):
         super()._handle_channel_id_message(info)
         (

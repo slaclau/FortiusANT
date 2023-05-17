@@ -4,11 +4,14 @@ __version__ = "2023-04-16"
 # 2023-04-16    Rewritten in class based fashion
 
 import binascii
-from enum import Enum
 import struct
+from typing import Dict
+
+from aenum import Enum, extend_enum
 
 import fortius_ant.structConstants as sc
-from fortius_ant.antPage import AntPage
+from fortius_ant.ant.plus.page import AntPage
+
 
 class Id(Enum):
     """Message ID enum."""
@@ -29,14 +32,21 @@ class Id(Enum):
     SetNetworkKey = 0x46
     ResetSystem = 0x4A
     OpenChannel = 0x4B
+    CloseChannel = 0x4C
     RequestMessage = 0x4D
 
     ChannelID = 0x51
+    ChannelStatus = 0x52
     ChannelTransmitPower = 0x60
 
     StartUp = 0x6F
 
     BurstData = 0x50
+
+    @classmethod
+    def _missing_(cls, value: object):
+        extend_enum(cls, str(value), value)
+        return list(cls)[-1]
 
 
 # Manufacturer ID       see FitSDKRelease_21.20.00 profile.xlsx
@@ -52,7 +62,7 @@ SYNC = 0xA4
 class AntMessage(bytes):
     """A message to be sent over an ANT+ interface."""
 
-    types = {}
+    types: Dict[Id, "type[AntMessage]"] = {}
 
     def __init__(self, data: bytes):
         super(bytes, data)
@@ -81,11 +91,19 @@ class AntMessage(bytes):
         checksum = 0
         info = binascii.unhexlify("")  # NULL-string bytes
         rest = ""  # No remainder (normal)
+        burst_sequence_number = None
 
-        if len(message) > 0:
-            synch = message[0]  # Carefull approach
-        if len(message) > 1:
+        try:
+            assert message[0] == SYNC
+            synch = message[0]
+            assert len(message) > 1
             length = message[1]
+            assert len(message) == length + 4
+        except AssertionError:
+            print(length)
+            print(len(message))
+            raise InvalidMessageError from None
+
         if len(message) > 2:
             messageID = Id(message[2])
         if len(message) > 3 + length:
@@ -103,10 +121,22 @@ class AntMessage(bytes):
             DataPageNumber = message[4]
 
         if messageID == Id.BurstData:
-            burst_sequence_number = (Channel & 0b11100000) >> 5  # Upper 3 bits # noqa: F841
+            burst_sequence_number = (
+                Channel & 0b11100000
+            ) >> 5  # Upper 3 bits # noqa: F841
             Channel = Channel & 0b00011111  # Lower 5 bits
 
-        return synch, length, messageID, info, checksum, rest, Channel, DataPageNumber, burst_sequence_number
+        return (
+            synch,
+            length,
+            messageID,
+            info,
+            checksum,
+            rest,
+            Channel,
+            DataPageNumber,
+            burst_sequence_number,
+        )
 
     @classmethod
     def decompose_to_dict(cls, message) -> dict:
@@ -133,16 +163,22 @@ class AntMessage(bytes):
 
     @classmethod
     def type_from_id(cls, message_id: Id):
-        if cls.types == {}:
+        """Return message class for given Id."""
+        if not cls.types:
             first_subclasses = AntMessage.__subclasses__()
             subclasses = []
-            for sc in first_subclasses:
-                subclasses += sc.__subclasses__()
+            for subclass in first_subclasses:
+                subclasses += subclass.__subclasses__()
 
-            for sc in subclasses:
-                cls.types[sc.message_id] = sc
+            for subclass in subclasses:
+                if hasattr(subclass, "message_id"):
+                    cls.types[subclass.message_id] = subclass
 
-        return cls.types[message_id]
+        try:
+            return cls.types[message_id]
+        except KeyError:
+            return None
+
 
 def calc_checksum(message):
     """Calculate checksum."""
@@ -163,10 +199,14 @@ class SpecialMessageSend(AntMessage):
     message_id: Id
     message_format: str
     info: bytes
-    
+
     def __new__(cls, **kwargs):
+        """Return result of :meth:`create`.
+
+        This allows :meth:`__init__` to be used.
+        """
         return cls.create(**kwargs)
-   
+
     @classmethod
     def _parse_args(cls, **kwargs) -> bytes:
         raise NotImplementedError
@@ -226,7 +266,7 @@ class AssignChannelMessage(SpecialMessageSend):
     @classmethod
     def _parse_args(cls, **kwargs):
         channel = kwargs["channel"]
-        channel_type = kwargs["type"]
+        channel_type = kwargs["type"].value
         network = kwargs["network"]
         return struct.pack(cls.message_format, channel, channel_type, network)
 
@@ -306,6 +346,18 @@ class OpenChannelMessage(SpecialMessageSend):
         return struct.pack(cls.message_format, channel)
 
 
+class CloseChannelMessage(SpecialMessageSend):
+    """Open channel."""
+
+    message_id = Id.CloseChannel
+    message_format = sc.no_alignment + sc.unsigned_char
+
+    @classmethod
+    def _parse_args(cls, **kwargs):
+        channel = kwargs["channel"]
+        return struct.pack(cls.message_format, channel)
+
+
 class RequestMessage(SpecialMessageSend):
     """Request message."""
 
@@ -315,13 +367,11 @@ class RequestMessage(SpecialMessageSend):
     @classmethod
     def _parse_args(cls, **kwargs):
         channel = kwargs["channel"] if "channel" in kwargs else 0
-        requested_id = kwargs["id"]
-        print(channel)
-        print(requested_id)
+        requested_id = kwargs["id"].value
         return struct.pack(cls.message_format, channel, requested_id)
 
 
-class SetChannelIdMessage(SpecialMessageSend):
+class SetChannelIdMessage(SpecialMessageSend, SpecialMessageReceive):
     """Set channel ID."""
 
     message_id = Id.ChannelID
@@ -346,6 +396,19 @@ class SetChannelIdMessage(SpecialMessageSend):
             device_type_id,
             transmission_type,
         )
+
+    @classmethod
+    def to_dict(cls, message):
+        """Return channel id."""
+
+        info = cls._get_info(message)
+        rtn = {}
+        rtn["channel"] = info[0]
+        rtn["device_number"] = int.from_bytes(info[1:3], byteorder="little")
+        rtn["device_type_id"] = info[3]
+        rtn["transmission_type"] = info[4]
+
+        return rtn
 
 
 class SetChannelTransmitPowerMessage(SpecialMessageSend):
@@ -433,11 +496,14 @@ class StartupMessage(SpecialMessageReceive):
         bits = "0" * (8 - len(bits)) + bits
         rtn["bits"] = bits
 
-        reset_type = ""
-        reset_type = "POWER_ON_RESET" if bits == "00000000" else ""
-        reset_type = "COMMAND_RESET" if bits[7 - 5] == "1" else ""
+        if info[0] == 0:
+            reset_type = "POWER_ON_RESET"
+        elif bits[7 - 5] == "1":
+            reset_type = "COMMAND_RESET"
+        else:
+            reset_type = ""
 
-        rtn["type"] = reset_type
+        rtn["type"] = reset_type if reset_type != "" else bits
         return rtn
 
 
@@ -467,6 +533,10 @@ class VersionMessage(SpecialMessageReceive):
         info = cls._get_info(message)
         version = bytes(info[0:-1]).decode("utf-8")
         return {"version": version}
+
+
+class InvalidMessageError(Exception):
+    """Raise when trying to decompose an invalid messsage."""
 
 
 class WrongMessageId(Exception):
