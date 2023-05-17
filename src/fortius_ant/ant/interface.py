@@ -27,11 +27,11 @@ default_network_key = 0xC1677A553B21E4E8
 
 parent_logger = logging.getLogger(__name__)
 
+message_file = open("log.txt", "w")
+
 
 class AntInterface:
     """Interface for communicating as an ANT device."""
-
-    network_key = default_network_key
 
     class Status(Enum):
         UNASSIGNED = 0
@@ -92,11 +92,12 @@ class AntInterface:
         """Broadcast ANT message."""
         raise NotImplementedError
 
-    def handle_received_message(self, messsage, message_dict):
+    def handle_received_message(self, message, message_dict):
         """Handle ANT message."""
+        message_file.write(message.hex() + "\n")
         if message_dict["channel"] != self.channel:
             raise WrongChannel
-        return self._handle_received_message(messsage, message_dict)
+        return self._handle_received_message(message, message_dict)
 
     def _handle_received_message(self, message, message_dict):
         message_id = message_dict["id"]
