@@ -178,10 +178,12 @@ class AntInterface:
         return RequestMessage(channel=self.channel, id=Id.ChannelID)
 
     def _handle_broadcast_data(self, data_page_number: int, info: bytes):
-        raise NotImplementedError
+        print(info)
+        #raise NotImplementedError
 
     def _handle_acknowledged_data(self, data_page_number: int, info: bytes):
-        raise NotImplementedError
+        print(info)
+        #raise NotImplementedError
 
     def wait_for_status(self, status, timeout=10):
         """Return true when `self.status` equals `status`."""
