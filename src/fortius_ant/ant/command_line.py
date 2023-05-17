@@ -52,7 +52,7 @@ def test2():
     intf = interface.AntInterface(master=False)
     intf.channel_frequency = 60
     intf.channel_period = 4096
-    intf.device_type_id = 81
+    intf.device_type_id = 0
     usb_dongle.start_read_thread()
     intf.channel_search_timeout = 255
     usb_dongle.start_handler_thread()
