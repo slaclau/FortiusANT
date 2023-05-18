@@ -1,5 +1,6 @@
 """Interfaces for communicating as and with Tacx Bushido trainers."""
 from fortius_ant.ant.plus.interface import AntPlusInterface
+from fortius_ant.ant.interface import default_network_key
 
 
 class BushidoBrake(AntPlusInterface):
@@ -9,6 +10,7 @@ class BushidoBrake(AntPlusInterface):
     channel_period = 4096
     device_type_id = 81
     channel_search_timeout = 255
+    network_key = default_network_key
 
     def __init__(self, master=True, device_number=0):
         super().__init__(master=master, device_number=device_number)
@@ -29,6 +31,7 @@ class BushidoHeadUnit(AntPlusInterface):
     channel_period = 4096
     device_type_id = 82
     channel_search_timeout = 255
+    network_key = default_network_key
 
     def __init__(self, master=True, device_number=0):
         super().__init__(master=master, device_number=device_number)
