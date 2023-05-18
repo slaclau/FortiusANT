@@ -28,4 +28,13 @@ class AntBridge:
         
         self.master = BridgeInterface(master, slave.channel)
         self.slave = BridgeInterface(slace, master.channel)
+        
+    @classmethod
+    def configure(cls, dongle, Interface, device_number):
+        master = Interface(device_number=device_number)
+        slave = Interface(master=False)
+        
+        bridge = cls(master, slave)
+        dongle.configure_channel(bridge.slave)
+        dongle.configure_channel(bridge.master)
 
