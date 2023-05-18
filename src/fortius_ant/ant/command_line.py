@@ -57,3 +57,17 @@ def test_bushido():
     usb_dongle.configure_channel(intf)
     usb_dongle.configure_channel(intf2)
     testing = True
+    
+def test_bridge():
+    global usb_dongle, testing
+    assert not testing
+    usb_dongle = dongle.USBDongle()
+    usb_dongle.startup()
+    
+    master = bushido.BushidoBrake(device_number = 1)
+    slave = bushido.BushidoBrake(master=False)
+    bridge = AntBridge(master, slave)
+    usb_dongle.start_read_thread()
+    usb_dongle.start_handler_thread()
+    usb_dongle.configure_channel(bridge.master)
+    usb_dongle.configure_channel(bridge.slave)
