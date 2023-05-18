@@ -5,6 +5,7 @@ import logging
 from fortius_ant.ant import dongle, interface
 from fortius_ant.ant.data import sport
 from fortius_ant.ant.plus import hrm, scs
+from fortius_ant.ant.tacx import bushido
 
 usb_dongle = None
 testing = False
@@ -44,17 +45,15 @@ def stop_test():
     testing = False
 
 
-def test2():
+def test_bushido():
     global usb_dongle, testing
     assert not testing
     usb_dongle = dongle.USBDongle()
     usb_dongle.startup()
-    intf = interface.AntInterface(master=False)
-    intf.channel_frequency = 60
-    intf.channel_period = 4096
-    intf.device_type_id = 0
+    intf = bushido.BushidoBrake(master=False)
+    intf2 = bushido.BushidoHeadUnit(master=False)
     usb_dongle.start_read_thread()
-    intf.channel_search_timeout = 255
     usb_dongle.start_handler_thread()
     usb_dongle.configure_channel(intf)
+    usb_dongle.configure_channel(intf2)
     testing = True

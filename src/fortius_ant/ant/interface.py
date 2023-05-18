@@ -8,7 +8,6 @@ import logging
 import time
 
 from fortius_ant.ant.dongle import (
-    ant_plus_frequency,
     power_0db,
     ChannelType,
     TransmissionType,
@@ -26,8 +25,6 @@ from fortius_ant.ant.data.data import Data
 default_network_key = 0xC1677A553B21E4E8
 
 parent_logger = logging.getLogger(__name__)
-
-message_file = open("log.txt", "w")
 
 
 class AntInterface:
@@ -54,11 +51,10 @@ class AntInterface:
     paired = False
 
     network_key = default_network_key
-    frequency = ant_plus_frequency
     transmit_power = power_0db
 
     channel_period = int(32768 / 4)
-    channel_frequency = 57
+    channel_frequency = 66
     channel_search_timeout = 24
 
     master_channel_type = ChannelType.BidirectionalTransmit
@@ -94,7 +90,6 @@ class AntInterface:
 
     def handle_received_message(self, message, message_dict):
         """Handle ANT message."""
-        message_file.write(message.hex() + "\n")
         if message_dict["channel"] != self.channel:
             raise WrongChannel
         return self._handle_received_message(message, message_dict)
@@ -178,12 +173,10 @@ class AntInterface:
         return RequestMessage(channel=self.channel, id=Id.ChannelID)
 
     def _handle_broadcast_data(self, data_page_number: int, info: bytes):
-        print(info)
-        #raise NotImplementedError
+        raise NotImplementedError
 
     def _handle_acknowledged_data(self, data_page_number: int, info: bytes):
-        print(info)
-        #raise NotImplementedError
+        raise NotImplementedError
 
     def wait_for_status(self, status, timeout=10):
         """Return true when `self.status` equals `status`."""

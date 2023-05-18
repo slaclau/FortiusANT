@@ -15,6 +15,7 @@ class AntPlusInterface(AntInterface):
     interleave_reset: int
 
     network_key = ant_plus_network_key
+    channel_frequency = 57
 
     @dataclass
     class P71_Data:

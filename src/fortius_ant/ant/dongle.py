@@ -36,7 +36,6 @@ from fortius_ant.ant.message import (
     SetNetworkKeyMessage,
 )
 
-ant_plus_frequency = 57
 power_0db = 0x03
 
 
@@ -164,11 +163,11 @@ class Dongle:
         )
         interface.wait_for_action(Id.ChannelID)
 
-        if interface.frequency != 66:
+        if interface.channel_frequency != 66:
             self._write(
                 SetChannelFrequencyMessage(
                     channel=channel_number,
-                    frequency=interface.frequency,
+                    frequency=interface.channel_frequency,
                 )
             )
             interface.wait_for_action(Id.ChannelRfFrequency)

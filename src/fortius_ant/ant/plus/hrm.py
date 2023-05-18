@@ -17,7 +17,7 @@ DeviceTypeID_heart_rate = 120
 
 
 class AntHRM(AntPlusInterface):
-    """Interface for communicating as an ANT+ HRM."""
+    """Interface for communicating as and with ANT+ HRMs."""
 
     interleave_reset = 204
     device_type_id = DeviceTypeID_heart_rate
