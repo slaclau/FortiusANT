@@ -124,7 +124,6 @@ class Dongle:
                 network = self.networks.index(None)
             except ValueError:
                 raise NoMoreNetworks from None
-            self.networks[network] = network_key
             self._write(SetNetworkKeyMessage())
             start = time.time()
             while time.time() - start < timeout:
@@ -132,6 +131,7 @@ class Dongle:
                     break
             if not self.network_flag:
                 raise ValueError
+            self.networks[network] = network_key
             self.network_flag = False
         return network
 
