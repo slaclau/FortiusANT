@@ -1,3 +1,4 @@
+"""Bridge between two ANT interfaces."""
 from fortius_ant.ant.interface import AntInterface
 from fortius_ant.ant.message import AntMessage, Id
 
@@ -39,13 +40,21 @@ class AntBridge:
 
         def broadcast_message(self):
             """Do not broadcast actively, only retransmit."""
-            pass
 
     def __init__(self, master, slave):
         assert isinstance(master, AntInterface)
         assert isinstance(slave, AntInterface)
         assert master.master
         assert not slave.master
-
         self.master = self.BridgeInterface(master, slave)
         self.slave = self.BridgeInterface(slave, master)
+
+    @classmethod
+    def configure(cls, dongle, Interface, device_number):
+        """Configure a bridge of the specified interface."""
+        master = Interface(device_number=device_number)
+        slave = Interface(master=False)
+
+        bridge = cls(master, slave)
+        dongle.configure_channel(bridge.slave)
+        dongle.configure_channel(bridge.master)

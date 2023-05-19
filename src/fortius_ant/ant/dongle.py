@@ -150,7 +150,7 @@ class Dongle:
             AssignChannelMessage(
                 channel=channel_number,
                 type=interface.channel_type,
-                network=0,
+                network=network,
             )
         )
         interface.wait_for_status(interface.Status.ASSIGNED)
