@@ -115,13 +115,15 @@ class Dongle:
         self.calibrate()
 
     def _get_network_number(self, network_key, timeout=10):
+        if network_key is None:
+            return 0
         if self.networks is None:
             self.networks = [None] * self.max_networks
         if network_key in self.networks:
             network = self.networks.index(network_key)
         else:
             try:
-                network = self.networks.index(None)
+                network = self.networks.index(None, 1)
             except ValueError:
                 raise NoMoreNetworks from None
             self._write(SetNetworkKeyMessage())
@@ -148,7 +150,7 @@ class Dongle:
             AssignChannelMessage(
                 channel=channel_number,
                 type=interface.channel_type,
-                network=network,
+                network=0,
             )
         )
         interface.wait_for_status(interface.Status.ASSIGNED)

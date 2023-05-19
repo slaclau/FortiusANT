@@ -50,7 +50,7 @@ class AntInterface:
     master: bool
     paired = False
 
-    network_key = default_network_key
+    network_key: int | None = None
     transmit_power = power_0db
 
     channel_period = int(32768 / 4)

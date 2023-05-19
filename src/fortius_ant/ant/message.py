@@ -7,7 +7,7 @@ import binascii
 import struct
 from typing import Dict
 
-from aenum import Enum, extend_enum
+from enum import Enum
 
 import fortius_ant.structConstants as sc
 from fortius_ant.ant.plus.page import AntPage
@@ -42,11 +42,6 @@ class Id(Enum):
     StartUp = 0x6F
 
     BurstData = 0x50
-
-    @classmethod
-    def _missing_(cls, value: object):
-        extend_enum(cls, str(value), value)
-        return list(cls)[-1]
 
 
 # Manufacturer ID       see FitSDKRelease_21.20.00 profile.xlsx
@@ -400,7 +395,6 @@ class SetChannelIdMessage(SpecialMessageSend, SpecialMessageReceive):
     @classmethod
     def to_dict(cls, message):
         """Return channel id."""
-
         info = cls._get_info(message)
         rtn = {}
         rtn["channel"] = info[0]

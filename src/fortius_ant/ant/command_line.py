@@ -2,7 +2,7 @@
 
 import logging
 
-from fortius_ant.ant import dongle, interface
+from fortius_ant.ant import dongle, interface, bridge
 from fortius_ant.ant.data import sport
 from fortius_ant.ant.plus import hrm, scs
 from fortius_ant.ant.tacx import bushido
@@ -57,17 +57,19 @@ def test_bushido():
     usb_dongle.configure_channel(intf)
     usb_dongle.configure_channel(intf2)
     testing = True
-    
+
+
 def test_bridge():
     global usb_dongle, testing
     assert not testing
     usb_dongle = dongle.USBDongle()
     usb_dongle.startup()
-    
-    master = bushido.BushidoBrake(device_number = 1)
+    logging.getLogger().setLevel(logging.DEBUG)
+    master = bushido.BushidoBrake(device_number=1)
     slave = bushido.BushidoBrake(master=False)
-    bridge = AntBridge(master, slave)
+    ant_bridge = bridge.AntBridge(master, slave)
     usb_dongle.start_read_thread()
     usb_dongle.start_handler_thread()
-    usb_dongle.configure_channel(bridge.master)
-    usb_dongle.configure_channel(bridge.slave)
+    usb_dongle.configure_channel(ant_bridge.master)
+    usb_dongle.configure_channel(ant_bridge.slave)
+    testing = True
