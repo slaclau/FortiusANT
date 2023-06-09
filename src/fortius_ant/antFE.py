@@ -28,6 +28,7 @@ from fortius_ant.ant.interface import AntInterface, UnknownDataPage, Unsupported
 from fortius_ant.ant.message import AntMessage, Manufacturer_tacx, msgID_BroadcastData
 from fortius_ant.antPage import Page80, Page81, Page82, FEPage16, FEPage25
 from fortius_ant import debug, logfile
+from fortius_ant.ant.dongle import TransmissionType
 
 ModelNumber_FE = 2875  # short antifier-value=0x8385, Tacx Neo=2875
 SerialNumber_FE = 19590705  # int   1959-7-5
@@ -45,6 +46,9 @@ class AntFE(AntInterface):
     interleave_reset = 256
     channel = channel_FE
     device_type_id = DeviceTypeID_fitness_equipment
+    transmission_type_master = (
+        TransmissionType.INDEPENDENT + TransmissionType.GLOBAL_PAGES
+    )
 
     def __init__(self, master=True):
         super().__init__(master)
