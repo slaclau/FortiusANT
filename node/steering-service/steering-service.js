@@ -44,7 +44,7 @@ class SteeringService extends bleno.PrimaryService {
   notify(event) {
     this.sc.notify(event);
     return this.RESULT_SUCCESS;
-  };
+  }
 }
 
 module.exports = SteeringService;

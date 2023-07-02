@@ -32,13 +32,13 @@ class IndoorBikeDataCharacteristic extends  bleno.Characteristic {
     debug('[IndoorBikeDataCharacteristic] onSubscribe');
     this.updateValueCallback = updateValueCallback;
     return this.RESULT_SUCCESS;
-  };
+  }
 
   onUnsubscribe() {
     debug('[IndoorBikeDataCharacteristic] onUnsubscribe');
     this.updateValueCallback = null;
     return this.RESULT_UNLIKELY_ERROR;
-  };
+  }
 
   notify(event) {
     debug('[IndoorBikeDataCharacteristic] notify');
@@ -93,6 +93,6 @@ class IndoorBikeDataCharacteristic extends  bleno.Characteristic {
 
     return this.RESULT_SUCCESS;
   }
-};
+}
 
 module.exports = IndoorBikeDataCharacteristic;

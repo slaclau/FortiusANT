@@ -20,7 +20,7 @@ class HeartRateService extends bleno.PrimaryService {
   notify(event) {
     this.hrmc.notify(event);
     return this.RESULT_SUCCESS;
-  };
+  }
 }
 
 module.exports = HeartRateService;

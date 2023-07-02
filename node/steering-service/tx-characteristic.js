@@ -27,13 +27,13 @@ class TxCharacteristic extends bleno.Characteristic {
     trace('[TxCharacteristic] onSubscribe');
     this.indicate = updateValueCallback;
     return this.RESULT_SUCCESS;
-  };
+  }
 
   onUnsubscribe() {
     trace('[TxCharacteristic] onUnsubscribe');
     this.indicate = null;
     return this.RESULT_UNLIKELY_ERROR;
-  };
+  }
 }
 
 module.exports = TxCharacteristic;

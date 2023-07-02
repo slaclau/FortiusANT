@@ -27,13 +27,13 @@ class UnknownCharacteristic3 extends  bleno.Characteristic {
     trace('[UnknownCharacteristic3] onSubscribe');
     this.updateValueCallback = updateValueCallback;
     return this.RESULT_SUCCESS;
-  };
+  }
 
   onUnsubscribe() {
     trace('[UnknownCharacteristic3] onUnsubscribe');
     this.updateValueCallback = null;
     return this.RESULT_UNLIKELY_ERROR;
-  };
+  }
 }
 
 module.exports = UnknownCharacteristic3;
