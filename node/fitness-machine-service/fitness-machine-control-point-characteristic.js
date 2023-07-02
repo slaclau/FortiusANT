@@ -53,13 +53,13 @@ class FitnessMachineControlPointCharacteristic extends  bleno.Characteristic {
     debug('[FitnessMachineControlPointCharacteristic] onSubscribe');
     this.indicate = updateValueCallback;
     return this.RESULT_SUCCESS;
-  };
+  }
 
   onUnsubscribe() {
     debug('[FitnessMachineControlPointCharacteristic] onUnsubscribe');
     this.indicate = null;
     return this.RESULT_UNLIKELY_ERROR;
-  };
+  }
 
   onIndicate() {
     debug('[FitnessMachineControlPointCharacteristic] onIndicate');
@@ -216,6 +216,6 @@ class FitnessMachineControlPointCharacteristic extends  bleno.Characteristic {
 
     this.indicate(response);
   }
-};
+}
 
 module.exports = FitnessMachineControlPointCharacteristic;

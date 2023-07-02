@@ -23,13 +23,13 @@ class SteeringCharacteristic extends bleno.Characteristic {
     debug('[SteeringCharacteristic] onSubscribe');
     this.updateValueCallback = updateValueCallback;
     return this.RESULT_SUCCESS;
-  };
+  }
 
   onUnsubscribe() {
     debug('[SteeringCharacteristic] onUnsubscribe');
     this.updateValueCallback = null;
     return this.RESULT_UNLIKELY_ERROR;
-  };
+  }
 
   notify(event) {
     debug('[SteeringCharacteristic] notify');
@@ -47,6 +47,6 @@ class SteeringCharacteristic extends bleno.Characteristic {
 
     return this.RESULT_SUCCESS;
   }
-};
+}
 
 module.exports = SteeringCharacteristic;

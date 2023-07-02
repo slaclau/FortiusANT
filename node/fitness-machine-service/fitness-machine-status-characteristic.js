@@ -30,13 +30,13 @@ class FitnessMachineStatusCharacteristic extends  bleno.Characteristic {
     debug('[FitnessMachineStatusCharacteristic] onSubscribe');
     this.updateValueCallback = updateValueCallback;
     return this.RESULT_SUCCESS;
-  };
+  }
 
   onUnsubscribe() {
     debug('[FitnessMachineStatusCharacteristic] onUnsubscribe');
     this.updateValueCallback = null;
     return this.RESULT_UNLIKELY_ERROR;
-  };
+  }
 
   notifyReset() {
     debug('[FitnessMachineStatusCharacteristic] notifyReset');
@@ -91,6 +91,6 @@ class FitnessMachineStatusCharacteristic extends  bleno.Characteristic {
     }
     return this.RESULT_SUCCESS;
   }
-};
+}
 
 module.exports = FitnessMachineStatusCharacteristic;

@@ -31,13 +31,13 @@ class HeartRateMeasurementCharacteristic extends  bleno.Characteristic {
     debug('[HeartRateMeasurementCharacteristic] onSubscribe');
     this.updateValueCallback = updateValueCallback;
     return this.RESULT_SUCCESS;
-  };
+  }
 
   onUnsubscribe() {
     debug('[HeartRateMeasurementCharacteristic] onUnsubscribe');
     this.updateValueCallback = null;
     return this.RESULT_UNLIKELY_ERROR;
-  };
+  }
 
   notify(event) {
     debug('[HeartRateMeasurementCharacteristic] notify');
@@ -56,6 +56,6 @@ class HeartRateMeasurementCharacteristic extends  bleno.Characteristic {
 
     return this.RESULT_SUCCESS;
   }
-};
+}
 
 module.exports = HeartRateMeasurementCharacteristic;

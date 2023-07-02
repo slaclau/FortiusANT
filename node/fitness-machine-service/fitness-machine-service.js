@@ -39,7 +39,7 @@ class FitnessMachineService extends bleno.PrimaryService {
     debug('[FitnessMachineService] notify')
     this.ibdc.notify(event);
     return this.RESULT_SUCCESS;
-  };
+  }
 }
 
 module.exports = FitnessMachineService;
