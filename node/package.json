@@ -12,7 +12,7 @@
   },
   "license": "ISC",
   "dependencies": {
-    "@abandonware/bleno": "^0.5.1-2",
+    "@abandonware/bleno": "^0.6.0",
     "bleno": "abandonware/bleno",
     "express": "^4.17.1"
   }
